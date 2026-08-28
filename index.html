@@ -129,9 +129,9 @@
         <summary>Proxy settings (for GitHub Pages hosting)</summary>
         <div style="margin-top:8px;">
           <label for="proxyUrl">CORS Proxy URL</label>
-          <input type="text" id="proxyUrl" placeholder="https://gmi-music-proxy.<your-sub>.workers.dev" />
+          <input type="text" id="proxyUrl" placeholder="https://gmi-music-proxy.minimax-bf7.workers.dev" />
           <div class="sub" style="margin-top:4px;">
-            Leave blank for local proxy (<code>localhost:8765</code>). Set to your Cloudflare Worker URL for GitHub Pages.
+            Pre-configured for GitHub Pages. Only change if you deploy your own Worker.
           </div>
         </div>
       </details>
@@ -216,10 +216,10 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
-  // Proxy endpoint — set to your Cloudflare Worker URL for GitHub Pages,
-  // or leave as "/requests" for local proxy (gmi_proxy.py on port 8765).
-  // Example: "https://gmi-music-proxy.<your-subdomain>.workers.dev"
-  const GMI_ENDPOINT = localStorage.getItem("gmi_proxy_url") || "/requests";
+  // Proxy endpoint — Cloudflare Worker URL for GitHub Pages,
+  // or "/requests" for local proxy (gmi_proxy.py on port 8765).
+  const DEFAULT_PROXY = "https://gmi-music-proxy.minimax-bf7.workers.dev";
+  const GMI_ENDPOINT = localStorage.getItem("gmi_proxy_url") || DEFAULT_PROXY;
   const POLL_INTERVAL = 4000; // ms
   const POLL_TIMEOUT = 180000; // 3 min
 
