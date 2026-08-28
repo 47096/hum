@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MiniMax Music 3.0 · GMI Cloud</title>
+<style>
+  :root {
+    --bg: #0b0b10;
+    --panel: #15151c;
+    --border: #2a2a35;
+    --fg: #e8e8ee;
+    --muted: #8a8a99;
+    --accent: #ff5e8a;
+    --accent-2: #ffb86b;
+    --ok: #5ee3a0;
+    --err: #ff6b6b;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 24px 80px; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+  .logo {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center;
+    font-weight: 800; font-size: 18px; color: #1a0a14;
+  }
+  h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .grid { display: grid; gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  label {
+    display: block; font-size: 12px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+    margin-bottom: 6px; font-weight: 600;
+  }
+  input[type="text"], input[type="password"], textarea, select {
+    width: 100%; background: #0e0e14; border: 1px solid var(--border);
+    color: var(--fg); padding: 10px 12px; border-radius: 8px;
+    font: inherit; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    transition: border-color .15s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 100px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .actions { display: flex; gap: 10px; align-items: center; margin-top: 18px; }
+  button {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #1a0a14; border: 0; padding: 12px 22px; border-radius: 10px;
+    font-weight: 700; font-size: 14px; cursor: pointer;
+    transition: transform .08s, box-shadow .15s, opacity .15s;
+    box-shadow: 0 4px 14px rgba(255, 94, 138, 0.25);
+  }
+  button:hover:not(:disabled) { transform: translateY(-1px); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+  button.ghost {
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--border); box-shadow: none;
+    padding: 10px 14px; font-weight: 500;
+  }
+  button.ghost:hover { color: var(--fg); border-color: var(--fg); }
+  .status { margin-left: auto; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.ok { background: var(--ok); }
+  .dot.err { background: var(--err); }
+  .dot.work { background: var(--accent-2); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: 0.3; } }
+  .player { margin-top: 16px; padding: 16px; background: #0e0e14; border: 1px solid var(--border); border-radius: 10px; }
+  audio { width: 100%; }
+  .meta { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip {
+    background: #0e0e14; border: 1px solid var(--border); border-radius: 999px;
+    padding: 4px 10px; font-size: 12px; color: var(--muted);
+    cursor: pointer; transition: all .12s; text-decoration: none;
+    display: inline-block;
+  }
+  .chip:hover { color: var(--fg); border-color: var(--accent); }
+  .lyrics-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .lyrics-tag { color: var(--accent); font-size: 12px; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 6px 0; user-select: none; }
+  details summary:hover { color: var(--fg); }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 10px 18px; border-radius: 10px; font-size: 13px;
+    opacity: 0; pointer-events: none; transition: all .25s; z-index: 10;
+    max-width: 90vw; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.err { border-color: var(--err); color: var(--err); }
+  .toast.ok { border-color: var(--ok); color: var(--ok); }
+  .endpoint-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    background: #0e0e14; border: 1px solid var(--border);
+    font-family: ui-monospace, monospace; font-size: 11px;
+    color: var(--muted); margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">M3</div>
+    <div>
+      <h1>MiniMax Music 3.0<span class="endpoint-badge">GMI Cloud · free 14d</span></h1>
+      <div class="sub">prompt + lyrics → MP3 · powered by GMI Inference Engine</div>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <div class="card">
+      <label for="apiKey">GMI Cloud API key</label>
+      <input type="password" id="apiKey" placeholder="paste key, stored only in this browser" autocomplete="off" />
+      <div class="sub" style="margin-top:6px;">
+        Get one at <code>console.gmicloud.ai → API Keys</code>. Free during the campaign (ends Sep 6, 2026).
+      </div>
+      <details style="margin-top:10px;">
+        <summary>Proxy settings (for GitHub Pages hosting)</summary>
+        <div style="margin-top:8px;">
+          <label for="proxyUrl">CORS Proxy URL</label>
+          <input type="text" id="proxyUrl" placeholder="https://gmi-music-proxy.<your-sub>.workers.dev" />
+          <div class="sub" style="margin-top:4px;">
+            Leave blank for local proxy (<code>localhost:8765</code>). Set to your Cloudflare Worker URL for GitHub Pages.
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="card">
+      <label for="prompt">Style / vibe prompt <span style="color:var(--muted); text-transform:none;">(genre, mood, instruments — optional)</span></label>
+      <input type="text" id="prompt" placeholder="Cheerful children's song, ukulele, clapping, bright, preschool" />
+      <div class="examples" id="promptChips"></div>
+
+      <div style="margin-top:14px;">
+        <label for="lyrics">Lyrics <span style="color:var(--muted); text-transform:none;">(required by GMI: 1–3500 chars, with [verse]/[chorus] tags)</span></label>
+        <textarea id="lyrics" rows="10"></textarea>
+        <div class="lyrics-tags">
+          <span class="lyrics-tag">[intro]</span>
+          <span class="lyrics-tag">[verse]</span>
+          <span class="lyrics-tag">[pre chorus]</span>
+          <span class="lyrics-tag">[chorus]</span>
+          <span class="lyrics-tag">[bridge]</span>
+          <span class="lyrics-tag">[outro]</span>
+          <span class="lyrics-tag">[inst]</span>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:14px;">
+        <div>
+          <label>Sample rate</label>
+          <select id="sampleRate">
+            <option value="44100" selected>44100 Hz (CD quality)</option>
+            <option value="32000">32000 Hz (radio quality)</option>
+            <option value="24000">24000 Hz (decent)</option>
+            <option value="16000">16000 Hz (phone call)</option>
+          </select>
+        </div>
+        <div>
+          <label>Bitrate</label>
+          <select id="bitrate">
+            <option value="256000" selected>256 kbps (high quality)</option>
+            <option value="128000">128 kbps (standard)</option>
+            <option value="64000">64 kbps (low quality)</option>
+          </select>
+        </div>
+        <div>
+          <label>Format</label>
+          <select id="format">
+            <option value="mp3" selected>MP3</option>
+            <option value="wav">WAV</option>
+            <option value="pcm">PCM</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="generateBtn">Generate song</button>
+        <button class="ghost" id="sampleBtn">Load sample</button>
+        <div class="status" id="status">
+          <span class="dot"></span>
+          <span id="statusText">Ready</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="playerCard" style="display:none;">
+      <label>Output</label>
+      <div class="player">
+        <audio id="player" controls></audio>
+        <div class="meta" id="meta"></div>
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+          <a id="downloadLink" class="chip" download="song.mp3">⬇ Download MP3</a>
+          <a id="openTab" class="chip" target="_blank">↗ Open in new tab</a>
+          <span class="chip" id="filenameChip" style="cursor:default;"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  // Proxy endpoint — set to your Cloudflare Worker URL for GitHub Pages,
+  // or leave as "/requests" for local proxy (gmi_proxy.py on port 8765).
+  // Example: "https://gmi-music-proxy.<your-subdomain>.workers.dev"
+  const GMI_ENDPOINT = localStorage.getItem("gmi_proxy_url") || "/requests";
+  const POLL_INTERVAL = 4000; // ms
+  const POLL_TIMEOUT = 180000; // 3 min
+
+  // Persist API key
+  const apiKeyEl = $("apiKey");
+  apiKeyEl.value = localStorage.getItem("gmi_api_key") || "";
+  apiKeyEl.addEventListener("change", () => {
+    localStorage.setItem("gmi_api_key", apiKeyEl.value);
+    toast("Key saved to this browser only", "ok");
+  });
+
+  // Persist proxy URL
+  const proxyUrlEl = $("proxyUrl");
+  proxyUrlEl.value = localStorage.getItem("gmi_proxy_url") || "";
+  proxyUrlEl.addEventListener("change", () => {
+    localStorage.setItem("gmi_proxy_url", proxyUrlEl.value.replace(/\/+$/, ""));
+    toast("Proxy URL saved", "ok");
+  });
+
+  // Style prompt chips (categorised)
+  const samplePrompts = {
+    "Kids 👶": [
+      "Cheerful children's song, ukulele, clapping, bright, preschool singalong",
+      "Silly goofy kids song, bouncy, kazoo, laughing, cartoon energy",
+      "Gentle bedtime lullaby, soft piano, warm, sleepy, music box",
+      "Kids adventure song, playful, marching drums, exploring the jungle",
+      "Children's robot dance song, electronic bleeps, fun, energetic, 8-bit",
+    ],
+    "Adults 🎵": [
+      "Smooth R&B, warm male vocals, romantic, late night, soft keys",
+      "Acoustic ballad, emotional, nostalgic, gentle guitar, heartfelt",
+      "Lo-fi chill hop, dreamy, rainy day, mellow, vinyl crackle",
+      "Soulful jazz, smoky bar, saxophone, intimate, slow tempo",
+      "Indie folk, campfire, storytelling, fingerpicked guitar, warm",
+    ],
+    "K-pop 🇰🇷": [
+      "K-pop dance, bright female vocal, catchy hook, synth pop, energetic, 120bpm",
+      "K-pop ballad, emotional, piano and strings, powerful vocals, cinematic",
+      "K-pop hip-hop, rap verse, hard-hitting beat, confident, club banger",
+      "K-pop cute concept, bubblegum pop, aegyo, playful, high-pitched vocal",
+      "K-pop R&B, smooth, groovy, falsetto, late night vibes, minimalist",
+    ],
+    "粵語流行 🇭🇰": [
+      "粵語流行曲, 90年代經典, 深情, 鋼琴弦樂, 慢歌, 懷舊",
+      "粵語快歌, 歡樂, 派對, 輕快節奏, 大合唱, 演唱會氣氛",
+      "粵語情歌, 抒情, 結他伴奏, 溫柔男聲, 浪漫, 深夜電台",
+      "粵語搖滾, 激情, 電結他, 熱血, 搖滾演唱會, 大聲吶喊",
+      "粵語小清新, 文青, 木結他, 乾淨女聲, 簡單, 陽光午後",
+    ],
+  };
+  const chipsEl = $("promptChips");
+  Object.entries(samplePrompts).forEach(([label, prompts]) => {
+    const group = document.createElement("div");
+    group.style.cssText = "margin-bottom:6px;";
+    const title = document.createElement("span");
+    title.textContent = label + " ";
+    title.style.cssText = "font-size:11px;color:var(--accent);margin-right:4px;";
+    group.appendChild(title);
+    prompts.forEach(p => {
+      const c = document.createElement("span");
+      c.className = "chip";
+      c.textContent = p.split(",")[0];
+      c.title = p;
+      c.addEventListener("click", () => $("prompt").value = p);
+      group.appendChild(c);
+    });
+    chipsEl.appendChild(group);
+  });
+
+  // Sample lyrics (Daniel, 5yo)
+  const sampleLyrics = `[verse]
+Daniel Daniel clap your hands
+Clap them loud and clap them soft
+Daniel Daniel stomp your feet
+Stomp them big and stomp them small
+
+[chorus]
+Daniel is five and oh so bright
+Smiling sunshine every day
+La la la la la la la
+Daniel loves to sing and play
+
+[verse]
+Daniel Daniel jump up high
+Touch the sky and wiggle down
+Daniel Daniel spin around
+Round and round and sit back down
+
+[chorus]
+Daniel is five and oh so bright
+Smiling sunshine every day
+La la la la la la la
+Daniel loves to sing and play
+
+[outro]
+La la la la la`;
+
+  $("sampleBtn").addEventListener("click", () => {
+    $("prompt").value = "Cheerful children's song, ukulele, clapping, bright, preschool singalong";
+    $("lyrics").value = sampleLyrics;
+  });
+
+  // Status
+  const setStatus = (text, kind) => {
+    $("statusText").textContent = text;
+    const dot = $("status").querySelector(".dot");
+    dot.className = "dot" + (kind ? " " + kind : "");
+  };
+
+  // Toast
+  const toastEl = $("toast");
+  let toastTimer;
+  const toast = (msg, kind) => {
+    toastEl.textContent = msg;
+    toastEl.className = "toast show" + (kind ? " " + kind : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.className = "toast", 3500);
+  };
+
+  // Sleep
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  // Submit
+  async function submitRequest(payload) {
+    const key = apiKeyEl.value.trim();
+    const resp = await fetch(GMI_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + key,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) {
+      const t = await resp.text();
+      throw new Error("Submit HTTP " + resp.status + ": " + t);
+    }
+    return resp.json();
+  }
+
+  // Poll
+  async function pollRequest(requestId) {
+    const key = apiKeyEl.value.trim();
+    const url = GMI_ENDPOINT + "/" + requestId;
+    const t0 = Date.now();
+    while (Date.now() - t0 < POLL_TIMEOUT) {
+      const r = await fetch(url, {
+        headers: { "Authorization": "Bearer " + key }
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        throw new Error("Poll HTTP " + r.status + ": " + t);
+      }
+      const j = await r.json();
+      const status = j.status;
+      if (status === "success") {
+        return j;
+      }
+      if (status === "failed") {
+        throw new Error("Generation failed: " + JSON.stringify(j));
+      }
+      setStatus(`Composing… (${Math.round((Date.now() - t0) / 1000)}s)`, "work");
+      await sleep(POLL_INTERVAL);
+    }
+    throw new Error("Timed out after 3 minutes");
+  }
+
+  // Main generate
+  $("generateBtn").addEventListener("click", async () => {
+    const key = apiKeyEl.value.trim();
+    if (!key) { toast("Paste your GMI API key first", "err"); apiKeyEl.focus(); return; }
+
+    const prompt = $("prompt").value.trim();
+    const lyrics = $("lyrics").value.trim();
+    if (!lyrics) { toast("Lyrics required by GMI (1–3500 chars)", "err"); $("lyrics").focus(); return; }
+    if (lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length + " / 3500 chars", "err"); return; }
+
+    const payload = {
+      model: "minimax-music-3.0",
+      payload: {
+        lyrics,
+        prompt,
+        sample_rate: parseInt($("sampleRate").value),
+        bitrate: parseInt($("bitrate").value),
+        format: $("format").value
+      }
+    };
+    if (!prompt) delete payload.payload.prompt; // optional
+
+    const btn = $("generateBtn");
+    btn.disabled = true;
+    setStatus("Submitting…", "work");
+
+    try {
+      const submitResult = await submitRequest(payload);
+      const requestId = submitResult.request_id;
+      if (!requestId) throw new Error("No request_id in submit response: " + JSON.stringify(submitResult));
+
+      setStatus("Composing…", "work");
+      const final = await pollRequest(requestId);
+
+      const audioUrl = final.outcome?.audio_url || final.outcome?.media_urls?.[0]?.url;
+      if (!audioUrl) throw new Error("No audio URL in result: " + JSON.stringify(final));
+
+      const player = $("player");
+      player.src = audioUrl;
+      $("playerCard").style.display = "block";
+      player.play().catch(() => {});
+
+      const filename = `daniel-song-${Date.now()}.${$("format").value}`;
+      const dl = $("downloadLink");
+      dl.href = audioUrl;
+      dl.download = filename;
+      $("openTab").href = audioUrl;
+      $("filenameChip").textContent = filename;
+
+      const dur = (final.outcome?.duration_ms || 0) / 1000;
+      const meta = [
+        `⏱ ${dur.toFixed(1)}s`,
+        `${final.outcome?.sample_rate || 0} Hz`,
+        `${final.outcome?.channels || 0} ch`,
+        `${(final.outcome?.bitrate || 0) / 1000 | 0} kbps`,
+        final.outcome?.format || "mp3"
+      ].join(" · ");
+      $("meta").textContent = meta;
+
+      setStatus("Done", "ok");
+      toast("Song ready — playing now", "ok");
+    } catch (err) {
+      console.error(err);
+      setStatus("Error", "err");
+      toast(err.message || String(err), "err");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
