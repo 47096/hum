@@ -85,7 +85,7 @@
     display: inline-block;
   }
   .chip:hover { color: var(--fg); border-color: var(--accent); }
-  #styleTabs .chip { padding: 5px 12px; font-size: 12px; }
+  #styleTabs .chip { padding: 4px 10px; font-size: 11px; }
   .lyrics-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
   .lyrics-tag { color: var(--accent); font-size: 12px; }
   details summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 6px 0; user-select: none; }
@@ -244,45 +244,110 @@
 
   // Style prompt chips (categorised)
   const samplePrompts = {
-    "Kids 👶": [
-      "Cheerful children's song, ukulele, clapping, bright, preschool singalong",
-      "Silly goofy kids song, bouncy, kazoo, laughing, cartoon energy",
-      "Gentle bedtime lullaby, soft piano, warm, sleepy, music box",
-      "Kids adventure song, playful, marching drums, exploring the jungle",
-      "Children's robot dance song, electronic bleeps, fun, energetic, 8-bit",
-      "ABC learning song, catchy, educational, xylophone, happy, toddler",
-      "Animal sounds song, farm animals, bouncy, fun, call and response",
-      "Rainbow song, colorful, magical, sparkly, dreamy, preschool",
+    "Pop": [
+      "Dance pop, upbeat, catchy hook, synth, energetic",
+      "Electropop, electronic beats, auto-tune, futuristic",
+      "Indie pop, dreamy, jangly guitar, lo-fi",
+      "Teen pop, bubblegum, fun, youthful",
+      "Synthpop, 80s retro, analog synths, nostalgic",
     ],
-    "Cantonese 🇭🇰": [
-      "粵語流行曲, 90年代經典, 深情, 鋼琴弦樂, 慢歌, 懷舊",
-      "粵語快歌, 歡樂, 派對, 輕快節奏, 大合唱, 演唱會氣氛",
-      "粵語情歌, 抒情, 結他伴奏, 溫柔男聲, 浪漫, 深夜電台",
-      "粵語搖滾, 激情, 電結他, 熱血, 搖滾演唱會, 大聲吶喊",
-      "粵語小清新, 文青, 木結他, 乾淨女聲, 簡單, 陽光午後",
-      "粵語R&B, 低音, 輕柔, 現代感, 深夜, 性感",
-      "粵語民謠, 故事性, 木結他, 溫暖, 簡單, 真摯",
-      "粵語電子, 合成器, 動感, 夜店, 節奏強, 未來感",
+    "R&B / Soul": [
+      "Smooth R&B, slow jam, romantic, soft keys",
+      "Neo-soul, groovy, live instruments, warm",
+      "Contemporary R&B, pop crossover, polished",
+      "Classic soul, Motown, brass, gospel roots",
+      "Alternative R&B, dark, moody, atmospheric",
     ],
-    "English 🇬🇧": [
-      "Pop ballad, emotional, piano, powerful vocals, cinematic, uplifting",
-      "Smooth R&B, warm vocals, romantic, late night, soft keys, groovy",
-      "Acoustic folk, gentle, fingerpicked guitar, storytelling, campfire",
-      "Lo-fi chill hop, dreamy, rainy day, mellow, vinyl crackle, study",
-      "Indie rock, energetic, electric guitar, driving beat, anthemic",
-      "Country, acoustic guitar, storytelling, warm, heartfelt, southern",
-      "Reggae, laid-back, offbeat guitar, sunny, island vibes, chill",
-      "Blues, soulful, electric guitar, smoky, emotional, raw",
+    "Hip-hop / Rap": [
+      "Boom bap, old school, sampling, lyrical",
+      "Trap, 808 bass, hi-hats, hard-hitting",
+      "Lo-fi hip-hop, chill, study beats, mellow",
+      "Drill, dark, aggressive, UK or US style",
+      "Conscious rap, storytelling, message-driven",
     ],
-    "Common 🎵": [
-      "Jazz, saxophone, smoky bar, intimate, slow tempo, improvised",
-      "Soul, powerful vocals, emotional, groovy, horn section, Motown",
-      "Hip-hop, hard-hitting beat, confident, rap verse, urban, energetic",
-      "Electronic, synth-driven, danceable, club, 128bpm, euphoric",
-      "Classical, orchestral, cinematic, sweeping strings, dramatic, epic",
-      "Funk, groovy, bass-heavy, rhythmic, danceable, retro, 70s",
-      "Metal, heavy guitar, aggressive, fast tempo, intense, powerful",
-      "Ambient, atmospheric, ethereal, spacey, calm, minimal, floating",
+    "Rock": [
+      "Classic rock, guitar riffs, arena, anthemic",
+      "Indie rock, DIY, guitar-driven, raw",
+      "Punk rock, fast, loud, rebellious",
+      "Alternative rock, 90s, grunge influence",
+      "Soft rock, mellow, acoustic guitar, easy listening",
+    ],
+    "Electronic / EDM": [
+      "House, four-on-the-floor, dance, club",
+      "Techno, repetitive, industrial, dark",
+      "Trance, euphoric, build-up, uplifting",
+      "Dubstep, heavy bass, wobble, drops",
+      "Ambient, atmospheric, chill, no beats",
+    ],
+    "Jazz": [
+      "Smooth jazz, saxophone, easy listening",
+      "Bebop, fast, complex, improvisation",
+      "Swing, big band, dancing, 1930s-40s",
+      "Jazz fusion, rock+jazz, electric, groovy",
+      "Vocal jazz, crooner, piano bar, intimate",
+    ],
+    "Classical": [
+      "Orchestral symphony, full orchestra, grand",
+      "Piano sonata, solo piano, elegant",
+      "Chamber music, small ensemble, intimate",
+      "Opera, dramatic, vocal, powerful",
+      "Contemporary classical, minimalist, modern",
+    ],
+    "Country": [
+      "Classic country, twang, storytelling, pedal steel",
+      "Country pop, crossover, polished, radio-friendly",
+      "Outlaw country, rough, rebellious, whiskey",
+      "Bluegrass, banjo, fiddle, fast picking",
+      "Country rock, electric guitar, southern, driving",
+    ],
+    "Folk / Acoustic": [
+      "Singer-songwriter, acoustic guitar, personal, intimate",
+      "Indie folk, fingerpicked, warm, nature",
+      "Celtic folk, fiddle, tin whistle, Irish",
+      "Americana, roots, storytelling, dusty road",
+      "Contemporary folk, modern production, heartfelt",
+    ],
+    "Reggae": [
+      "Roots reggae, classic, one-drop rhythm, spiritual",
+      "Dancehall, fast, DJ, party",
+      "Dub, echo, reverb, bass-heavy, stripped back",
+      "Lovers rock, romantic, smooth, warm",
+      "Reggae fusion, pop crossover, modern",
+    ],
+    "Latin": [
+      "Reggaeton, dembow beat, urban, party",
+      "Salsa, brass, percussion, dance",
+      "Bachata, romantic, guitar, Dominican",
+      "Latin pop, catchy, crossover, mainstream",
+      "Cumbia, Colombian, accordion, tropical",
+    ],
+    "K-pop": [
+      "Dance pop, bright, catchy hook, energetic",
+      "K-pop ballad, emotional, piano, strings",
+      "K-pop hip-hop, rap, hard-hitting, confident",
+      "Cute concept, bubblegum, aegyo, playful",
+      "K-pop R&B, smooth, groovy, falsetto",
+    ],
+    "Cantopop 🇭🇰": [
+      "90s classic, 深情, 鋼琴弦樂, 懷舊",
+      "快歌, 歡樂, 派對, 輕快節奏",
+      "情歌, 抒情, 結他伴奏, 浪漫",
+      "搖滾, 激情, 電結他, 熱血",
+      "小清新, 文青, 木結他, 簡單",
+    ],
+    "Mandopop 🇹🇼": [
+      "華語情歌, 抒情, 鋼琴, 深情",
+      "華語舞曲, 輕快, 流行, 節奏感",
+      "中國風, 古箏, 琵琶, 古典融合",
+      "華語搖滾, 激情, 電結他, 熱血",
+      "華語民謠, 木結他, 簡單, 文青",
+    ],
+    "Metal": [
+      "Heavy metal, powerful riffs, fast drums",
+      "Death metal, growling, blast beats, dark",
+      "Power metal, epic, symphonic, fantasy",
+      "Progressive metal, complex, long songs, technical",
+      "Metalcore, breakdowns, screaming + clean vocals",
     ],
   };
   const chipsEl = $("promptChips");
