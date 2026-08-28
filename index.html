@@ -85,6 +85,7 @@
     display: inline-block;
   }
   .chip:hover { color: var(--fg); border-color: var(--accent); }
+  #styleTabs .chip { padding: 5px 12px; font-size: 12px; }
   .lyrics-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
   .lyrics-tag { color: var(--accent); font-size: 12px; }
   details summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 6px 0; user-select: none; }
@@ -141,6 +142,7 @@
     <div class="card">
       <label for="prompt">Style / vibe prompt <span style="color:var(--muted); text-transform:none;">(genre, mood, instruments — optional)</span></label>
       <input type="text" id="prompt" placeholder="Cheerful children's song, ukulele, clapping, bright, preschool" />
+      <div id="styleTabs" style="display:flex;gap:6px;margin-top:10px;margin-bottom:8px;flex-wrap:wrap;"></div>
       <div class="examples" id="promptChips"></div>
 
       <div style="margin-top:14px;">
@@ -284,26 +286,44 @@
     ],
   };
   const chipsEl = $("promptChips");
-  Object.entries(samplePrompts).forEach(([label, prompts]) => {
-    const group = document.createElement("div");
-    group.style.cssText = "margin-bottom:8px;";
-    const title = document.createElement("div");
-    title.textContent = label;
-    title.style.cssText = "font-size:11px;font-weight:600;color:var(--accent);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;";
-    group.appendChild(title);
-    const chipsWrap = document.createElement("div");
-    chipsWrap.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;";
+  const tabsEl = $("styleTabs");
+  let activeTab = null;
+
+  function renderChips(category) {
+    chipsEl.innerHTML = "";
+    const prompts = samplePrompts[category];
+    if (!prompts) return;
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "display:flex;flex-wrap:wrap;gap:5px;";
     prompts.forEach(p => {
       const c = document.createElement("span");
       c.className = "chip";
       c.textContent = p.split(",")[0];
       c.title = p;
       c.addEventListener("click", () => $("prompt").value = p);
-      chipsWrap.appendChild(c);
+      wrap.appendChild(c);
     });
-    group.appendChild(chipsWrap);
-    chipsEl.appendChild(group);
+    chipsEl.appendChild(wrap);
+  }
+
+  Object.keys(samplePrompts).forEach((label, i) => {
+    const btn = document.createElement("span");
+    btn.className = "chip";
+    btn.textContent = label;
+    btn.style.cssText = "cursor:pointer;font-weight:600;";
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#styleTabs .chip").forEach(el => el.style.borderColor = "");
+      btn.style.borderColor = "var(--accent)";
+      activeTab = label;
+      renderChips(label);
+    });
+    tabsEl.appendChild(btn);
+    if (i === 0) {
+      btn.style.borderColor = "var(--accent)";
+      activeTab = label;
+    }
   });
+  renderChips(Object.keys(samplePrompts)[0]);
 
   // Sample lyrics (Daniel, 5yo)
   const sampleLyrics = `[verse]
