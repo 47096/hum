@@ -3,3 +3,4 @@ songs/
 node_modules/
 screenshot.png
 .Rhistory
+.gstack/

@@ -25,6 +25,10 @@ export default {
     if (pathname === "/" || pathname === "") {
       pathname = "/requests";
     }
+    // Handle /{requestId} -> /requests/{requestId}
+    else if (!pathname.startsWith("/requests")) {
+      pathname = "/requests" + pathname;
+    }
     if (!pathname.startsWith("/requests")) {
       return new Response("Not found", { status: 404, headers: CORS });
     }
