@@ -247,45 +247,60 @@
       "Gentle bedtime lullaby, soft piano, warm, sleepy, music box",
       "Kids adventure song, playful, marching drums, exploring the jungle",
       "Children's robot dance song, electronic bleeps, fun, energetic, 8-bit",
+      "ABC learning song, catchy, educational, xylophone, happy, toddler",
+      "Animal sounds song, farm animals, bouncy, fun, call and response",
+      "Rainbow song, colorful, magical, sparkly, dreamy, preschool",
     ],
-    "Adults 🎵": [
-      "Smooth R&B, warm male vocals, romantic, late night, soft keys",
-      "Acoustic ballad, emotional, nostalgic, gentle guitar, heartfelt",
-      "Lo-fi chill hop, dreamy, rainy day, mellow, vinyl crackle",
-      "Soulful jazz, smoky bar, saxophone, intimate, slow tempo",
-      "Indie folk, campfire, storytelling, fingerpicked guitar, warm",
-    ],
-    "K-pop 🇰🇷": [
-      "K-pop dance, bright female vocal, catchy hook, synth pop, energetic, 120bpm",
-      "K-pop ballad, emotional, piano and strings, powerful vocals, cinematic",
-      "K-pop hip-hop, rap verse, hard-hitting beat, confident, club banger",
-      "K-pop cute concept, bubblegum pop, aegyo, playful, high-pitched vocal",
-      "K-pop R&B, smooth, groovy, falsetto, late night vibes, minimalist",
-    ],
-    "粵語流行 🇭🇰": [
+    "Cantonese 🇭🇰": [
       "粵語流行曲, 90年代經典, 深情, 鋼琴弦樂, 慢歌, 懷舊",
       "粵語快歌, 歡樂, 派對, 輕快節奏, 大合唱, 演唱會氣氛",
       "粵語情歌, 抒情, 結他伴奏, 溫柔男聲, 浪漫, 深夜電台",
       "粵語搖滾, 激情, 電結他, 熱血, 搖滾演唱會, 大聲吶喊",
       "粵語小清新, 文青, 木結他, 乾淨女聲, 簡單, 陽光午後",
+      "粵語R&B, 低音, 輕柔, 現代感, 深夜, 性感",
+      "粵語民謠, 故事性, 木結他, 溫暖, 簡單, 真摯",
+      "粵語電子, 合成器, 動感, 夜店, 節奏強, 未來感",
+    ],
+    "English 🇬🇧": [
+      "Pop ballad, emotional, piano, powerful vocals, cinematic, uplifting",
+      "Smooth R&B, warm vocals, romantic, late night, soft keys, groovy",
+      "Acoustic folk, gentle, fingerpicked guitar, storytelling, campfire",
+      "Lo-fi chill hop, dreamy, rainy day, mellow, vinyl crackle, study",
+      "Indie rock, energetic, electric guitar, driving beat, anthemic",
+      "Country, acoustic guitar, storytelling, warm, heartfelt, southern",
+      "Reggae, laid-back, offbeat guitar, sunny, island vibes, chill",
+      "Blues, soulful, electric guitar, smoky, emotional, raw",
+    ],
+    "Common 🎵": [
+      "Jazz, saxophone, smoky bar, intimate, slow tempo, improvised",
+      "Soul, powerful vocals, emotional, groovy, horn section, Motown",
+      "Hip-hop, hard-hitting beat, confident, rap verse, urban, energetic",
+      "Electronic, synth-driven, danceable, club, 128bpm, euphoric",
+      "Classical, orchestral, cinematic, sweeping strings, dramatic, epic",
+      "Funk, groovy, bass-heavy, rhythmic, danceable, retro, 70s",
+      "Metal, heavy guitar, aggressive, fast tempo, intense, powerful",
+      "Ambient, atmospheric, ethereal, spacey, calm, minimal, floating",
     ],
   };
   const chipsEl = $("promptChips");
   Object.entries(samplePrompts).forEach(([label, prompts]) => {
     const group = document.createElement("div");
-    group.style.cssText = "margin-bottom:6px;";
-    const title = document.createElement("span");
-    title.textContent = label + " ";
-    title.style.cssText = "font-size:11px;color:var(--accent);margin-right:4px;";
+    group.style.cssText = "margin-bottom:8px;";
+    const title = document.createElement("div");
+    title.textContent = label;
+    title.style.cssText = "font-size:11px;font-weight:600;color:var(--accent);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;";
     group.appendChild(title);
+    const chipsWrap = document.createElement("div");
+    chipsWrap.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;";
     prompts.forEach(p => {
       const c = document.createElement("span");
       c.className = "chip";
       c.textContent = p.split(",")[0];
       c.title = p;
       c.addEventListener("click", () => $("prompt").value = p);
-      group.appendChild(c);
+      chipsWrap.appendChild(c);
     });
+    group.appendChild(chipsWrap);
     chipsEl.appendChild(group);
   });
 
