@@ -1,8 +1,8 @@
-/**
- * Cloudflare Worker — CORS proxy for GMI Cloud MiniMax Music API.
- * Deploy: cd worker && npx wrangler deploy
- */
+# Cloudflare Worker Code
 
+Copy this code into your Cloudflare Worker editor and deploy.
+
+```javascript
 const GMI_BASE = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey";
 
 const CORS = {
@@ -62,3 +62,4 @@ export default {
     }
   },
 };
+```
