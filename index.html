@@ -147,6 +147,7 @@
 
       <div style="margin-top:14px;">
         <label for="lyrics">Lyrics <span style="color:var(--muted); text-transform:none;">(required by GMI: 1–3500 chars, with [verse]/[chorus] tags)</span></label>
+        <div id="templateChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;"></div>
         <textarea id="lyrics" rows="10"></textarea>
         <div class="lyrics-tags">
           <span class="lyrics-tag">[intro]</span>
@@ -360,6 +361,260 @@
   };
   const chipsEl = $("promptChips");
   const tabsEl = $("styleTabs");
+
+  // Lyrics templates
+  const lyricsTemplates = {
+    "Birthday": {
+      prompt: "Upbeat pop, cheerful, handclaps, bright piano, celebration energy, confetti vibes",
+      lyrics: `[verse]
+It's your birthday, time to celebrate
+Another year, you're looking great
+Blow the candles, make a wish today
+Everybody here to say
+
+[chorus]
+Happy happy birthday to you
+Let's party all night through
+Happy happy birthday, hip hooray
+This is your special day
+
+[verse]
+Cake and presents, friends all around
+Music's playing, hear that sound
+Grab your party hat, let's dance and play
+Celebrate in every way
+
+[chorus]
+Happy happy birthday to you
+Let's party all night through
+Happy happy birthday, hip hooray
+This is your special day
+
+[outro]
+Happy birthday, happy birthday
+Make a wish and let it fly`
+    },
+    "Love ballad": {
+      prompt: "Slow R&B ballad, romantic piano, soft strings, intimate, candlelit atmosphere, heartfelt",
+      lyrics: `[verse]
+I saw you standing in the light
+The world just faded out of sight
+Your eyes held something I could not explain
+A feeling running through my veins
+
+[pre chorus]
+And every moment by your side
+Is where I want to be tonight
+
+[chorus]
+You're the one I've been waiting for
+Every heartbeat says you're worth fighting for
+Hold me close and don't let go
+You're the only love I know
+
+[verse]
+The way you laugh, the way you smile
+Makes every single mile worthwhile
+Your hand in mine, we'll write our story
+A love that lives in all its glory
+
+[pre chorus]
+And every whisper in the dark
+Reminds me you're my missing part
+
+[chorus]
+You're the one I've been waiting for
+Every heartbeat says you're worth fighting for
+Hold me close and don't let go
+You're the only love I know
+
+[bridge]
+Through the storms and through the rain
+I'd do it all again
+Your love is my anchor, my home
+
+[chorus]
+You're the one I've been waiting for
+Every heartbeat says you're worth fighting for
+Hold me close and don't let go
+You're the only love I know
+
+[outro]
+You're the only love I know`
+    },
+    "Hype track": {
+      prompt: "Trap, booming 808 bass, hard-hitting drums, confident energy, festival anthem, crowd chant",
+      lyrics: `[intro]
+Yeah, yeah, let's go
+We're here now, turn it up
+
+[verse]
+Started from the bottom, now we're standing tall
+Built it brick by brick, we never gonna fall
+Eyes on the horizon, fire in my soul
+Every single step is taking back control
+
+[chorus]
+We don't stop, no we never quit
+Rising up, this is just the lit
+Hands up high, feel the energy
+This is who we're meant to be
+
+[verse]
+They said we couldn't, said we wouldn't make it
+Look at us now, there's no way to fake it
+Loud and proud, we own the night
+Every single moment, we ignite
+
+[chorus]
+We don't stop, no we never quit
+Rising up, this is just the lit
+Hands up high, feel the energy
+This is who we're meant to be
+
+[bridge]
+Turn the speakers up, feel the bass drop
+Nothing's gonna make this energy stop
+
+[chorus]
+We don't stop, no we never quit
+Rising up, this is just the lit
+Hands up high, feel the energy
+This is who we're meant to be
+
+[outro]
+We're here now, we made it
+Let's go`
+    },
+    "Lullaby": {
+      prompt: "Gentle lullaby, soft acoustic guitar, music box melody, whispering vocals, warm and soothing, bedtime",
+      lyrics: `[verse]
+Close your eyes, my little one
+The day is done, the stars have come
+The moon is rising, soft and bright
+To watch over you through the night
+
+[chorus]
+Sleep tight, dream deep
+Angels guard you while you sleep
+Sleep tight, don't you cry
+Tomorrow brings a brand new sky
+
+[verse]
+The flowers close, the birds take rest
+The world is settling, peaceful and blessed
+Your teddy's here, right by your side
+In this moment, love won't hide
+
+[chorus]
+Sleep tight, dream deep
+Angels guard you while you sleep
+Sleep tight, don't you cry
+Tomorrow brings a brand new sky
+
+[outro]
+La la la, la la la
+Sleep now, my little star`
+    },
+    "Diss track": {
+      prompt: "Aggressive hip-hop, dark trap beat, menacing bass, confrontational energy, sharp delivery",
+      lyrics: `[verse]
+You talk a lot but say nothing at all
+Built your house of cards, watch it fall
+Claiming you're the best, where's the proof
+Empty words, that's the cold hard truth
+
+[verse]
+You copy everything, no originality
+Hiding behind screens, no reality
+Step into the light, let's see what you got
+All that talk and yet you're still not hot
+
+[chorus]
+Sit down, be humble, know your place
+You're a shadow trying to win the race
+Sit down, be humble, face the facts
+You're a footnote, that's where you at
+
+[verse]
+Your followers are bots, your shine is fake
+Your whole career is a big mistake
+I've been grinding, you've been playing games
+When they write the history, forget your name
+
+[chorus]
+Sit down, be humble, know your place
+You're a shadow trying to win the race
+Sit down, be humble, face the facts
+You're a footnote, that's where you at
+
+[outro]
+That's where you at`
+    },
+    "Story song": {
+      prompt: "Country folk, acoustic guitar, storytelling, warm and nostalgic, road trip vibes, campfire atmosphere",
+      lyrics: `[verse]
+He left that town on a Monday morning
+With a suitcase and a guitar case
+Nothing but a dream and a tank of gas
+And a smile upon his face
+
+[verse]
+He played in bars from dusk till dawn
+Slept in his car, kept pushing on
+Every mile a lesson learned
+Every bridge he crossed, a bridge not burned
+
+[chorus]
+It's a long road home
+But he's never alone
+Every step he takes
+Is a story that he makes
+
+[verse]
+She was singing at a roadside cafe
+Voice like honey, stole his breath away
+He said, I'm heading somewhere, I don't know where
+She said, mind if I come along from there
+
+[chorus]
+It's a long road home
+But they're never alone
+Every step they take
+Is a story that they make
+
+[bridge]
+Years went by, the road got tired
+But the fire in their hearts never expired
+A little house, a porch, two rocking chairs
+Music floating on the evening air
+
+[chorus]
+It's a long road home
+But they're never alone
+Every step they take
+Is a story that they make
+
+[outro]
+And the story's still being written`
+    },
+  };
+
+  // Render template chips
+  const templateChipsEl = $("templateChips");
+  Object.keys(lyricsTemplates).forEach(name => {
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = name;
+    chip.style.cursor = "pointer";
+    chip.addEventListener("click", () => {
+      const t = lyricsTemplates[name];
+      $("lyrics").value = t.lyrics;
+      $("prompt").value = t.prompt;
+      toast("Loaded: " + name, "ok");
+    });
+    templateChipsEl.appendChild(chip);
+  });
   let activeTab = null;
 
   function renderChips(category) {
