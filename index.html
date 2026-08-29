@@ -212,34 +212,6 @@
         </details>
       </div>
 
-      <div class="row" style="margin-top:14px;">
-        <div>
-          <label>Sample rate</label>
-          <select id="sampleRate">
-            <option value="44100" selected>44100 Hz (CD quality)</option>
-            <option value="32000">32000 Hz (radio quality)</option>
-            <option value="24000">24000 Hz (decent)</option>
-            <option value="16000">16000 Hz (phone call)</option>
-          </select>
-        </div>
-        <div>
-          <label>Bitrate</label>
-          <select id="bitrate">
-            <option value="256000" selected>256 kbps (high quality)</option>
-            <option value="128000">128 kbps (standard)</option>
-            <option value="64000">64 kbps (low quality)</option>
-          </select>
-        </div>
-        <div>
-          <label>Format</label>
-          <select id="format">
-            <option value="mp3" selected>MP3</option>
-            <option value="wav">WAV</option>
-            <option value="pcm">PCM</option>
-          </select>
-        </div>
-      </div>
-
       <div class="actions">
         <button id="generateBtn">Generate song</button>
         <button class="ghost" id="sampleBtn">Load sample</button>
@@ -248,22 +220,55 @@
           <span id="statusText">Ready</span>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap;">
-        <label style="margin-bottom:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
-          <span class="toggle" id="remixToggle"><span class="toggle-knob"></span></span>
-          <span style="font-size:13px;color:var(--muted);">Style remix</span>
-        </label>
-        <select id="remixCount" style="width:auto;padding:4px 8px;font-size:12px;display:none;">
-          <option value="2">2 versions</option>
-          <option value="3" selected>3 versions</option>
-        </select>
-        <div style="margin-left:auto;display:flex;gap:6px;">
-          <button class="ghost" id="copySettingsBtn" style="font-size:12px;padding:6px 10px;">Copy settings</button>
-          <button class="ghost" id="pasteSettingsBtn" style="font-size:12px;padding:6px 10px;">Paste settings</button>
-        </div>
-      </div>
       <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
       <div class="queue-info" id="queueInfo"></div>
+
+      <details style="margin-top:16px;">
+        <summary>Advanced settings</summary>
+        <div style="margin-top:12px;">
+          <div class="row">
+            <div>
+              <label>Sample rate</label>
+              <select id="sampleRate">
+                <option value="44100" selected>44100 Hz (CD quality)</option>
+                <option value="32000">32000 Hz (radio quality)</option>
+                <option value="24000">24000 Hz (decent)</option>
+                <option value="16000">16000 Hz (phone call)</option>
+              </select>
+            </div>
+            <div>
+              <label>Bitrate</label>
+              <select id="bitrate">
+                <option value="256000" selected>256 kbps (high quality)</option>
+                <option value="128000">128 kbps (standard)</option>
+                <option value="64000">64 kbps (low quality)</option>
+              </select>
+            </div>
+            <div>
+              <label>Format</label>
+              <select id="format">
+                <option value="mp3" selected>MP3</option>
+                <option value="wav">WAV</option>
+                <option value="pcm">PCM</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap;">
+            <label style="margin-bottom:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <span class="toggle" id="remixToggle"><span class="toggle-knob"></span></span>
+              <span style="font-size:13px;color:var(--muted);">Style remix</span>
+            </label>
+            <select id="remixCount" style="width:auto;padding:4px 8px;font-size:12px;display:none;">
+              <option value="2">2 versions</option>
+              <option value="3" selected>3 versions</option>
+            </select>
+            <div style="margin-left:auto;display:flex;gap:6px;">
+              <button class="ghost" id="copySettingsBtn" style="font-size:12px;padding:6px 10px;">Copy settings</button>
+              <button class="ghost" id="pasteSettingsBtn" style="font-size:12px;padding:6px 10px;">Paste settings</button>
+            </div>
+          </div>
+        </div>
+      </details>
     </div>
 
     <div class="card" id="playerCard" style="display:none;">
