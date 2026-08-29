@@ -1,6 +1,8 @@
 .DS_Store
 songs/
 node_modules/
-screenshot.png
+screenshot*.png
 .Rhistory
 .gstack/
+gmi_proxy.py
+test-gmi-music.sh
