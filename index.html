@@ -88,6 +88,16 @@
     display: none; font-size: 12px; color: var(--muted);
     margin-top: 6px; text-align: center;
   }
+  .toggle {
+    width: 36px; height: 20px; background: var(--border); border-radius: 10px;
+    position: relative; cursor: pointer; transition: background .2s;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle-knob {
+    width: 16px; height: 16px; background: var(--fg); border-radius: 50%;
+    position: absolute; top: 2px; left: 2px; transition: transform .2s;
+  }
+  .toggle.on .toggle-knob { transform: translateX(16px); }
   .player { margin-top: 16px; padding: 16px; background: #0e0e14; border: 1px solid var(--border); border-radius: 10px; }
   audio { width: 100%; }
   .meta { color: var(--muted); font-size: 12px; margin-top: 8px; }
@@ -210,6 +220,16 @@
           <span id="statusText">Ready</span>
         </div>
       </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:12px;">
+        <label style="margin-bottom:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <span class="toggle" id="remixToggle"><span class="toggle-knob"></span></span>
+          <span style="font-size:13px;color:var(--muted);">Style remix</span>
+        </label>
+        <select id="remixCount" style="width:auto;padding:4px 8px;font-size:12px;display:none;">
+          <option value="2">2 versions</option>
+          <option value="3" selected>3 versions</option>
+        </select>
+      </div>
       <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
       <div class="queue-info" id="queueInfo"></div>
     </div>
@@ -225,6 +245,11 @@
           <span class="chip" id="filenameChip" style="cursor:default;"></span>
         </div>
       </div>
+    </div>
+
+    <div class="card" id="remixCard" style="display:none;">
+      <label>Style remix</label>
+      <div id="remixGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px;"></div>
     </div>
 
     <div class="card" id="historyCard" style="display:none;">
@@ -751,6 +776,26 @@ La la la la la`;
     $("progressBar").style.width = "0%";
   }
 
+  // Remix toggle
+  let remixOn = false;
+  const remixToggle = $("remixToggle");
+  const remixCount = $("remixCount");
+  remixToggle.addEventListener("click", () => {
+    remixOn = !remixOn;
+    remixToggle.classList.toggle("on", remixOn);
+    remixCount.style.display = remixOn ? "block" : "none";
+  });
+
+  // Pick N random prompts from different categories
+  function pickRandomStyles(n) {
+    const categories = Object.keys(samplePrompts);
+    const shuffled = categories.sort(() => Math.random() - 0.5).slice(0, n);
+    return shuffled.map(cat => {
+      const prompts = samplePrompts[cat];
+      return { category: cat, prompt: prompts[Math.floor(Math.random() * prompts.length)] };
+    });
+  }
+
   // Toast
   const toastEl = $("toast");
   let toastTimer;
@@ -888,6 +933,89 @@ La la la la la`;
 
   renderHistory();
 
+  // Build payload for a given lyrics + prompt
+  function buildPayload(lyrics, prompt) {
+    const p = {
+      model: "minimax-music-3.0",
+      payload: {
+        lyrics,
+        prompt,
+        sample_rate: parseInt($("sampleRate").value),
+        bitrate: parseInt($("bitrate").value),
+        format: $("format").value
+      }
+    };
+    if (!prompt) delete p.payload.prompt;
+    return p;
+  }
+
+  // Extract audio URL from result
+  function extractAudioUrl(result) {
+    return result.outcome?.audio_url || result.outcome?.media_urls?.[0]?.url;
+  }
+
+  // Build meta string from result
+  function buildMeta(result) {
+    const dur = (result.outcome?.duration_ms || 0) / 1000;
+    return [
+      `⏱ ${dur.toFixed(1)}s`,
+      `${result.outcome?.sample_rate || 0} Hz`,
+      `${result.outcome?.channels || 0} ch`,
+      `${(result.outcome?.bitrate || 0) / 1000 | 0} kbps`,
+      result.outcome?.format || "mp3"
+    ].join(" · ");
+  }
+
+  // Display a single result in the player card
+  function displaySingleResult(audioUrl, filename, meta) {
+    const player = $("player");
+    player.src = audioUrl;
+    $("playerCard").style.display = "block";
+    $("remixCard").style.display = "none";
+    player.play().catch(() => {});
+    $("downloadLink").href = audioUrl;
+    $("downloadLink").download = filename;
+    $("openTab").href = audioUrl;
+    $("filenameChip").textContent = filename;
+    $("meta").textContent = meta;
+  }
+
+  // Display remix results in grid
+  function displayRemixResults(results) {
+    $("playerCard").style.display = "none";
+    const card = $("remixCard");
+    card.style.display = "block";
+    const grid = $("remixGrid");
+    grid.innerHTML = "";
+    results.forEach((r, i) => {
+      const item = document.createElement("div");
+      item.style.cssText = "background:#0e0e14;border:1px solid var(--border);border-radius:10px;padding:14px;";
+      item.innerHTML = `
+        <div style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:6px;">${r.category}</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${r.prompt}">${r.prompt.split(",").slice(0,3).join(",")}</div>
+        <audio controls style="width:100%;"></audio>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+          <a class="chip" href="${r.audioUrl}" download="remix-${i+1}.${$("format").value}" style="font-size:11px;">Download</a>
+          <a class="chip" href="${r.audioUrl}" target="_blank" style="font-size:11px;">Open</a>
+          <span class="chip use-remix" data-prompt="${encodeURIComponent(r.prompt)}" style="cursor:pointer;font-size:11px;">Use style</span>
+        </div>
+      `;
+      item.querySelector("audio").src = r.audioUrl;
+      grid.appendChild(item);
+    });
+
+    // Play first result automatically
+    grid.querySelector("audio")?.play().catch(() => {});
+
+    // "Use style" buttons
+    grid.querySelectorAll(".use-remix").forEach(btn => {
+      btn.addEventListener("click", () => {
+        $("prompt").value = decodeURIComponent(btn.dataset.prompt);
+        toast("Style loaded — edit and regenerate", "ok");
+      });
+    });
+  }
+
   // Main generate
   $("generateBtn").addEventListener("click", async () => {
     const key = apiKeyEl.value.trim();
@@ -898,72 +1026,93 @@ La la la la la`;
     if (!lyrics) { toast("Lyrics required by GMI (1–3500 chars)", "err"); $("lyrics").focus(); return; }
     if (lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length + " / 3500 chars", "err"); return; }
 
-    const payload = {
-      model: "minimax-music-3.0",
-      payload: {
-        lyrics,
-        prompt,
-        sample_rate: parseInt($("sampleRate").value),
-        bitrate: parseInt($("bitrate").value),
-        format: $("format").value
-      }
-    };
-    if (!prompt) delete payload.payload.prompt; // optional
-
     const btn = $("generateBtn");
     btn.disabled = true;
     setStatus("Submitting…", "work");
     showProgress();
 
     try {
-      const submitResult = await submitRequest(payload);
-      const requestId = submitResult.request_id;
-      if (!requestId) throw new Error("No request_id in submit response: " + JSON.stringify(submitResult));
+      if (remixOn) {
+        // REMIX MODE: parallel generation with random styles
+        const count = parseInt(remixCount.value);
+        const styles = pickRandomStyles(count);
+        setStatus(`Submitting ${count} versions…`, "work");
 
-      setStatus("Composing…", "work");
-      const final = await pollRequest(requestId);
+        // Submit all in parallel
+        const payloads = styles.map(s => buildPayload(lyrics, s.prompt));
+        const submitResults = await Promise.all(payloads.map(p => submitRequest(p)));
 
-      const audioUrl = final.outcome?.audio_url || final.outcome?.media_urls?.[0]?.url;
-      if (!audioUrl) throw new Error("No audio URL in result: " + JSON.stringify(final));
+        const requestIds = submitResults.map((r, i) => {
+          if (!r.request_id) throw new Error("No request_id for version " + (i+1));
+          return r.request_id;
+        });
 
-      const player = $("player");
-      player.src = audioUrl;
-      $("playerCard").style.display = "block";
-      player.play().catch(() => {});
+        setStatus(`Composing ${count} versions…`, "work");
 
-      const filename = `daniel-song-${Date.now()}.${$("format").value}`;
-      const dl = $("downloadLink");
-      dl.href = audioUrl;
-      dl.download = filename;
-      $("openTab").href = audioUrl;
-      $("filenameChip").textContent = filename;
+        // Poll all in parallel
+        const finals = await Promise.all(requestIds.map(id => pollRequest(id)));
 
-      const dur = (final.outcome?.duration_ms || 0) / 1000;
-      const meta = [
-        `⏱ ${dur.toFixed(1)}s`,
-        `${final.outcome?.sample_rate || 0} Hz`,
-        `${final.outcome?.channels || 0} ch`,
-        `${(final.outcome?.bitrate || 0) / 1000 | 0} kbps`,
-        final.outcome?.format || "mp3"
-      ].join(" · ");
-      $("meta").textContent = meta;
+        // Collect results
+        const remixResults = finals.map((f, i) => {
+          const audioUrl = extractAudioUrl(f);
+          if (!audioUrl) throw new Error("No audio URL for version " + (i+1));
+          return { category: styles[i].category, prompt: styles[i].prompt, audioUrl, meta: buildMeta(f) };
+        });
 
-      setStatus("Done", "ok");
-      completeProgress();
-      toast("Song ready — playing now", "ok");
+        displayRemixResults(remixResults);
+        setStatus("Done", "ok");
+        completeProgress();
+        toast(`${count} remixes ready`, "ok");
 
-      // Save to history
-      const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
-      saveToHistory({
-        id: String(Date.now()),
-        title: (titleLine || "Untitled").slice(0, 60),
-        lyrics,
-        prompt,
-        audioUrl,
-        filename,
-        meta,
-        date: new Date().toLocaleString()
-      });
+        // Save each to history
+        const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
+        remixResults.forEach(r => {
+          saveToHistory({
+            id: String(Date.now()) + "-" + r.category,
+            title: (titleLine || "Untitled").slice(0, 60) + " (" + r.category + ")",
+            lyrics,
+            prompt: r.prompt,
+            audioUrl: r.audioUrl,
+            filename: `remix-${r.category.toLowerCase()}.${$("format").value}`,
+            meta: r.meta,
+            date: new Date().toLocaleString()
+          });
+        });
+
+      } else {
+        // NORMAL MODE: single generation
+        const payload = buildPayload(lyrics, prompt);
+        const submitResult = await submitRequest(payload);
+        const requestId = submitResult.request_id;
+        if (!requestId) throw new Error("No request_id in submit response: " + JSON.stringify(submitResult));
+
+        setStatus("Composing…", "work");
+        const final = await pollRequest(requestId);
+
+        const audioUrl = extractAudioUrl(final);
+        if (!audioUrl) throw new Error("No audio URL in result: " + JSON.stringify(final));
+
+        const filename = `song-${Date.now()}.${$("format").value}`;
+        const meta = buildMeta(final);
+        displaySingleResult(audioUrl, filename, meta);
+
+        setStatus("Done", "ok");
+        completeProgress();
+        toast("Song ready — playing now", "ok");
+
+        // Save to history
+        const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
+        saveToHistory({
+          id: String(Date.now()),
+          title: (titleLine || "Untitled").slice(0, 60),
+          lyrics,
+          prompt,
+          audioUrl,
+          filename,
+          meta,
+          date: new Date().toLocaleString()
+        });
+      }
     } catch (err) {
       console.error(err);
       setStatus("Error", "err");
