@@ -74,6 +74,20 @@
   .dot.err { background: var(--err); }
   .dot.work { background: var(--accent-2); animation: pulse 1s infinite; }
   @keyframes pulse { 50% { opacity: 0.3; } }
+  .progress-wrap {
+    width: 100%; height: 6px; background: #0e0e14; border-radius: 3px;
+    margin-top: 10px; overflow: hidden; display: none;
+  }
+  .progress-bar {
+    height: 100%; width: 0%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width 0.3s ease;
+  }
+  .progress-bar.complete { background: var(--ok); }
+  .queue-info {
+    display: none; font-size: 12px; color: var(--muted);
+    margin-top: 6px; text-align: center;
+  }
   .player { margin-top: 16px; padding: 16px; background: #0e0e14; border: 1px solid var(--border); border-radius: 10px; }
   audio { width: 100%; }
   .meta { color: var(--muted); font-size: 12px; margin-top: 8px; }
@@ -196,6 +210,8 @@
           <span id="statusText">Ready</span>
         </div>
       </div>
+      <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="queue-info" id="queueInfo"></div>
     </div>
 
     <div class="card" id="playerCard" style="display:none;">
@@ -693,6 +709,48 @@ La la la la la`;
     dot.className = "dot" + (kind ? " " + kind : "");
   };
 
+  // Progress bar
+  const ESTIMATED_MS = 60000; // 60s estimated generation time
+  let progressTimer = null;
+  let progressStart = 0;
+
+  function showProgress() {
+    $("progressWrap").style.display = "block";
+    $("queueInfo").style.display = "block";
+    $("progressBar").style.width = "0%";
+    $("progressBar").classList.remove("complete");
+    progressStart = Date.now();
+    updateProgress();
+    progressTimer = setInterval(updateProgress, 500);
+  }
+
+  function updateProgress() {
+    const elapsed = Date.now() - progressStart;
+    const pct = Math.min(95, (elapsed / ESTIMATED_MS) * 100);
+    $("progressBar").style.width = pct + "%";
+    const secs = Math.round(elapsed / 1000);
+    $("queueInfo").textContent = `${secs}s elapsed` + (secs > 30 ? " · almost there…" : "");
+  }
+
+  function completeProgress() {
+    clearInterval(progressTimer);
+    $("progressBar").style.width = "100%";
+    $("progressBar").classList.add("complete");
+    const elapsed = Math.round((Date.now() - progressStart) / 1000);
+    $("queueInfo").textContent = `Done in ${elapsed}s`;
+    setTimeout(() => {
+      $("progressWrap").style.display = "none";
+      $("queueInfo").style.display = "none";
+    }, 3000);
+  }
+
+  function resetProgress() {
+    clearInterval(progressTimer);
+    $("progressWrap").style.display = "none";
+    $("queueInfo").style.display = "none";
+    $("progressBar").style.width = "0%";
+  }
+
   // Toast
   const toastEl = $("toast");
   let toastTimer;
@@ -855,6 +913,7 @@ La la la la la`;
     const btn = $("generateBtn");
     btn.disabled = true;
     setStatus("Submitting…", "work");
+    showProgress();
 
     try {
       const submitResult = await submitRequest(payload);
@@ -890,6 +949,7 @@ La la la la la`;
       $("meta").textContent = meta;
 
       setStatus("Done", "ok");
+      completeProgress();
       toast("Song ready — playing now", "ok");
 
       // Save to history
@@ -907,6 +967,7 @@ La la la la la`;
     } catch (err) {
       console.error(err);
       setStatus("Error", "err");
+      resetProgress();
       toast(err.message || String(err), "err");
     } finally {
       btn.disabled = false;
