@@ -146,18 +146,24 @@
   <div class="grid">
 
     <div class="card">
-      <label for="apiKey">GMI Cloud API key</label>
-      <input type="password" id="apiKey" placeholder="paste key, stored only in this browser" autocomplete="off" />
-      <div class="sub" style="margin-top:6px;">
-        Get one at <code>console.gmicloud.ai → API Keys</code>. Free during the campaign (ends Sep 6, 2026).
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:600;">API & proxy</span>
+        <span class="chip" id="apiKeyStatus" style="cursor:default;font-size:11px;">Not set</span>
       </div>
-      <details style="margin-top:10px;">
-        <summary>Proxy settings (for GitHub Pages hosting)</summary>
+      <details style="margin-top:8px;">
+        <summary>API key & proxy settings</summary>
         <div style="margin-top:8px;">
-          <label for="proxyUrl">CORS Proxy URL</label>
-          <input type="text" id="proxyUrl" placeholder="https://gmi-music-proxy.minimax-bf7.workers.dev" />
-          <div class="sub" style="margin-top:4px;">
-            Pre-configured for GitHub Pages. Only change if you deploy your own Worker.
+          <label for="apiKey">GMI Cloud API key</label>
+          <input type="password" id="apiKey" placeholder="paste key, stored only in this browser" autocomplete="off" />
+          <div class="sub" style="margin-top:6px;">
+            Get one at <code>console.gmicloud.ai → API Keys</code>. Free during the campaign (ends Sep 6, 2026).
+          </div>
+          <div style="margin-top:12px;">
+            <label for="proxyUrl">CORS Proxy URL</label>
+            <input type="text" id="proxyUrl" placeholder="https://gmi-music-proxy.minimax-bf7.workers.dev" />
+            <div class="sub" style="margin-top:4px;">
+              Pre-configured for GitHub Pages. Only change if you deploy your own Worker.
+            </div>
           </div>
         </div>
       </details>
@@ -315,9 +321,20 @@
 
   // Persist API key
   const apiKeyEl = $("apiKey");
+  const apiKeyStatus = $("apiKeyStatus");
   apiKeyEl.value = localStorage.getItem("gmi_api_key") || "";
+
+  function updateApiKeyStatus() {
+    const hasKey = apiKeyEl.value.trim().length > 0;
+    apiKeyStatus.textContent = hasKey ? "Set" : "Not set";
+    apiKeyStatus.style.borderColor = hasKey ? "var(--ok)" : "var(--border)";
+    apiKeyStatus.style.color = hasKey ? "var(--ok)" : "var(--muted)";
+  }
+  updateApiKeyStatus();
+
   apiKeyEl.addEventListener("change", () => {
     localStorage.setItem("gmi_api_key", apiKeyEl.value);
+    updateApiKeyStatus();
     toast("Key saved to this browser only", "ok");
   });
 
