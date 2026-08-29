@@ -174,29 +174,39 @@
         <div id="templateChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;"></div>
         <textarea id="lyrics" rows="10"></textarea>
         <div class="lyrics-tags">
-          <span class="lyrics-tag">[intro]</span>
-          <span class="lyrics-tag">[verse]</span>
-          <span class="lyrics-tag">[pre-chorus]</span>
-          <span class="lyrics-tag">[chorus]</span>
-          <span class="lyrics-tag">[post-chorus]</span>
-          <span class="lyrics-tag">[bridge]</span>
-          <span class="lyrics-tag">[instrumental]</span>
-          <span class="lyrics-tag">[solo]</span>
-          <span class="lyrics-tag">[outro]</span>
+          <span class="lyrics-tag">[Intro]</span>
+          <span class="lyrics-tag">[Verse]</span>
+          <span class="lyrics-tag">[Pre Chorus]</span>
+          <span class="lyrics-tag">[Chorus]</span>
+          <span class="lyrics-tag">[Post Chorus]</span>
+          <span class="lyrics-tag">[Hook]</span>
+          <span class="lyrics-tag">[Bridge]</span>
+          <span class="lyrics-tag">[Interlude]</span>
+          <span class="lyrics-tag">[Transition]</span>
+          <span class="lyrics-tag">[Build Up]</span>
+          <span class="lyrics-tag">[Break]</span>
+          <span class="lyrics-tag">[Inst]</span>
+          <span class="lyrics-tag">[Solo]</span>
+          <span class="lyrics-tag">[Outro]</span>
         </div>
         <details style="margin-top:10px;">
           <summary>Song structure for AI</summary>
           <div style="margin-top:8px;background:#0e0e14;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;line-height:1.8;color:var(--muted);">
             <div style="font-weight:600;color:var(--fg);margin-bottom:6px;">Song structure:</div>
-            <div><code style="color:var(--accent);">[intro]</code> — short opening, set the mood</div>
-            <div><code style="color:var(--accent);">[verse]</code> — tell the story, build the narrative</div>
-            <div><code style="color:var(--accent);">[pre-chorus]</code> — build tension before the hook</div>
-            <div><code style="color:var(--accent);">[chorus]</code> — the main hook, catchy and repeatable</div>
-            <div><code style="color:var(--accent);">[post-chorus]</code> — reinforcement after the hook</div>
-            <div><code style="color:var(--accent);">[bridge]</code> — change of perspective or new angle</div>
-            <div><code style="color:var(--accent);">[instrumental]</code> — music break, no vocals</div>
-            <div><code style="color:var(--accent);">[solo]</code> — featured instrument performance</div>
-            <div><code style="color:var(--accent);">[outro]</code> — wrap it up, fade or strong ending</div>
+            <div><code style="color:var(--accent);">[Intro]</code> — short opening, set the mood</div>
+            <div><code style="color:var(--accent);">[Verse]</code> — tell the story, build the narrative</div>
+            <div><code style="color:var(--accent);">[Pre Chorus]</code> — build tension before the hook</div>
+            <div><code style="color:var(--accent);">[Chorus]</code> — the main hook, catchy and repeatable</div>
+            <div><code style="color:var(--accent);">[Post Chorus]</code> — reinforcement after the hook</div>
+            <div><code style="color:var(--accent);">[Hook]</code> — the most memorable part, the earworm</div>
+            <div><code style="color:var(--accent);">[Bridge]</code> — change of perspective or new angle</div>
+            <div><code style="color:var(--accent);">[Interlude]</code> — instrumental break between sections</div>
+            <div><code style="color:var(--accent);">[Transition]</code> — connect two sections smoothly</div>
+            <div><code style="color:var(--accent);">[Build Up]</code> — rising energy before a drop or chorus</div>
+            <div><code style="color:var(--accent);">[Break]</code> — stripped-back moment, tension release</div>
+            <div><code style="color:var(--accent);">[Inst]</code> — instrumental section, no vocals</div>
+            <div><code style="color:var(--accent);">[Solo]</code> — featured instrument performance</div>
+            <div><code style="color:var(--accent);">[Outro]</code> — wrap it up, fade or strong ending</div>
             <button class="ghost" id="copyStructureBtn" style="margin-top:10px;font-size:12px;padding:6px 10px;">Copy structure</button>
           </div>
         </details>
@@ -820,15 +830,20 @@ La la la la la`;
 
   // Copy song structure
   const songStructure = `Song structure:
-[intro] — short opening, set the mood
-[verse] — tell the story, build the narrative
-[pre-chorus] — build tension before the hook
-[chorus] — the main hook, catchy and repeatable
-[post-chorus] — reinforcement after the hook
-[bridge] — change of perspective or new angle
-[instrumental] — music break, no vocals
-[solo] — featured instrument performance
-[outro] — wrap it up, fade or strong ending`;
+[Intro] — short opening, set the mood
+[Verse] — tell the story, build the narrative
+[Pre Chorus] — build tension before the hook
+[Chorus] — the main hook, catchy and repeatable
+[Post Chorus] — reinforcement after the hook
+[Hook] — the most memorable part, the earworm
+[Bridge] — change of perspective or new angle
+[Interlude] — instrumental break between sections
+[Transition] — connect two sections smoothly
+[Build Up] — rising energy before a drop or chorus
+[Break] — stripped-back moment, tension release
+[Inst] — instrumental section, no vocals
+[Solo] — featured instrument performance
+[Outro] — wrap it up, fade or strong ending`;
 
   $("copyStructureBtn").addEventListener("click", async () => {
     try {
