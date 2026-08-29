@@ -176,11 +176,13 @@
         <div class="lyrics-tags">
           <span class="lyrics-tag">[intro]</span>
           <span class="lyrics-tag">[verse]</span>
-          <span class="lyrics-tag">[pre chorus]</span>
+          <span class="lyrics-tag">[pre-chorus]</span>
           <span class="lyrics-tag">[chorus]</span>
+          <span class="lyrics-tag">[post-chorus]</span>
           <span class="lyrics-tag">[bridge]</span>
+          <span class="lyrics-tag">[instrumental]</span>
+          <span class="lyrics-tag">[solo]</span>
           <span class="lyrics-tag">[outro]</span>
-          <span class="lyrics-tag">[inst]</span>
         </div>
         <details style="margin-top:10px;">
           <summary>Song structure for AI</summary>
@@ -188,9 +190,12 @@
             <div style="font-weight:600;color:var(--fg);margin-bottom:6px;">Song structure:</div>
             <div><code style="color:var(--accent);">[intro]</code> — short opening, set the mood</div>
             <div><code style="color:var(--accent);">[verse]</code> — tell the story, build the narrative</div>
-            <div><code style="color:var(--accent);">[pre chorus]</code> — build tension before the hook</div>
+            <div><code style="color:var(--accent);">[pre-chorus]</code> — build tension before the hook</div>
             <div><code style="color:var(--accent);">[chorus]</code> — the main hook, catchy and repeatable</div>
+            <div><code style="color:var(--accent);">[post-chorus]</code> — reinforcement after the hook</div>
             <div><code style="color:var(--accent);">[bridge]</code> — change of perspective or new angle</div>
+            <div><code style="color:var(--accent);">[instrumental]</code> — music break, no vocals</div>
+            <div><code style="color:var(--accent);">[solo]</code> — featured instrument performance</div>
             <div><code style="color:var(--accent);">[outro]</code> — wrap it up, fade or strong ending</div>
             <button class="ghost" id="copyStructureBtn" style="margin-top:10px;font-size:12px;padding:6px 10px;">Copy structure</button>
           </div>
@@ -817,9 +822,12 @@ La la la la la`;
   const songStructure = `Song structure:
 [intro] — short opening, set the mood
 [verse] — tell the story, build the narrative
-[pre chorus] — build tension before the hook
+[pre-chorus] — build tension before the hook
 [chorus] — the main hook, catchy and repeatable
+[post-chorus] — reinforcement after the hook
 [bridge] — change of perspective or new angle
+[instrumental] — music break, no vocals
+[solo] — featured instrument performance
 [outro] — wrap it up, fade or strong ending`;
 
   $("copyStructureBtn").addEventListener("click", async () => {
