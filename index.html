@@ -220,7 +220,7 @@
           <span id="statusText">Ready</span>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;margin-top:12px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap;">
         <label style="margin-bottom:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
           <span class="toggle" id="remixToggle"><span class="toggle-knob"></span></span>
           <span style="font-size:13px;color:var(--muted);">Style remix</span>
@@ -229,6 +229,10 @@
           <option value="2">2 versions</option>
           <option value="3" selected>3 versions</option>
         </select>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <button class="ghost" id="copySettingsBtn" style="font-size:12px;padding:6px 10px;">Copy settings</button>
+          <button class="ghost" id="pasteSettingsBtn" style="font-size:12px;padding:6px 10px;">Paste settings</button>
+        </div>
       </div>
       <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
       <div class="queue-info" id="queueInfo"></div>
@@ -795,6 +799,38 @@ La la la la la`;
       return { category: cat, prompt: prompts[Math.floor(Math.random() * prompts.length)] };
     });
   }
+
+  // Copy/Paste settings
+  $("copySettingsBtn").addEventListener("click", async () => {
+    const data = {
+      style: $("prompt").value,
+      lyrics: $("lyrics").value,
+      sampleRate: $("sampleRate").value,
+      bitrate: $("bitrate").value,
+      format: $("format").value
+    };
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(data));
+      toast("Settings copied to clipboard", "ok");
+    } catch {
+      toast("Failed to copy — try again", "err");
+    }
+  });
+
+  $("pasteSettingsBtn").addEventListener("click", async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const data = JSON.parse(text);
+      if (data.style !== undefined) $("prompt").value = data.style;
+      if (data.lyrics !== undefined) $("lyrics").value = data.lyrics;
+      if (data.sampleRate) $("sampleRate").value = data.sampleRate;
+      if (data.bitrate) $("bitrate").value = data.bitrate;
+      if (data.format) $("format").value = data.format;
+      toast("Settings pasted", "ok");
+    } catch {
+      toast("No valid settings in clipboard", "err");
+    }
+  });
 
   // Toast
   const toastEl = $("toast");
