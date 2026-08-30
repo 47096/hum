@@ -4,11 +4,12 @@ Copy this code into your Cloudflare Worker editor and deploy.
 
 ```javascript
 const GMI_BASE = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey";
+const MINIMAX_BASE = "https://api.minimax.io/v1/music_generation";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Authorization, Content-Type",
+  "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Provider",
 };
 
 export default {
@@ -20,12 +21,40 @@ export default {
       return new Response(null, { status: 204, headers: CORS });
     }
 
-    // Only proxy /requests paths (or root as /requests)
+    const provider = request.headers.get("X-Provider") || "gmi";
+
+    // MiniMax: single POST endpoint, no polling (returns audio directly or task_id)
+    if (provider === "minimax") {
+      const init = {
+        method: request.method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: request.headers.get("Authorization") || "",
+        },
+      };
+      if (request.method === "POST") {
+        init.body = await request.text();
+      }
+      try {
+        const resp = await fetch(MINIMAX_BASE, init);
+        const body = await resp.text();
+        return new Response(body, {
+          status: resp.status,
+          headers: { ...CORS, "Content-Type": "application/json" },
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), {
+          status: 502,
+          headers: { ...CORS, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // GMI Cloud: async queue with polling
     let pathname = url.pathname;
     if (pathname === "/" || pathname === "") {
       pathname = "/requests";
     }
-    // Handle /{requestId} -> /requests/{requestId}
     else if (!pathname.startsWith("/requests")) {
       pathname = "/requests" + pathname;
     }

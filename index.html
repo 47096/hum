@@ -338,9 +338,14 @@
       <details style="margin-top:8px;">
         <summary>API key & proxy settings</summary>
         <div style="margin-top:8px;">
-          <label for="apiKey">GMI Cloud API key</label>
+          <label>Provider</label>
+          <div style="display:flex;gap:6px;margin-bottom:12px;">
+            <span class="chip provider-tab" data-provider="gmi" style="cursor:pointer;font-weight:700;border-color:var(--accent);color:var(--accent);">GMI Cloud</span>
+            <span class="chip provider-tab" data-provider="minimax" style="cursor:pointer;font-weight:700;">MiniMax</span>
+          </div>
+          <label for="apiKey" id="apiKeyLabel">GMI Cloud API key</label>
           <input type="password" id="apiKey" placeholder="paste key, stored only in this browser" autocomplete="off" />
-          <div class="sub" style="margin-top:6px;">
+          <div class="sub" style="margin-top:6px;" id="apiKeyHelp">
             Get one at <code style="color:var(--accent);">console.gmicloud.ai -> API Keys</code>. Free during the campaign (ends Sep 6, 2026).
           </div>
           <div style="margin-top:12px;">
@@ -362,7 +367,7 @@
       <input type="text" id="prompt" placeholder="Cheerful children's song, ukulele, clapping, bright, preschool" />
 
       <div style="margin-top:14px;">
-        <label for="lyrics">Lyrics <span style="color:var(--muted); text-transform:none;">(required by GMI: 1-3500 chars, with [verse]/[chorus] tags)</span></label>
+        <label for="lyrics">Lyrics <span style="color:var(--muted); text-transform:none;">(1-3500 chars, with [verse]/[chorus] tags)</span></label>
         <div id="templateChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;"></div>
         <textarea id="lyrics" rows="10"></textarea>
         <div class="lyrics-tags">
@@ -505,10 +510,32 @@
   const POLL_INTERVAL = 4000; // ms
   const POLL_TIMEOUT = 180000; // 3 min
 
+  // Provider toggle (gmi | minimax)
+  let activeProvider = localStorage.getItem("gmi_provider") || "gmi";
+  const providerTabs = document.querySelectorAll(".provider-tab");
+
+  function switchProvider(provider) {
+    activeProvider = provider;
+    localStorage.setItem("gmi_provider", provider);
+    providerTabs.forEach(t => {
+      const isActive = t.dataset.provider === provider;
+      t.style.borderColor = isActive ? "var(--accent)" : "";
+      t.style.color = isActive ? "var(--accent)" : "";
+    });
+    $("apiKeyLabel").textContent = provider === "gmi" ? "GMI Cloud API key" : "MiniMax API key";
+    $("apiKeyHelp").innerHTML = provider === "gmi"
+      ? 'Get one at <code style="color:var(--accent);">console.gmicloud.ai -> API Keys</code>. Free during the campaign (ends Sep 6, 2026).'
+      : 'Get one at <code style="color:var(--accent);">platform.minimax.io -> API Keys</code>. Paid users only.';
+    apiKeyEl.value = localStorage.getItem(provider === "gmi" ? "gmi_api_key" : "minimax_api_key") || "";
+    updateApiKeyStatus();
+  }
+
+  providerTabs.forEach(t => t.addEventListener("click", () => switchProvider(t.dataset.provider)));
+  switchProvider(activeProvider);
+
   // Persist API key
   const apiKeyEl = $("apiKey");
   const apiKeyStatus = $("apiKeyStatus");
-  apiKeyEl.value = localStorage.getItem("gmi_api_key") || "";
 
   function updateApiKeyStatus() {
     const hasKey = apiKeyEl.value.trim().length > 0;
@@ -519,7 +546,8 @@
   updateApiKeyStatus();
 
   apiKeyEl.addEventListener("change", () => {
-    localStorage.setItem("gmi_api_key", apiKeyEl.value);
+    const storageKey = activeProvider === "gmi" ? "gmi_api_key" : "minimax_api_key";
+    localStorage.setItem(storageKey, apiKeyEl.value);
     updateApiKeyStatus();
     toast("Key saved to this browser only", "ok");
   });
@@ -758,22 +786,19 @@
   // Submit
   async function submitRequest(payload) {
     const key = apiKeyEl.value.trim();
-    const resp = await fetch(GMI_ENDPOINT, {
-      method: "POST",
-      headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    const headers = { "Authorization": "Bearer " + key, "Content-Type": "application/json", "X-Provider": activeProvider };
+    const resp = await fetch(GMI_ENDPOINT, { method: "POST", headers, body: JSON.stringify(payload) });
     if (!resp.ok) { const t = await resp.text(); throw new Error("Submit HTTP " + resp.status + ": " + t); }
     return resp.json();
   }
 
-  // Poll
+  // Poll (GMI only — MiniMax returns result directly)
   async function pollRequest(requestId) {
     const key = apiKeyEl.value.trim();
     const url = GMI_ENDPOINT + "/" + requestId;
     const t0 = Date.now();
     while (Date.now() - t0 < POLL_TIMEOUT) {
-      const r = await fetch(url, { headers: { "Authorization": "Bearer " + key } });
+      const r = await fetch(url, { headers: { "Authorization": "Bearer " + key, "X-Provider": activeProvider } });
       if (!r.ok) { const t = await r.text(); throw new Error("Poll HTTP " + r.status + ": " + t); }
       const j = await r.json();
       if (j.status === "success") return j;
@@ -865,6 +890,23 @@
 
   // Build payload for a given lyrics + prompt
   function buildPayload(lyrics, prompt) {
+    if (activeProvider === "minimax") {
+      const p = {
+        model: "music-3.0",
+        prompt: prompt || "",
+        lyrics: lyrics,
+        stream: false,
+        output_format: "url",
+        audio_setting: {
+          sample_rate: parseInt($("sampleRate").value),
+          bitrate: parseInt($("bitrate").value),
+          format: $("format").value
+        }
+      };
+      if (!prompt) delete p.prompt;
+      return p;
+    }
+    // GMI Cloud
     const p = { model: "minimax-music-3.0", payload: { lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value } };
     if (!prompt) delete p.payload.prompt;
     return p;
@@ -872,11 +914,18 @@
 
   // Extract audio URL from result
   function extractAudioUrl(result) {
+    if (activeProvider === "minimax") {
+      return result.data?.audio || result.audio;
+    }
     return result.outcome?.audio_url || result.outcome?.media_urls?.[0]?.url;
   }
 
   // Build meta string from result
   function buildMeta(result) {
+    if (activeProvider === "minimax") {
+      const dur = (result.extra_info?.music_duration || 0);
+      return [`⏱ ${dur.toFixed(1)}s`, `${$("sampleRate").value} Hz`, `${$("bitrate").value / 1000} kbps`, $("format").value].join(" · ");
+    }
     const dur = (result.outcome?.duration_ms || 0) / 1000;
     return [`⏱ ${dur.toFixed(1)}s`, `${result.outcome?.sample_rate || 0} Hz`, `${result.outcome?.channels || 0} ch`, `${(result.outcome?.bitrate || 0) / 1000 | 0} kbps`, result.outcome?.format || "mp3"].join(" · ");
   }
@@ -932,11 +981,12 @@
   // Main generate
   $("generateBtn").addEventListener("click", async () => {
     const key = apiKeyEl.value.trim();
-    if (!key) { toast("Paste your GMI API key first", "err"); apiKeyEl.focus(); return; }
+    const providerName = activeProvider === "gmi" ? "GMI" : "MiniMax";
+    if (!key) { toast("Paste your " + providerName + " API key first", "err"); apiKeyEl.focus(); return; }
 
     const prompt = $("prompt").value.trim();
     const lyrics = $("lyrics").value.trim();
-    if (!lyrics) { toast("Lyrics required by GMI (1-3500 chars)", "err"); $("lyrics").focus(); return; }
+    if (!lyrics) { toast("Lyrics required (1-3500 chars, with [verse]/[chorus] tags)", "err"); $("lyrics").focus(); return; }
     if (lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length + " / 3500 chars", "err"); return; }
 
     const btn = $("generateBtn");
@@ -953,14 +1003,19 @@
         const payloads = styles.map(s => buildPayload(lyrics, s.prompt));
         const submitResults = await Promise.all(payloads.map(p => submitRequest(p)));
 
-        const requestIds = submitResults.map((r, i) => {
-          if (!r.request_id) throw new Error("No request_id for version " + (i+1));
-          return r.request_id;
-        });
-
-        setStatus(`Composing ${count} versions…`, "work");
-
-        const finals = await Promise.all(requestIds.map(id => pollRequest(id)));
+        let finals;
+        if (activeProvider === "minimax") {
+          // MiniMax returns result directly
+          finals = submitResults;
+        } else {
+          // GMI: poll for results
+          const requestIds = submitResults.map((r, i) => {
+            if (!r.request_id) throw new Error("No request_id for version " + (i+1));
+            return r.request_id;
+          });
+          setStatus(`Composing ${count} versions…`, "work");
+          finals = await Promise.all(requestIds.map(id => pollRequest(id)));
+        }
 
         const remixResults = finals.map((f, i) => {
           const audioUrl = extractAudioUrl(f);
@@ -990,11 +1045,18 @@
       } else {
         const payload = buildPayload(lyrics, prompt);
         const submitResult = await submitRequest(payload);
-        const requestId = submitResult.request_id;
-        if (!requestId) throw new Error("No request_id in submit response: " + JSON.stringify(submitResult));
 
-        setStatus("Composing…", "work");
-        const final = await pollRequest(requestId);
+        let final;
+        if (activeProvider === "minimax") {
+          // MiniMax returns result directly
+          final = submitResult;
+        } else {
+          // GMI: poll for result
+          const requestId = submitResult.request_id;
+          if (!requestId) throw new Error("No request_id in submit response: " + JSON.stringify(submitResult));
+          setStatus("Composing…", "work");
+          final = await pollRequest(requestId);
+        }
 
         const audioUrl = extractAudioUrl(final);
         if (!audioUrl) throw new Error("No audio URL in result: " + JSON.stringify(final));
