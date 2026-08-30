@@ -634,11 +634,11 @@
   });
   renderChips(Object.keys(samplePrompts)[0]);
 
-  // Sample lyrics (Daniel, 5yo)
-  const sampleLyrics = `[verse]\nDaniel Daniel clap your hands\nClap them loud and clap them soft\nDaniel Daniel stomp your feet\nStomp them big and stomp them small\n\n[chorus]\nDaniel is five and oh so bright\nSmiling sunshine every day\nLa la la la la la la\nDaniel loves to sing and play\n\n[verse]\nDaniel Daniel jump up high\nTouch the sky and wiggle down\nDaniel Daniel spin around\nRound and round and sit back down\n\n[chorus]\nDaniel is five and oh so bright\nSmiling sunshine every day\nLa la la la la la la\nDaniel loves to sing and play\n\n[outro]\nLa la la la la`;
+  // Sample lyrics — Imagine (John Lennon style)
+  const sampleLyrics = `[verse]\nImagine there's no heaven\nIt's easy if you try\nNo hell below us\nAbove us only sky\n\n[verse]\nImagine all the people\nLiving for today\n\n[verse]\nImagine there's no countries\nIt isn't hard to do\nNothing to kill or die for\nAnd no religion too\n\n[verse]\nImagine all the people\nLiving life in peace\n\n[chorus]\nYou may say I'm a dreamer\nBut I'm not the only one\nI hope someday you'll join us\nAnd the world will be as one\n\n[verse]\nImagine no possessions\nI wonder if you can\nNo need for greed or hunger\nA brotherhood of man\n\n[verse]\nImagine all the people\nSharing all the world\n\n[chorus]\nYou may say I'm a dreamer\nBut I'm not the only one\nI hope someday you'll join us\nAnd the world will be as one\n\n[outro]\nYou may say I'm a dreamer\nBut I'm not the only one\nI hope someday you'll join us\nAnd the world will live as one`;
 
   $("sampleBtn").addEventListener("click", () => {
-    $("prompt").value = "Cheerful children's song, ukulele, clapping, bright, preschool singalong";
+    $("prompt").value = "Gentle piano ballad, soft and intimate, minimal arrangement, reflective and hopeful, simple chord progression, warm strings gradually building, 76 BPM, C major, peaceful and contemplative, Lennon-inspired sincerity";
     $("lyrics").value = sampleLyrics;
   });
 
