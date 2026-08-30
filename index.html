@@ -762,12 +762,20 @@
   // Sleep
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  // Submit
-  async function submitRequest(payload) {
+  // Submit (with retry for 524 Cloudflare timeout)
+  async function submitRequest(payload, retries = 2) {
     const key = apiKeyEl.value.trim();
     const headers = { "Authorization": "Bearer " + key, "Content-Type": "application/json", "X-Provider": activeProvider };
     const resp = await fetch(GMI_ENDPOINT, { method: "POST", headers, body: JSON.stringify(payload) });
-    if (!resp.ok) { const t = await resp.text(); throw new Error("Submit HTTP " + resp.status + ": " + t); }
+    if (!resp.ok) {
+      const t = await resp.text();
+      if (resp.status === 524 && retries > 0) {
+        setStatus("Server slow, retrying…", "work");
+        await sleep(3000);
+        return submitRequest(payload, retries - 1);
+      }
+      throw new Error("Submit HTTP " + resp.status + ": " + t);
+    }
     return resp.json();
   }
 
