@@ -582,6 +582,10 @@
     if (!prompts) return;
     const subgenreEl = $("subgenreDisplay");
     subgenreEl.innerHTML = "";
+    const label = document.createElement("div");
+    label.style.cssText = "width:100%;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:6px;font-weight:600;font-family:var(--font-mono);";
+    label.textContent = "Subgenres";
+    subgenreEl.appendChild(label);
     prompts.forEach(p => {
       const c = document.createElement("span");
       c.className = "chip";
