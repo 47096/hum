@@ -587,14 +587,25 @@
     label.style.cssText = "width:100%;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:6px;font-weight:600;font-family:var(--font-mono);";
     label.textContent = "Subgenres";
     subgenreEl.appendChild(label);
-    prompts.forEach(p => {
+    prompts.forEach((p, i) => {
       const c = document.createElement("span");
       c.className = "chip";
       c.textContent = p.split(",")[0];
       c.title = p;
-      c.addEventListener("click", () => $("prompt").value = p);
+      if (i === 0) {
+        c.style.borderColor = "var(--accent)";
+        c.style.color = "var(--accent)";
+      }
+      c.addEventListener("click", () => {
+        subgenreEl.querySelectorAll(".chip").forEach(el => { el.style.borderColor = ""; el.style.color = ""; });
+        c.style.borderColor = "var(--accent)";
+        c.style.color = "var(--accent)";
+        $("prompt").value = p;
+      });
       subgenreEl.appendChild(c);
     });
+    // Auto-fill prompt with first subgenre
+    $("prompt").value = prompts[0];
   }
 
   Object.keys(samplePrompts).forEach((label, i) => {
