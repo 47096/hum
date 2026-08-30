@@ -364,8 +364,11 @@
       <input type="text" id="prompt" placeholder="Cheerful children's song, ukulele, clapping, bright, preschool" />
 
       <div style="margin-top:14px;">
-        <label for="lyrics">Lyrics <span style="color:var(--muted); text-transform:none;">(1-3500 chars, with [verse]/[chorus] tags)</span></label>
-        <div id="templateChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;"></div>
+        <label for="lyrics">Lyrics templates <span style="color:var(--muted); text-transform:none;">(1-3500 chars, with [verse]/[chorus] tags)</span></label>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;align-items:center;">
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-right:4px;">Templates:</span>
+          <div id="templateChips" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+        </div>
         <textarea id="lyrics" rows="10"></textarea>
         <details style="margin-top:10px;">
           <summary>Song structure for AI</summary>
