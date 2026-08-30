@@ -354,11 +354,11 @@
     </div>
 
     <div class="card">
-      <label for="prompt">Genre</label>
+      <label>Genre</label>
+      <div id="styleTabs" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"></div>
+      <div id="subgenreDisplay" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;"></div>
+      <label for="prompt">Prompt <span style="color:var(--muted); text-transform:none; font-weight:400;">(auto-fills from subgenre — edit to customise)</span></label>
       <input type="text" id="prompt" placeholder="Cheerful children's song, ukulele, clapping, bright, preschool" />
-      <div id="styleTabs" style="display:flex;gap:6px;margin-top:10px;margin-bottom:8px;flex-wrap:wrap;"></div>
-      <div id="subgenreDisplay" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;"></div>
-      <div class="examples" id="promptChips"></div>
 
       <div style="margin-top:14px;">
         <label for="lyrics">Lyrics <span style="color:var(--muted); text-transform:none;">(required by GMI: 1-3500 chars, with [verse]/[chorus] tags)</span></label>
@@ -549,7 +549,6 @@
     "Mandopop": ["Mandopop ballad, 華語抒情鋼琴, 深情弦樂編曲, 周杰倫式旋律美感, 深夜思念情緒, 電台經典情歌","Mandopop dance, 輕快流行節奏, 閃耀電子合成器, 蔡依林式舞曲能量, 派對歡樂氣氛, 朗朗上口 hook","Chinese style, 古箏琵琶融合, 中國風五聲音階, 周杰倫式古典跨界, 水墨畫意境, 東方美學韻味","Mandopop rock, 激情電結他, 熱血搖滾鼓點, 五月天式青春熱血, 演唱會萬人合唱能量, 反叛精神","Mandopop folk, 木結他簡單伴奏, 文青質感, 樸實真摯歌詞, 陳綺貞式清新, 校園草地午後時光"],
     "Metal": ["Heavy metal, thunderous double-kick drums, screaming guitar solos, powerful riffs, Iron Maiden-inspired gallop, epic and triumphant","Death metal, guttural growls, blast beats, downtuned guitars, dark and brutal, Cannibal Corpse-inspired intensity, relentless aggression","Power metal, soaring clean vocals, symphonic keyboards, fantasy themes, DragonForce-inspired speed, epic quest energy","Progressive metal, complex time signatures, extended compositions, Tool-inspired depth, technical virtuosity, cerebral and evolving","Metalcore, breakdowns with crushing heaviness, screaming verses, melodic choruses, Architects-inspired dynamics, emotional catharsis"],
   };
-  const chipsEl = $("promptChips");
   const tabsEl = $("styleTabs");
 
   // Lyrics templates
@@ -579,33 +578,17 @@
   let activeTab = null;
 
   function renderChips(category) {
-    chipsEl.innerHTML = "";
     const prompts = samplePrompts[category];
     if (!prompts) return;
-    const wrap = document.createElement("div");
-    wrap.style.cssText = "display:flex;flex-wrap:wrap;gap:5px;";
+    const subgenreEl = $("subgenreDisplay");
+    subgenreEl.innerHTML = "";
     prompts.forEach(p => {
       const c = document.createElement("span");
       c.className = "chip";
       c.textContent = p.split(",")[0];
       c.title = p;
       c.addEventListener("click", () => $("prompt").value = p);
-      wrap.appendChild(c);
-    });
-    chipsEl.appendChild(wrap);
-
-    // Render subgenre names below tabs
-    const subgenreEl = $("subgenreDisplay");
-    subgenreEl.innerHTML = "";
-    const label = document.createElement("div");
-    label.style.cssText = "width:100%;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;font-family:var(--font-mono);";
-    label.textContent = category + " subgenres:";
-    subgenreEl.appendChild(label);
-    prompts.forEach(p => {
-      const sub = document.createElement("span");
-      sub.style.cssText = "font-size:11px;color:var(--accent);font-family:var(--font-mono);";
-      sub.textContent = p.split(",")[0];
-      subgenreEl.appendChild(sub);
+      subgenreEl.appendChild(c);
     });
   }
 
