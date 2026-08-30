@@ -7,129 +7,313 @@
 <title>MiniMax Music 3.0 · GMI Cloud</title>
 <style>
   :root {
-    --bg: #0b0b10;
-    --panel: #15151c;
-    --border: #2a2a35;
-    --fg: #e8e8ee;
-    --muted: #8a8a99;
-    --accent: #ff5e8a;
-    --accent-2: #ffb86b;
-    --ok: #5ee3a0;
-    --err: #ff6b6b;
-    --radius: 12px;
+    --bg: #0a0a0f;
+    --panel: #111118;
+    --border: #00ff8833;
+    --fg: #e0e0e8;
+    --muted: #6a6a80;
+    --accent: #00ff88;
+    --accent-2: #ff00ff;
+    --ok: #00ff88;
+    --err: #ff0055;
+    --radius: 6px;
+    --glow-green: 0 0 8px #00ff8844, 0 0 20px #00ff8822;
+    --glow-magenta: 0 0 8px #ff00ff44, 0 0 20px #ff00ff22;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
+
   * { box-sizing: border-box; }
+
   html, body {
     margin: 0; padding: 0;
     background: var(--bg);
     color: var(--fg);
-    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+    font: 14px/1.6 var(--font-mono);
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 24px 80px; }
-  header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+
+  /* Scanline overlay */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.08) 2px,
+      rgba(0, 0, 0, 0.08) 4px
+    );
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 24px 80px; position: relative; }
+
+  /* Header with glitch */
+  header {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 28px;
+    position: relative;
+  }
+
   .logo {
-    width: 44px; height: 44px; border-radius: 12px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    width: 48px; height: 48px; border-radius: 4px;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    box-shadow: var(--glow-green);
     display: grid; place-items: center;
-    font-weight: 800; font-size: 18px; color: #1a0a14;
+    font-weight: 900; font-size: 16px; color: var(--accent);
+    font-family: var(--font-mono);
+    letter-spacing: -1px;
   }
-  h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
-  .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  h1 {
+    font-size: 20px; margin: 0;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+
+  /* Glitch effect on h1 */
+  h1::before,
+  h1::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  h1::before {
+    color: var(--accent);
+    animation: glitch-1 3s infinite linear alternate-reverse;
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    z-index: -1;
+  }
+
+  h1::after {
+    color: var(--accent-2);
+    animation: glitch-2 2.5s infinite linear alternate-reverse;
+    clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+    z-index: -1;
+  }
+
+  @keyframes glitch-1 {
+    0%, 90% { transform: translate(0); }
+    91% { transform: translate(-3px, 1px); }
+    93% { transform: translate(3px, -1px); }
+    95% { transform: translate(-2px, 0); }
+    97% { transform: translate(2px, 1px); }
+    100% { transform: translate(0); }
+  }
+
+  @keyframes glitch-2 {
+    0%, 88% { transform: translate(0); }
+    89% { transform: translate(3px, -1px); }
+    92% { transform: translate(-3px, 1px); }
+    94% { transform: translate(1px, 2px); }
+    96% { transform: translate(-1px, -1px); }
+    100% { transform: translate(0); }
+  }
+
+  .sub { color: var(--muted); font-size: 12px; margin-top: 2px; font-family: var(--font-mono); }
+
   .grid { display: grid; gap: 16px; }
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--glow-green);
+    position: relative;
+  }
+
   label {
-    display: block; font-size: 12px; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--muted);
+    display: block; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--accent);
     margin-bottom: 6px; font-weight: 600;
+    font-family: var(--font-mono);
   }
+
   input[type="text"], input[type="password"], textarea, select {
-    width: 100%; background: #0e0e14; border: 1px solid var(--border);
-    color: var(--fg); padding: 10px 12px; border-radius: 8px;
-    font: inherit; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    transition: border-color .15s;
+    width: 100%; background: #08080d; border: 1px solid #00ff8833;
+    color: var(--fg); padding: 10px 12px; border-radius: 4px;
+    font: inherit; font-family: var(--font-mono);
+    transition: border-color .15s, box-shadow .15s;
+    caret-color: var(--accent);
   }
-  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--glow-green);
+  }
+
   textarea { resize: vertical; min-height: 100px; }
+
   .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
   .actions { display: flex; gap: 10px; align-items: center; margin-top: 18px; }
+
   button {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #1a0a14; border: 0; padding: 12px 22px; border-radius: 10px;
-    font-weight: 700; font-size: 14px; cursor: pointer;
-    transition: transform .08s, box-shadow .15s, opacity .15s;
-    box-shadow: 0 4px 14px rgba(255, 94, 138, 0.25);
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 12px 22px; border-radius: 4px;
+    font-weight: 700; font-size: 13px; cursor: pointer;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: all .12s;
+    box-shadow: var(--glow-green);
+    position: relative;
   }
-  button:hover:not(:disabled) { transform: translateY(-1px); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+  button:hover:not(:disabled) {
+    background: var(--accent);
+    color: #0a0a0f;
+    box-shadow: 0 0 16px #00ff8866, 0 0 40px #00ff8833;
+  }
+
+  button:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+
   button.ghost {
     background: transparent; color: var(--muted);
-    border: 1px solid var(--border); box-shadow: none;
+    border: 1px solid #333345; box-shadow: none;
     padding: 10px 14px; font-weight: 500;
+    text-transform: none; letter-spacing: normal;
   }
-  button.ghost:hover { color: var(--fg); border-color: var(--fg); }
-  .status { margin-left: auto; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
-  .dot.ok { background: var(--ok); }
-  .dot.err { background: var(--err); }
-  .dot.work { background: var(--accent-2); animation: pulse 1s infinite; }
-  @keyframes pulse { 50% { opacity: 0.3; } }
+  button.ghost:hover:not(:disabled) {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: transparent;
+    box-shadow: var(--glow-green);
+  }
+
+  .status { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); }
+  .dot { width: 8px; height: 8px; border-radius: 0; background: var(--muted); }
+  .dot.ok { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .dot.err { background: var(--err); box-shadow: 0 0 8px var(--err); }
+  .dot.work { background: var(--accent-2); box-shadow: 0 0 8px var(--accent-2); animation: pulse 0.8s infinite; }
+
+  @keyframes pulse { 50% { opacity: 0.2; } }
+
   .progress-wrap {
-    width: 100%; height: 6px; background: #0e0e14; border-radius: 3px;
+    width: 100%; height: 4px; background: #08080d; border-radius: 0;
     margin-top: 10px; overflow: hidden; display: none;
+    border: 1px solid #00ff8822;
   }
+
   .progress-bar {
-    height: 100%; width: 0%; border-radius: 3px;
+    height: 100%; width: 0%; border-radius: 0;
     background: linear-gradient(90deg, var(--accent), var(--accent-2));
     transition: width 0.3s ease;
+    box-shadow: 0 0 12px var(--accent);
   }
-  .progress-bar.complete { background: var(--ok); }
+  .progress-bar.complete { background: var(--accent); }
+
   .queue-info {
-    display: none; font-size: 12px; color: var(--muted);
-    margin-top: 6px; text-align: center;
+    display: none; font-size: 11px; color: var(--muted);
+    margin-top: 6px; text-align: center; font-family: var(--font-mono);
   }
+
   .toggle {
-    width: 36px; height: 20px; background: var(--border); border-radius: 10px;
+    width: 36px; height: 20px; background: #1a1a28; border-radius: 2px;
     position: relative; cursor: pointer; transition: background .2s;
+    border: 1px solid #333345;
   }
-  .toggle.on { background: var(--accent); }
+  .toggle.on { background: transparent; border-color: var(--accent); box-shadow: var(--glow-green); }
   .toggle-knob {
-    width: 16px; height: 16px; background: var(--fg); border-radius: 50%;
+    width: 14px; height: 14px; background: var(--muted); border-radius: 0;
     position: absolute; top: 2px; left: 2px; transition: transform .2s;
   }
-  .toggle.on .toggle-knob { transform: translateX(16px); }
-  .player { margin-top: 16px; padding: 16px; background: #0e0e14; border: 1px solid var(--border); border-radius: 10px; }
+  .toggle.on .toggle-knob { transform: translateX(16px); background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+  .player {
+    margin-top: 16px; padding: 16px;
+    background: #08080d;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
   audio { width: 100%; }
-  .meta { color: var(--muted); font-size: 12px; margin-top: 8px; }
+
+  .meta { color: var(--muted); font-size: 11px; margin-top: 8px; font-family: var(--font-mono); }
+
   .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
   .chip {
-    background: #0e0e14; border: 1px solid var(--border); border-radius: 999px;
-    padding: 4px 10px; font-size: 12px; color: var(--muted);
+    background: transparent;
+    border: 1px solid #333345;
+    border-radius: 2px;
+    padding: 4px 10px; font-size: 11px; color: var(--muted);
     cursor: pointer; transition: all .12s; text-decoration: none;
     display: inline-block;
+    font-family: var(--font-mono);
   }
-  .chip:hover { color: var(--fg); border-color: var(--accent); }
-  #styleTabs .chip { padding: 4px 10px; font-size: 11px; }
+  .chip:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: var(--glow-green);
+  }
+
+  #styleTabs .chip { padding: 4px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+
   .lyrics-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-  .lyrics-tag { color: var(--accent); font-size: 12px; }
-  details summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 6px 0; user-select: none; }
-  details summary:hover { color: var(--fg); }
+  .lyrics-tag { color: var(--accent-2); font-size: 11px; font-family: var(--font-mono); cursor: pointer; }
+  .lyrics-tag:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
+
+  details summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 6px 0; user-select: none; font-family: var(--font-mono); }
+  details summary:hover { color: var(--accent); }
+
   .toast {
     position: fixed; bottom: 24px; left: 50%;
     transform: translateX(-50%) translateY(20px);
-    background: var(--panel); border: 1px solid var(--border);
-    padding: 10px 18px; border-radius: 10px; font-size: 13px;
-    opacity: 0; pointer-events: none; transition: all .25s; z-index: 10;
+    background: var(--panel); border: 1px solid var(--accent);
+    padding: 10px 18px; border-radius: 4px; font-size: 12px;
+    font-family: var(--font-mono);
+    opacity: 0; pointer-events: none; transition: all .25s; z-index: 1000;
     max-width: 90vw; text-align: center;
+    box-shadow: var(--glow-green);
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast.err { border-color: var(--err); color: var(--err); }
-  .toast.ok { border-color: var(--ok); color: var(--ok); }
+  .toast.err { border-color: var(--err); color: var(--err); box-shadow: 0 0 8px #ff005544; }
+  .toast.ok { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow-green); }
+
   .endpoint-badge {
-    display: inline-block; padding: 2px 8px; border-radius: 4px;
-    background: #0e0e14; border: 1px solid var(--border);
-    font-family: ui-monospace, monospace; font-size: 11px;
-    color: var(--muted); margin-left: 8px;
+    display: inline-block; padding: 2px 8px; border-radius: 2px;
+    background: transparent; border: 1px solid var(--accent-2);
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--accent-2); margin-left: 8px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  /* Neon accent line under header */
+  header::after {
+    content: "";
+    position: absolute;
+    bottom: -14px; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent 30%, transparent 70%, var(--accent-2));
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #333345; border-radius: 0; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* Selection */
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .row { grid-template-columns: 1fr; }
+    .actions { flex-wrap: wrap; }
   }
 </style>
 </head>
@@ -138,8 +322,8 @@
   <header>
     <div class="logo">M3</div>
     <div>
-      <h1>MiniMax Music 3.0<span class="endpoint-badge">GMI Cloud · free 14d</span></h1>
-      <div class="sub">prompt + lyrics → MP3 · powered by GMI Inference Engine</div>
+      <h1 data-text="MiniMax Music 3.0">MiniMax Music 3.0<span class="endpoint-badge">GMI Cloud</span></h1>
+      <div class="sub">prompt + lyrics -> MP3 :: powered by GMI Inference Engine</div>
     </div>
   </header>
 
@@ -147,8 +331,8 @@
 
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:600;">API & proxy</span>
-        <span class="chip" id="apiKeyStatus" style="cursor:default;font-size:11px;">Not set</span>
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:600;">API & proxy</span>
+        <span class="chip" id="apiKeyStatus" style="cursor:default;font-size:10px;">Not set</span>
       </div>
       <details style="margin-top:8px;">
         <summary>API key & proxy settings</summary>
@@ -156,7 +340,7 @@
           <label for="apiKey">GMI Cloud API key</label>
           <input type="password" id="apiKey" placeholder="paste key, stored only in this browser" autocomplete="off" />
           <div class="sub" style="margin-top:6px;">
-            Get one at <code>console.gmicloud.ai → API Keys</code>. Free during the campaign (ends Sep 6, 2026).
+            Get one at <code style="color:var(--accent);">console.gmicloud.ai -> API Keys</code>. Free during the campaign (ends Sep 6, 2026).
           </div>
           <div style="margin-top:12px;">
             <label for="proxyUrl">CORS Proxy URL</label>
@@ -170,13 +354,13 @@
     </div>
 
     <div class="card">
-      <label for="prompt">Style / vibe prompt <span style="color:var(--muted); text-transform:none;">(genre, mood, instruments — optional)</span></label>
+      <label for="prompt">Style / vibe prompt <span style="color:var(--muted); text-transform:none;">(genre, mood, instruments -- optional)</span></label>
       <input type="text" id="prompt" placeholder="Cheerful children's song, ukulele, clapping, bright, preschool" />
       <div id="styleTabs" style="display:flex;gap:6px;margin-top:10px;margin-bottom:8px;flex-wrap:wrap;"></div>
       <div class="examples" id="promptChips"></div>
 
       <div style="margin-top:14px;">
-        <label for="lyrics">Lyrics <span style="color:var(--muted); text-transform:none;">(required by GMI: 1–3500 chars, with [verse]/[chorus] tags)</span></label>
+        <label for="lyrics">Lyrics <span style="color:var(--muted); text-transform:none;">(required by GMI: 1-3500 chars, with [verse]/[chorus] tags)</span></label>
         <div id="templateChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;"></div>
         <textarea id="lyrics" rows="10"></textarea>
         <div class="lyrics-tags">
@@ -197,23 +381,23 @@
         </div>
         <details style="margin-top:10px;">
           <summary>Song structure for AI</summary>
-          <div style="margin-top:8px;background:#0e0e14;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;line-height:1.8;color:var(--muted);">
-            <div style="font-weight:600;color:var(--fg);margin-bottom:6px;">Song structure:</div>
-            <div><code style="color:var(--accent);">[Intro]</code> — short opening, set the mood</div>
-            <div><code style="color:var(--accent);">[Verse]</code> — tell the story, build the narrative</div>
-            <div><code style="color:var(--accent);">[Pre Chorus]</code> — build tension before the hook</div>
-            <div><code style="color:var(--accent);">[Chorus]</code> — the main hook, catchy and repeatable</div>
-            <div><code style="color:var(--accent);">[Post Chorus]</code> — reinforcement after the hook</div>
-            <div><code style="color:var(--accent);">[Hook]</code> — the most memorable part, the earworm</div>
-            <div><code style="color:var(--accent);">[Bridge]</code> — change of perspective or new angle</div>
-            <div><code style="color:var(--accent);">[Interlude]</code> — instrumental break between sections</div>
-            <div><code style="color:var(--accent);">[Transition]</code> — connect two sections smoothly</div>
-            <div><code style="color:var(--accent);">[Build Up]</code> — rising energy before a drop or chorus</div>
-            <div><code style="color:var(--accent);">[Break]</code> — stripped-back moment, tension release</div>
-            <div><code style="color:var(--accent);">[Inst]</code> — instrumental section, no vocals</div>
-            <div><code style="color:var(--accent);">[Solo]</code> — featured instrument performance</div>
-            <div><code style="color:var(--accent);">[Outro]</code> — wrap it up, fade or strong ending</div>
-            <button class="ghost" id="copyStructureBtn" style="margin-top:10px;font-size:12px;padding:6px 10px;">Copy structure</button>
+          <div style="margin-top:8px;background:#08080d;border:1px solid #00ff8822;border-radius:4px;padding:12px;font-size:12px;line-height:1.8;color:var(--muted);font-family:var(--font-mono);">
+            <div style="font-weight:700;color:var(--accent);margin-bottom:6px;">Song structure:</div>
+            <div><code style="color:var(--accent-2);">[Intro]</code> -- short opening, set the mood</div>
+            <div><code style="color:var(--accent-2);">[Verse]</code> -- tell the story, build the narrative</div>
+            <div><code style="color:var(--accent-2);">[Pre Chorus]</code> -- build tension before the hook</div>
+            <div><code style="color:var(--accent-2);">[Chorus]</code> -- the main hook, catchy and repeatable</div>
+            <div><code style="color:var(--accent-2);">[Post Chorus]</code> -- reinforcement after the hook</div>
+            <div><code style="color:var(--accent-2);">[Hook]</code> -- the most memorable part, the earworm</div>
+            <div><code style="color:var(--accent-2);">[Bridge]</code> -- change of perspective or new angle</div>
+            <div><code style="color:var(--accent-2);">[Interlude]</code> -- instrumental break between sections</div>
+            <div><code style="color:var(--accent-2);">[Transition]</code> -- connect two sections smoothly</div>
+            <div><code style="color:var(--accent-2);">[Build Up]</code> -- rising energy before a drop or chorus</div>
+            <div><code style="color:var(--accent-2);">[Break]</code> -- stripped-back moment, tension release</div>
+            <div><code style="color:var(--accent-2);">[Inst]</code> -- instrumental section, no vocals</div>
+            <div><code style="color:var(--accent-2);">[Solo]</code> -- featured instrument performance</div>
+            <div><code style="color:var(--accent-2);">[Outro]</code> -- wrap it up, fade or strong ending</div>
+            <button class="ghost" id="copyStructureBtn" style="margin-top:10px;font-size:11px;padding:6px 10px;">Copy structure</button>
           </div>
         </details>
       </div>
@@ -262,15 +446,15 @@
           <div style="display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap;">
             <label style="margin-bottom:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
               <span class="toggle" id="remixToggle"><span class="toggle-knob"></span></span>
-              <span style="font-size:13px;color:var(--muted);">Style remix</span>
+              <span style="font-size:12px;color:var(--muted);">Style remix</span>
             </label>
-            <select id="remixCount" style="width:auto;padding:4px 8px;font-size:12px;display:none;">
+            <select id="remixCount" style="width:auto;padding:4px 8px;font-size:11px;display:none;">
               <option value="2">2 versions</option>
               <option value="3" selected>3 versions</option>
             </select>
             <div style="margin-left:auto;display:flex;gap:6px;">
-              <button class="ghost" id="copySettingsBtn" style="font-size:12px;padding:6px 10px;">Copy settings</button>
-              <button class="ghost" id="pasteSettingsBtn" style="font-size:12px;padding:6px 10px;">Paste settings</button>
+              <button class="ghost" id="copySettingsBtn" style="font-size:11px;padding:6px 10px;">Copy settings</button>
+              <button class="ghost" id="pasteSettingsBtn" style="font-size:11px;padding:6px 10px;">Paste settings</button>
             </div>
           </div>
         </div>
@@ -283,8 +467,8 @@
         <audio id="player" controls></audio>
         <div class="meta" id="meta"></div>
         <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-          <a id="downloadLink" class="chip" download="song.mp3">⬇ Download MP3</a>
-          <a id="openTab" class="chip" target="_blank">↗ Open in new tab</a>
+          <a id="downloadLink" class="chip" download="song.mp3">[ Download MP3 ]</a>
+          <a id="openTab" class="chip" target="_blank">[ Open in new tab ]</a>
           <span class="chip" id="filenameChip" style="cursor:default;"></span>
         </div>
       </div>
@@ -298,7 +482,7 @@
     <div class="card" id="historyCard" style="display:none;">
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <label style="margin-bottom:0;">Song history</label>
-        <span class="chip" id="clearHistory" style="cursor:pointer;font-size:11px;">Clear all</span>
+        <span class="chip" id="clearHistory" style="cursor:pointer;font-size:10px;">[ Clear all ]</span>
       </div>
       <div id="historyList" style="margin-top:12px;"></div>
     </div>
@@ -348,354 +532,35 @@
 
   // Style prompt chips (categorised)
   const samplePrompts = {
-    "Pop": [
-      "Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads, catchy melodic hook, 120 BPM, feel-good summer anthem energy",
-      "Electropop, glossy production, sidechain compression, vocoder harmonies, pulsing bassline, futuristic neon atmosphere, radio-ready polish",
-      "Indie pop, jangly reverb guitar, soft brushed drums, warm lo-fi texture, dreamy and wistful, slightly off-kilter charm, cassette aesthetic",
-      "Teen pop, bubblegum sweetness, handclaps, bright piano chords, bouncy rhythm, innocent and playful, school-dance energy",
-      "Synthpop, 80s analog warmth, arpeggiated Juno synths, gated reverb snare, nostalgic and cinematic, John Hughes movie soundtrack feel",
-    ],
-    "R&B / Soul": [
-      "Smooth R&B slow jam, silky Rhodes piano, deep sub-bass, finger-snapped rhythm, candlelit intimacy, late-night bedroom vibes, breathy vocals",
-      "Neo-soul, live bass groove, warm Fender Rhodes, D'Angelo-inspired looseness, organic and earthy, Sunday afternoon warmth",
-      "Contemporary R&B, polished pop production, trap-influenced hi-hats, layered vocal harmonies, confident and sleek, chart-ready sound",
-      "Classic Motown soul, punchy brass section, handclaps, walking bassline, gospel choir backing, joyful and uplifting, vintage warmth",
-      "Alternative R&B, dark atmospheric pads, sparse beats, reverb-drenched vocals, moody and introspective, Frank Ocean-esque vulnerability",
-    ],
-    "Hip-hop / Rap": [
-      "Boom bap, dusty vinyl samples, chopped soul loops, punchy kick-snare pattern, 90s golden era, lyrical and head-nodding, DJ Premier style",
-      "Trap, booming 808 sub-bass, rapid hi-hat rolls, dark piano melody, hard-hitting and aggressive, festival-ready energy",
-      "Lo-fi hip-hop, crackling vinyl texture, mellow jazz piano samples, lazy drum pattern, rainy-day study vibes, warm and comforting",
-      "UK drill, sliding 808 bass, ominous piano chords, skippy hi-hat pattern, dark and tense, street-level intensity",
-      "Conscious rap, soulful sample, boom bap drums, storytelling energy, thoughtful and deliberate, Common or Kendrick-inspired depth",
-    ],
-    "Rock": [
-      "Classic rock, crunchy Marshall amp tone, driving power chords, pounding drums, arena-sized energy, 70s swagger, Led Zeppelin spirit",
-      "Indie rock, angular guitar riffs, tight rhythm section, raw and DIY, slightly off-kilter, Pavement-esque charm, basement-show energy",
-      "Punk rock, breakneck tempo, buzzing power chords, snotty vocals, three-chord fury, Ramones-style simplicity, anti-establishment fire",
-      "Alternative rock, 90s grunge influence, heavy chorus guitar, dynamic quiet-loud-quiet, angsty and cathartic, flannel-shirt atmosphere",
-      "Soft rock, warm acoustic strumming, gentle piano, easygoing groove, sunset-cruise mellow, Eagles-inspired smoothness",
-    ],
-    "Electronic / EDM": [
-      "House, four-on-the-floor kick, deep bassline, soulful vocal chops, building energy, warehouse rave atmosphere, sunrise-set euphoria",
-      "Techno, industrial pulse, repetitive hypnotic groove, dark and mechanical, Berlin club aesthetic, relentless forward motion",
-      "Trance, euphoric synth leads, sweeping build-ups, uplifting breakdowns, hands-in-the-air moments, 138 BPM peak-time energy",
-      "Dubstep, earth-shaking sub-bass, wobble synths, half-time drums, aggressive drops, Skrillex-style chaos, speaker-rattling power",
-      "Ambient, lush evolving pads, no percussion, ethereal textures, Brian Eno-inspired spaciousness, meditative and calming, floating sensation",
-    ],
-    "Jazz": [
-      "Smooth jazz, warm tenor saxophone melody, brushed snare, walking upright bass, candlelit lounge atmosphere, effortless sophistication",
-      "Bebop, lightning-fast sax runs, complex chord changes, driving ride cymbal, Charlie Parker-inspired virtuosity, smoky late-night club",
-      "Swing, big band brass section, walking bass, driving rhythm, 1940s dancehall energy, Benny Goodman-era joy, toe-tapping infectiousness",
-      "Jazz fusion, electric guitar shredding, funky bass grooves, complex time signatures, Herbie Hancock-inspired, genre-bending energy",
-      "Vocal jazz, intimate piano accompaniment, soft brushed drums, smoky late-night bar, Billie Holiday-inspired phrasing, bittersweet elegance",
-    ],
-    "Classical": [
-      "Orchestral symphony, full string section, soaring melodies, dramatic dynamics, Beethoven-inspired grandeur, concert-hall majesty",
-      "Solo piano sonata, delicate phrasing, intimate and introspective, Chopin-esque elegance, recital-hall clarity, emotional depth",
-      "Chamber music, string quartet, intimate interplay, Mozart-inspired balance, salon-performance warmth, refined conversation between instruments",
-      "Opera, powerful soprano aria, full orchestral backing, dramatic and passionate, Verdi-inspired emotion, theatrical grandeur",
-      "Contemporary classical, minimalist repetition, Steve Reich-inspired patterns, evolving textures, modern and meditative, gradual transformation",
-    ],
-    "Country": [
-      "Classic country, twangy Telecaster, pedal steel weeping, storytelling lyrics, honky-tonk bar atmosphere, Johnny Cash-inspired authenticity",
-      "Country pop, polished Nashville production, catchy chorus, crossover appeal, radio-friendly sheen, Taylor Swift-era energy",
-      "Outlaw country, rough-edged vocals, whiskey-soaked baritone, rebellious spirit, Waylon Jennings swagger, dusty-road freedom",
-      "Bluegrass, lightning-fast banjo rolls, fiddle breakdowns, mandolin chops, front-porch picking energy, Appalachian mountain spirit",
-      "Country rock, crunchy electric guitar, driving drums, southern-rock grit, Lynyrd Skynyrd-inspired, open-highway freedom",
-    ],
-    "Folk / Acoustic": [
-      "Singer-songwriter, fingerpicked acoustic guitar, intimate vocal delivery, confessional lyrics, coffeehouse warmth, Nick Drake-inspired delicacy",
-      "Indie folk, layered acoustic textures, soft harmonies, nature-inspired imagery, Bon Iver-esque spaciousness, cabin-in-the-woods solitude",
-      "Celtic folk, fiddle melodies, tin whistle, bodhran drum, Irish pub atmosphere, rolling green hills energy, traditional and timeless",
-      "Americana, roots-rock twang, dusty storytelling, pedal steel accents, open-road nostalgia, Ryan Adams-inspired authenticity",
-      "Contemporary folk, modern production polish, heartfelt lyrics, gentle strumming, Mumford & Sons-inspired energy, campfire singalong warmth",
-    ],
-    "Reggae": [
-      "Roots reggae, classic one-drop rhythm, deep bass groove, Nyabinghi percussion, spiritual and meditative, Bob Marley-inspired peace",
-      "Dancehall, fast-paced riddim, DJ toasting, party energy, bass-heavy, Jamaican sound-system vibes, infectious and energetic",
-      "Dub, heavy echo and reverb, stripped-back bass and drums, psychedelic space, King Tubby-inspired, sonic experimentation",
-      "Lovers rock, smooth romantic groove, warm bass, gentle rhythm, candlelit intimacy, British reggae sweetness, tender and soothing",
-      "Reggae fusion, modern pop production, reggae rhythm foundation, crossover appeal, contemporary and polished, island-meets-mainstream",
-    ],
-    "Latin": [
-      "Reggaeton, dembow beat, booming bass, urban party energy, Bad Bunny-inspired swagger, club-ready heat, infectious perreo rhythm",
-      "Salsa, punchy brass section, conga percussion, piano montuno, dance-floor fire, Fania All-Stars energy, tropical and vibrant",
-      "Bachata, romantic guitar melody, bongo rhythm, Dominican warmth, intimate and passionate, Romeo Santos-inspired tenderness",
-      "Latin pop, catchy bilingual hooks, polished production, crossover appeal, Shakira-inspired energy, mainstream and infectious",
-      "Cumbia, accordion melody, Colombian rhythm, tropical percussion, festive and joyful, street-party energy, accordion-driven charm",
-    ],
-    "K-pop": [
-      "K-pop dance track, bright synth hooks, powerful choreography energy, polished production, BTS-inspired precision, stadium-ready anthem",
-      "K-pop ballad, emotional piano, soaring strings, heartfelt vocals, dramatic build-up, IU-inspired tenderness, tear-jerking beauty",
-      "K-pop hip-hop, hard-hitting rap verses, trap beats, confident swagger, Stray Kids-inspired intensity, fierce and commanding",
-      "Cute concept, bubblegum synths, aegyo sweetness, playful rhythm, TWICE-inspired charm, bright and innocent, feel-good energy",
-      "K-pop R&B, smooth grooves, falsetto vocals, sophisticated production, Dean-inspired coolness, late-night Seoul atmosphere",
-    ],
-    "Cantopop": [
-      "90s Cantopop ballad, 深情款款, 鋼琴弦樂編曲, 懷舊經典氣息, 張學友式深情演繹, 夜色浪漫氛圍",
-      "Cantopop dance track, 歡樂派對節奏, 輕快電子合成器, 陳奕迅式活力, 城市夜生活能量, 朗朗上口旋律",
-      "Cantopop love song, 抒情結他伴奏, 溫柔聲線, 浪漫歌詞意境, 王菲式空靈氣質, 深夜電台情歌",
-      "Cantopop rock, 激情電結他riff, 熱血鼓點, Beyond式搖滾精神, 青春反叛能量, 舞台爆發力",
-      "Cantopop indie, 小清新木結他, 文青氣質, 簡單純粹旋律, 林夕式歌詞意境, 咖啡店午後氛圍",
-    ],
-    "Mandopop": [
-      "Mandopop ballad, 華語抒情鋼琴, 深情弦樂編曲, 周杰倫式旋律美感, 深夜思念情緒, 電台經典情歌",
-      "Mandopop dance, 輕快流行節奏, 閃耀電子合成器, 蔡依林式舞曲能量, 派對歡樂氣氛, 朗朗上口 hook",
-      "Chinese style, 古箏琵琶融合, 中國風五聲音階, 周杰倫式古典跨界, 水墨畫意境, 東方美學韻味",
-      "Mandopop rock, 激情電結他, 熱血搖滾鼓點, 五月天式青春熱血, 演唱會萬人合唱能量, 反叛精神",
-      "Mandopop folk, 木結他簡單伴奏, 文青質感, 樸實真摯歌詞, 陳綺貞式清新, 校園草地午後時光",
-    ],
-    "Metal": [
-      "Heavy metal, thunderous double-kick drums, screaming guitar solos, powerful riffs, Iron Maiden-inspired gallop, epic and triumphant",
-      "Death metal, guttural growls, blast beats, downtuned guitars, dark and brutal, Cannibal Corpse-inspired intensity, relentless aggression",
-      "Power metal, soaring clean vocals, symphonic keyboards, fantasy themes, DragonForce-inspired speed, epic quest energy",
-      "Progressive metal, complex time signatures, extended compositions, Tool-inspired depth, technical virtuosity, cerebral and evolving",
-      "Metalcore, breakdowns with crushing heaviness, screaming verses, melodic choruses, Architects-inspired dynamics, emotional catharsis",
-    ],
+    "Pop": ["Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads, catchy melodic hook, 120 BPM, feel-good summer anthem energy","Electropop, glossy production, sidechain compression, vocoder harmonies, pulsing bassline, futuristic neon atmosphere, radio-ready polish","Indie pop, jangly reverb guitar, soft brushed drums, warm lo-fi texture, dreamy and wistful, slightly off-kilter charm, cassette aesthetic","Teen pop, bubblegum sweetness, handclaps, bright piano chords, bouncy rhythm, innocent and playful, school-dance energy","Synthpop, 80s analog warmth, arpeggiated Juno synths, gated reverb snare, nostalgic and cinematic, John Hughes movie soundtrack feel"],
+    "R&B / Soul": ["Smooth R&B slow jam, silky Rhodes piano, deep sub-bass, finger-snapped rhythm, candlelit intimacy, late-night bedroom vibes, breathy vocals","Neo-soul, live bass groove, warm Fender Rhodes, D'Angelo-inspired looseness, organic and earthy, Sunday afternoon warmth","Contemporary R&B, polished pop production, trap-influenced hi-hats, layered vocal harmonies, confident and sleek, chart-ready sound","Classic Motown soul, punchy brass section, handclaps, walking bassline, gospel choir backing, joyful and uplifting, vintage warmth","Alternative R&B, dark atmospheric pads, sparse beats, reverb-drenched vocals, moody and introspective, Frank Ocean-esque vulnerability"],
+    "Hip-hop / Rap": ["Boom bap, dusty vinyl samples, chopped soul loops, punchy kick-snare pattern, 90s golden era, lyrical and head-nodding, DJ Premier style","Trap, booming 808 sub-bass, rapid hi-hat rolls, dark piano melody, hard-hitting and aggressive, festival-ready energy","Lo-fi hip-hop, crackling vinyl texture, mellow jazz piano samples, lazy drum pattern, rainy-day study vibes, warm and comforting","UK drill, sliding 808 bass, ominous piano chords, skippy hi-hat pattern, dark and tense, street-level intensity","Conscious rap, soulful sample, boom bap drums, storytelling energy, thoughtful and deliberate, Common or Kendrick-inspired depth"],
+    "Rock": ["Classic rock, crunchy Marshall amp tone, driving power chords, pounding drums, arena-sized energy, 70s swagger, Led Zeppelin spirit","Indie rock, angular guitar riffs, tight rhythm section, raw and DIY, slightly off-kilter, Pavement-esque charm, basement-show energy","Punk rock, breakneck tempo, buzzing power chords, snotty vocals, three-chord fury, Ramones-style simplicity, anti-establishment fire","Alternative rock, 90s grunge influence, heavy chorus guitar, dynamic quiet-loud-quiet, angsty and cathartic, flannel-shirt atmosphere","Soft rock, warm acoustic strumming, gentle piano, easygoing groove, sunset-cruise mellow, Eagles-inspired smoothness"],
+    "Electronic / EDM": ["House, four-on-the-floor kick, deep bassline, soulful vocal chops, building energy, warehouse rave atmosphere, sunrise-set euphoria","Techno, industrial pulse, repetitive hypnotic groove, dark and mechanical, Berlin club aesthetic, relentless forward motion","Trance, euphoric synth leads, sweeping build-ups, uplifting breakdowns, hands-in-the-air moments, 138 BPM peak-time energy","Dubstep, earth-shaking sub-bass, wobble synths, half-time drums, aggressive drops, Skrillex-style chaos, speaker-rattling power","Ambient, lush evolving pads, no percussion, ethereal textures, Brian Eno-inspired spaciousness, meditative and calming, floating sensation"],
+    "Jazz": ["Smooth jazz, warm tenor saxophone melody, brushed snare, walking upright bass, candlelit lounge atmosphere, effortless sophistication","Bebop, lightning-fast sax runs, complex chord changes, driving ride cymbal, Charlie Parker-inspired virtuosity, smoky late-night club","Swing, big band brass section, walking bass, driving rhythm, 1940s dancehall energy, Benny Goodman-era joy, toe-tapping infectiousness","Jazz fusion, electric guitar shredding, funky bass grooves, complex time signatures, Herbie Hancock-inspired, genre-bending energy","Vocal jazz, intimate piano accompaniment, soft brushed drums, smoky late-night bar, Billie Holiday-inspired phrasing, bittersweet elegance"],
+    "Classical": ["Orchestral symphony, full string section, soaring melodies, dramatic dynamics, Beethoven-inspired grandeur, concert-hall majesty","Solo piano sonata, delicate phrasing, intimate and introspective, Chopin-esque elegance, recital-hall clarity, emotional depth","Chamber music, string quartet, intimate interplay, Mozart-inspired balance, salon-performance warmth, refined conversation between instruments","Opera, powerful soprano aria, full orchestral backing, dramatic and passionate, Verdi-inspired emotion, theatrical grandeur","Contemporary classical, minimalist repetition, Steve Reich-inspired patterns, evolving textures, modern and meditative, gradual transformation"],
+    "Country": ["Classic country, twangy Telecaster, pedal steel weeping, storytelling lyrics, honky-tonk bar atmosphere, Johnny Cash-inspired authenticity","Country pop, polished Nashville production, catchy chorus, crossover appeal, radio-friendly sheen, Taylor Swift-era energy","Outlaw country, rough-edged vocals, whiskey-soaked baritone, rebellious spirit, Waylon Jennings swagger, dusty-road freedom","Bluegrass, lightning-fast banjo rolls, fiddle breakdowns, mandolin chops, front-porch picking energy, Appalachian mountain spirit","Country rock, crunchy electric guitar, driving drums, southern-rock grit, Lynyrd Skynyrd-inspired, open-highway freedom"],
+    "Folk / Acoustic": ["Singer-songwriter, fingerpicked acoustic guitar, intimate vocal delivery, confessional lyrics, coffeehouse warmth, Nick Drake-inspired delicacy","Indie folk, layered acoustic textures, soft harmonies, nature-inspired imagery, Bon Iver-esque spaciousness, cabin-in-the-woods solitude","Celtic folk, fiddle melodies, tin whistle, bodhran drum, Irish pub atmosphere, rolling green hills energy, traditional and timeless","Americana, roots-rock twang, dusty storytelling, pedal steel accents, open-road nostalgia, Ryan Adams-inspired authenticity","Contemporary folk, modern production polish, heartfelt lyrics, gentle strumming, Mumford & Sons-inspired energy, campfire singalong warmth"],
+    "Reggae": ["Roots reggae, classic one-drop rhythm, deep bass groove, Nyabinghi percussion, spiritual and meditative, Bob Marley-inspired peace","Dancehall, fast-paced riddim, DJ toasting, party energy, bass-heavy, Jamaican sound-system vibes, infectious and energetic","Dub, heavy echo and reverb, stripped-back bass and drums, psychedelic space, King Tubby-inspired, sonic experimentation","Lovers rock, smooth romantic groove, warm bass, gentle rhythm, candlelit intimacy, British reggae sweetness, tender and soothing","Reggae fusion, modern pop production, reggae rhythm foundation, crossover appeal, contemporary and polished, island-meets-mainstream"],
+    "Latin": ["Reggaeton, dembow beat, booming bass, urban party energy, Bad Bunny-inspired swagger, club-ready heat, infectious perreo rhythm","Salsa, punchy brass section, conga percussion, piano montuno, dance-floor fire, Fania All-Stars energy, tropical and vibrant","Bachata, romantic guitar melody, bongo rhythm, Dominican warmth, intimate and passionate, Romeo Santos-inspired tenderness","Latin pop, catchy bilingual hooks, polished production, crossover appeal, Shakira-inspired energy, mainstream and infectious","Cumbia, accordion melody, Colombian rhythm, tropical percussion, festive and joyful, street-party energy, accordion-driven charm"],
+    "K-pop": ["K-pop dance track, bright synth hooks, powerful choreography energy, polished production, BTS-inspired precision, stadium-ready anthem","K-pop ballad, emotional piano, soaring strings, heartfelt vocals, dramatic build-up, IU-inspired tenderness, tear-jerking beauty","K-pop hip-hop, hard-hitting rap verses, trap beats, confident swagger, Stray Kids-inspired intensity, fierce and commanding","Cute concept, bubblegum synths, aegyo sweetness, playful rhythm, TWICE-inspired charm, bright and innocent, feel-good energy","K-pop R&B, smooth grooves, falsetto vocals, sophisticated production, Dean-inspired coolness, late-night Seoul atmosphere"],
+    "Cantopop": ["90s Cantopop ballad, 深情款款, 鋼琴弦樂編曲, 懷舊經典氣息, 張學友式深情演繹, 夜色浪漫氛圍","Cantopop dance track, 歡樂派對節奏, 輕快電子合成器, 陳奕迅式活力, 城市夜生活能量, 朗朗上口旋律","Cantopop love song, 抒情結他伴奏, 溫柔聲線, 浪漫歌詞意境, 王菲式空靈氣質, 深夜電台情歌","Cantopop rock, 激情電結他riff, 熱血鼓點, Beyond式搖滾精神, 青春反叛能量, 舞台爆發力","Cantopop indie, 小清新木結他, 文青氣質, 簡單純粹旋律, 林夕式歌詞意境, 咖啡店午後氛圍"],
+    "Mandopop": ["Mandopop ballad, 華語抒情鋼琴, 深情弦樂編曲, 周杰倫式旋律美感, 深夜思念情緒, 電台經典情歌","Mandopop dance, 輕快流行節奏, 閃耀電子合成器, 蔡依林式舞曲能量, 派對歡樂氣氛, 朗朗上口 hook","Chinese style, 古箏琵琶融合, 中國風五聲音階, 周杰倫式古典跨界, 水墨畫意境, 東方美學韻味","Mandopop rock, 激情電結他, 熱血搖滾鼓點, 五月天式青春熱血, 演唱會萬人合唱能量, 反叛精神","Mandopop folk, 木結他簡單伴奏, 文青質感, 樸實真摯歌詞, 陳綺貞式清新, 校園草地午後時光"],
+    "Metal": ["Heavy metal, thunderous double-kick drums, screaming guitar solos, powerful riffs, Iron Maiden-inspired gallop, epic and triumphant","Death metal, guttural growls, blast beats, downtuned guitars, dark and brutal, Cannibal Corpse-inspired intensity, relentless aggression","Power metal, soaring clean vocals, symphonic keyboards, fantasy themes, DragonForce-inspired speed, epic quest energy","Progressive metal, complex time signatures, extended compositions, Tool-inspired depth, technical virtuosity, cerebral and evolving","Metalcore, breakdowns with crushing heaviness, screaming verses, melodic choruses, Architects-inspired dynamics, emotional catharsis"],
   };
   const chipsEl = $("promptChips");
   const tabsEl = $("styleTabs");
 
   // Lyrics templates
   const lyricsTemplates = {
-    "Birthday": {
-      prompt: "Upbeat pop, cheerful, handclaps, bright piano, celebration energy, confetti vibes",
-      lyrics: `[verse]
-It's your birthday, time to celebrate
-Another year, you're looking great
-Blow the candles, make a wish today
-Everybody here to say
-
-[chorus]
-Happy happy birthday to you
-Let's party all night through
-Happy happy birthday, hip hooray
-This is your special day
-
-[verse]
-Cake and presents, friends all around
-Music's playing, hear that sound
-Grab your party hat, let's dance and play
-Celebrate in every way
-
-[chorus]
-Happy happy birthday to you
-Let's party all night through
-Happy happy birthday, hip hooray
-This is your special day
-
-[outro]
-Happy birthday, happy birthday
-Make a wish and let it fly`
-    },
-    "Love ballad": {
-      prompt: "Slow R&B ballad, romantic piano, soft strings, intimate, candlelit atmosphere, heartfelt",
-      lyrics: `[verse]
-I saw you standing in the light
-The world just faded out of sight
-Your eyes held something I could not explain
-A feeling running through my veins
-
-[pre chorus]
-And every moment by your side
-Is where I want to be tonight
-
-[chorus]
-You're the one I've been waiting for
-Every heartbeat says you're worth fighting for
-Hold me close and don't let go
-You're the only love I know
-
-[verse]
-The way you laugh, the way you smile
-Makes every single mile worthwhile
-Your hand in mine, we'll write our story
-A love that lives in all its glory
-
-[pre chorus]
-And every whisper in the dark
-Reminds me you're my missing part
-
-[chorus]
-You're the one I've been waiting for
-Every heartbeat says you're worth fighting for
-Hold me close and don't let go
-You're the only love I know
-
-[bridge]
-Through the storms and through the rain
-I'd do it all again
-Your love is my anchor, my home
-
-[chorus]
-You're the one I've been waiting for
-Every heartbeat says you're worth fighting for
-Hold me close and don't let go
-You're the only love I know
-
-[outro]
-You're the only love I know`
-    },
-    "Hype track": {
-      prompt: "Trap, booming 808 bass, hard-hitting drums, confident energy, festival anthem, crowd chant",
-      lyrics: `[intro]
-Yeah, yeah, let's go
-We're here now, turn it up
-
-[verse]
-Started from the bottom, now we're standing tall
-Built it brick by brick, we never gonna fall
-Eyes on the horizon, fire in my soul
-Every single step is taking back control
-
-[chorus]
-We don't stop, no we never quit
-Rising up, this is just the lit
-Hands up high, feel the energy
-This is who we're meant to be
-
-[verse]
-They said we couldn't, said we wouldn't make it
-Look at us now, there's no way to fake it
-Loud and proud, we own the night
-Every single moment, we ignite
-
-[chorus]
-We don't stop, no we never quit
-Rising up, this is just the lit
-Hands up high, feel the energy
-This is who we're meant to be
-
-[bridge]
-Turn the speakers up, feel the bass drop
-Nothing's gonna make this energy stop
-
-[chorus]
-We don't stop, no we never quit
-Rising up, this is just the lit
-Hands up high, feel the energy
-This is who we're meant to be
-
-[outro]
-We're here now, we made it
-Let's go`
-    },
-    "Lullaby": {
-      prompt: "Gentle lullaby, soft acoustic guitar, music box melody, whispering vocals, warm and soothing, bedtime",
-      lyrics: `[verse]
-Close your eyes, my little one
-The day is done, the stars have come
-The moon is rising, soft and bright
-To watch over you through the night
-
-[chorus]
-Sleep tight, dream deep
-Angels guard you while you sleep
-Sleep tight, don't you cry
-Tomorrow brings a brand new sky
-
-[verse]
-The flowers close, the birds take rest
-The world is settling, peaceful and blessed
-Your teddy's here, right by your side
-In this moment, love won't hide
-
-[chorus]
-Sleep tight, dream deep
-Angels guard you while you sleep
-Sleep tight, don't you cry
-Tomorrow brings a brand new sky
-
-[outro]
-La la la, la la la
-Sleep now, my little star`
-    },
-    "Diss track": {
-      prompt: "Aggressive hip-hop, dark trap beat, menacing bass, confrontational energy, sharp delivery",
-      lyrics: `[verse]
-You talk a lot but say nothing at all
-Built your house of cards, watch it fall
-Claiming you're the best, where's the proof
-Empty words, that's the cold hard truth
-
-[verse]
-You copy everything, no originality
-Hiding behind screens, no reality
-Step into the light, let's see what you got
-All that talk and yet you're still not hot
-
-[chorus]
-Sit down, be humble, know your place
-You're a shadow trying to win the race
-Sit down, be humble, face the facts
-You're a footnote, that's where you at
-
-[verse]
-Your followers are bots, your shine is fake
-Your whole career is a big mistake
-I've been grinding, you've been playing games
-When they write the history, forget your name
-
-[chorus]
-Sit down, be humble, know your place
-You're a shadow trying to win the race
-Sit down, be humble, face the facts
-You're a footnote, that's where you at
-
-[outro]
-That's where you at`
-    },
-    "Story song": {
-      prompt: "Country folk, acoustic guitar, storytelling, warm and nostalgic, road trip vibes, campfire atmosphere",
-      lyrics: `[verse]
-He left that town on a Monday morning
-With a suitcase and a guitar case
-Nothing but a dream and a tank of gas
-And a smile upon his face
-
-[verse]
-He played in bars from dusk till dawn
-Slept in his car, kept pushing on
-Every mile a lesson learned
-Every bridge he crossed, a bridge not burned
-
-[chorus]
-It's a long road home
-But he's never alone
-Every step he takes
-Is a story that he makes
-
-[verse]
-She was singing at a roadside cafe
-Voice like honey, stole his breath away
-He said, I'm heading somewhere, I don't know where
-She said, mind if I come along from there
-
-[chorus]
-It's a long road home
-But they're never alone
-Every step they take
-Is a story that they make
-
-[bridge]
-Years went by, the road got tired
-But the fire in their hearts never expired
-A little house, a porch, two rocking chairs
-Music floating on the evening air
-
-[chorus]
-It's a long road home
-But they're never alone
-Every step they take
-Is a story that they make
-
-[outro]
-And the story's still being written`
-    },
+    "Birthday": { prompt: "Upbeat pop, cheerful, handclaps, bright piano, celebration energy, confetti vibes", lyrics: `[verse]\nIt's your birthday, time to celebrate\nAnother year, you're looking great\nBlow the candles, make a wish today\nEverybody here to say\n\n[chorus]\nHappy happy birthday to you\nLet's party all night through\nHappy happy birthday, hip hooray\nThis is your special day\n\n[verse]\nCake and presents, friends all around\nMusic's playing, hear that sound\nGrab your party hat, let's dance and play\nCelebrate in every way\n\n[chorus]\nHappy happy birthday to you\nLet's party all night through\nHappy happy birthday, hip hooray\nThis is your special day\n\n[outro]\nHappy birthday, happy birthday\nMake a wish and let it fly` },
+    "Love ballad": { prompt: "Slow R&B ballad, romantic piano, soft strings, intimate, candlelit atmosphere, heartfelt", lyrics: `[verse]\nI saw you standing in the light\nThe world just faded out of sight\nYour eyes held something I could not explain\nA feeling running through my veins\n\n[pre chorus]\nAnd every moment by your side\nIs where I want to be tonight\n\n[chorus]\nYou're the one I've been waiting for\nEvery heartbeat says you're worth fighting for\nHold me close and don't let go\nYou're the only love I know\n\n[verse]\nThe way you laugh, the way you smile\nMakes every single mile worthwhile\nYour hand in mine, we'll write our story\nA love that lives in all its glory\n\n[pre chorus]\nAnd every whisper in the dark\nReminds me you're my missing part\n\n[chorus]\nYou're the one I've been waiting for\nEvery heartbeat says you're worth fighting for\nHold me close and don't let go\nYou're the only love I know\n\n[bridge]\nThrough the storms and through the rain\nI'd do it all again\nYour love is my anchor, my home\n\n[chorus]\nYou're the one I've been waiting for\nEvery heartbeat says you're worth fighting for\nHold me close and don't let go\nYou're the only love I know\n\n[outro]\nYou're the only love I know` },
+    "Hype track": { prompt: "Trap, booming 808 bass, hard-hitting drums, confident energy, festival anthem, crowd chant", lyrics: `[intro]\nYeah, yeah, let's go\nWe're here now, turn it up\n\n[verse]\nStarted from the bottom, now we're standing tall\nBuilt it brick by brick, we never gonna fall\nEyes on the horizon, fire in my soul\nEvery single step is taking back control\n\n[chorus]\nWe don't stop, no we never quit\nRising up, this is just the lit\nHands up high, feel the energy\nThis is who we're meant to be\n\n[verse]\nThey said we couldn't, said we wouldn't make it\nLook at us now, there's no way to fake it\nLoud and proud, we own the night\nEvery single moment, we ignite\n\n[chorus]\nWe don't stop, no we never quit\nRising up, this is just the lit\nHands up high, feel the energy\nThis is who we're meant to be\n\n[bridge]\nTurn the speakers up, feel the bass drop\nNothing's gonna make this energy stop\n\n[chorus]\nWe don't stop, no we never quit\nRising up, this is just the lit\nHands up high, feel the energy\nThis is who we're meant to be\n\n[outro]\nWe're here now, we made it\nLet's go` },
+    "Lullaby": { prompt: "Gentle lullaby, soft acoustic guitar, music box melody, whispering vocals, warm and soothing, bedtime", lyrics: `[verse]\nClose your eyes, my little one\nThe day is done, the stars have come\nThe moon is rising, soft and bright\nTo watch over you through the night\n\n[chorus]\nSleep tight, dream deep\nAngels guard you while you sleep\nSleep tight, don't you cry\nTomorrow brings a brand new sky\n\n[verse]\nThe flowers close, the birds take rest\nThe world is settling, peaceful and blessed\nYour teddy's here, right by your side\nIn this moment, love won't hide\n\n[chorus]\nSleep tight, dream deep\nAngels guard you while you sleep\nSleep tight, don't you cry\nTomorrow brings a brand new sky\n\n[outro]\nLa la la, la la la\nSleep now, my little star` },
+    "Diss track": { prompt: "Aggressive hip-hop, dark trap beat, menacing bass, confrontational energy, sharp delivery", lyrics: `[verse]\nYou talk a lot but say nothing at all\nBuilt your house of cards, watch it fall\nClaiming you're the best, where's the proof\nEmpty words, that's the cold hard truth\n\n[verse]\nYou copy everything, no originality\nHiding behind screens, no reality\nStep into the light, let's see what you got\nAll that talk and yet you're still not hot\n\n[chorus]\nSit down, be humble, know your place\nYou're a shadow trying to win the race\nSit down, be humble, face the facts\nYou're a footnote, that's where you at\n\n[verse]\nYour followers are bots, your shine is fake\nYour whole career is a big mistake\nI've been grinding, you've been playing games\nWhen they write the history, forget your name\n\n[chorus]\nSit down, be humble, know your place\nYou're a shadow trying to win the race\nSit down, be humble, face the facts\nYou're a footnote, that's where you at\n\n[outro]\nThat's where you at` },
+    "Story song": { prompt: "Country folk, acoustic guitar, storytelling, warm and nostalgic, road trip vibes, campfire atmosphere", lyrics: `[verse]\nHe left that town on a Monday morning\nWith a suitcase and a guitar case\nNothing but a dream and a tank of gas\nAnd a smile upon his face\n\n[verse]\nHe played in bars from dusk till dawn\nSlept in his car, kept pushing on\nEvery mile a lesson learned\nEvery bridge he crossed, a bridge not burned\n\n[chorus]\nIt's a long road home\nBut he's never alone\nEvery step he takes\nIs a story that he makes\n\n[verse]\nShe was singing at a roadside cafe\nVoice like honey, stole his breath away\nHe said, I'm heading somewhere, I don't know where\nShe said, mind if I come along from there\n\n[chorus]\nIt's a long road home\nBut they're never alone\nEvery step they take\nIs a story that they make\n\n[bridge]\nYears went by, the road got tired\nBut the fire in their hearts never expired\nA little house, a porch, two rocking chairs\nMusic floating on the evening air\n\n[chorus]\nIt's a long road home\nBut they're never alone\nEvery step they take\nIs a story that they make\n\n[outro]\nAnd the story's still being written` },
   };
 
-  // Render template chips
   const templateChipsEl = $("templateChips");
   Object.keys(lyricsTemplates).forEach(name => {
     const chip = document.createElement("span");
@@ -733,7 +598,7 @@ And the story's still being written`
     const btn = document.createElement("span");
     btn.className = "chip";
     btn.textContent = label;
-    btn.style.cssText = "cursor:pointer;font-weight:600;";
+    btn.style.cssText = "cursor:pointer;font-weight:700;";
     btn.addEventListener("click", () => {
       document.querySelectorAll("#styleTabs .chip").forEach(el => el.style.borderColor = "");
       btn.style.borderColor = "var(--accent)";
@@ -749,32 +614,7 @@ And the story's still being written`
   renderChips(Object.keys(samplePrompts)[0]);
 
   // Sample lyrics (Daniel, 5yo)
-  const sampleLyrics = `[verse]
-Daniel Daniel clap your hands
-Clap them loud and clap them soft
-Daniel Daniel stomp your feet
-Stomp them big and stomp them small
-
-[chorus]
-Daniel is five and oh so bright
-Smiling sunshine every day
-La la la la la la la
-Daniel loves to sing and play
-
-[verse]
-Daniel Daniel jump up high
-Touch the sky and wiggle down
-Daniel Daniel spin around
-Round and round and sit back down
-
-[chorus]
-Daniel is five and oh so bright
-Smiling sunshine every day
-La la la la la la la
-Daniel loves to sing and play
-
-[outro]
-La la la la la`;
+  const sampleLyrics = `[verse]\nDaniel Daniel clap your hands\nClap them loud and clap them soft\nDaniel Daniel stomp your feet\nStomp them big and stomp them small\n\n[chorus]\nDaniel is five and oh so bright\nSmiling sunshine every day\nLa la la la la la la\nDaniel loves to sing and play\n\n[verse]\nDaniel Daniel jump up high\nTouch the sky and wiggle down\nDaniel Daniel spin around\nRound and round and sit back down\n\n[chorus]\nDaniel is five and oh so bright\nSmiling sunshine every day\nLa la la la la la la\nDaniel loves to sing and play\n\n[outro]\nLa la la la la`;
 
   $("sampleBtn").addEventListener("click", () => {
     $("prompt").value = "Cheerful children's song, ukulele, clapping, bright, preschool singalong";
@@ -851,45 +691,25 @@ La la la la la`;
   }
 
   // Copy song structure
-  const songStructure = `Song structure:
-[Intro] — short opening, set the mood
-[Verse] — tell the story, build the narrative
-[Pre Chorus] — build tension before the hook
-[Chorus] — the main hook, catchy and repeatable
-[Post Chorus] — reinforcement after the hook
-[Hook] — the most memorable part, the earworm
-[Bridge] — change of perspective or new angle
-[Interlude] — instrumental break between sections
-[Transition] — connect two sections smoothly
-[Build Up] — rising energy before a drop or chorus
-[Break] — stripped-back moment, tension release
-[Inst] — instrumental section, no vocals
-[Solo] — featured instrument performance
-[Outro] — wrap it up, fade or strong ending`;
+  const songStructure = `Song structure:\n[Intro] -- short opening, set the mood\n[Verse] -- tell the story, build the narrative\n[Pre Chorus] -- build tension before the hook\n[Chorus] -- the main hook, catchy and repeatable\n[Post Chorus] -- reinforcement after the hook\n[Hook] -- the most memorable part, the earworm\n[Bridge] -- change of perspective or new angle\n[Interlude] -- instrumental break between sections\n[Transition] -- connect two sections smoothly\n[Build Up] -- rising energy before a drop or chorus\n[Break] -- stripped-back moment, tension release\n[Inst] -- instrumental section, no vocals\n[Solo] -- featured instrument performance\n[Outro] -- wrap it up, fade or strong ending`;
 
   $("copyStructureBtn").addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(songStructure);
-      toast("Structure copied — paste into ChatGPT/Claude", "ok");
+      toast("Structure copied -- paste into ChatGPT/Claude", "ok");
     } catch {
-      toast("Failed to copy — try again", "err");
+      toast("Failed to copy -- try again", "err");
     }
   });
 
   // Copy/Paste settings
   $("copySettingsBtn").addEventListener("click", async () => {
-    const data = {
-      style: $("prompt").value,
-      lyrics: $("lyrics").value,
-      sampleRate: $("sampleRate").value,
-      bitrate: $("bitrate").value,
-      format: $("format").value
-    };
+    const data = { style: $("prompt").value, lyrics: $("lyrics").value, sampleRate: $("sampleRate").value, bitrate: $("bitrate").value, format: $("format").value };
     try {
       await navigator.clipboard.writeText(JSON.stringify(data));
       toast("Settings copied to clipboard", "ok");
     } catch {
-      toast("Failed to copy — try again", "err");
+      toast("Failed to copy -- try again", "err");
     }
   });
 
@@ -926,16 +746,10 @@ La la la la la`;
     const key = apiKeyEl.value.trim();
     const resp = await fetch(GMI_ENDPOINT, {
       method: "POST",
-      headers: {
-        "Authorization": "Bearer " + key,
-        "Content-Type": "application/json"
-      },
+      headers: { "Authorization": "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-    if (!resp.ok) {
-      const t = await resp.text();
-      throw new Error("Submit HTTP " + resp.status + ": " + t);
-    }
+    if (!resp.ok) { const t = await resp.text(); throw new Error("Submit HTTP " + resp.status + ": " + t); }
     return resp.json();
   }
 
@@ -945,21 +759,11 @@ La la la la la`;
     const url = GMI_ENDPOINT + "/" + requestId;
     const t0 = Date.now();
     while (Date.now() - t0 < POLL_TIMEOUT) {
-      const r = await fetch(url, {
-        headers: { "Authorization": "Bearer " + key }
-      });
-      if (!r.ok) {
-        const t = await r.text();
-        throw new Error("Poll HTTP " + r.status + ": " + t);
-      }
+      const r = await fetch(url, { headers: { "Authorization": "Bearer " + key } });
+      if (!r.ok) { const t = await r.text(); throw new Error("Poll HTTP " + r.status + ": " + t); }
       const j = await r.json();
-      const status = j.status;
-      if (status === "success") {
-        return j;
-      }
-      if (status === "failed") {
-        throw new Error("Generation failed: " + JSON.stringify(j));
-      }
+      if (j.status === "success") return j;
+      if (j.status === "failed") throw new Error("Generation failed: " + JSON.stringify(j));
       setStatus(`Composing… (${Math.round((Date.now() - t0) / 1000)}s)`, "work");
       await sleep(POLL_INTERVAL);
     }
@@ -998,15 +802,15 @@ La la la la la`;
     list.innerHTML = "";
     history.forEach(h => {
       const row = document.createElement("div");
-      row.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);";
+      row.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #00ff8822;";
       row.innerHTML = `
         <div style="flex:1;min-width:0;">
-          <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.title || "Untitled"}</div>
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.title || "Untitled"}</div>
           <div style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.prompt || "No style prompt"}</div>
           <div style="font-size:11px;color:var(--muted);">${h.date}</div>
         </div>
-        <span class="chip play-history" data-id="${h.id}" style="cursor:pointer;font-size:11px;">Play</span>
-        <span class="chip delete-history" data-id="${h.id}" style="cursor:pointer;font-size:11px;color:var(--err);border-color:var(--err);">Delete</span>
+        <span class="chip play-history" data-id="${h.id}" style="cursor:pointer;font-size:10px;">Play</span>
+        <span class="chip delete-history" data-id="${h.id}" style="cursor:pointer;font-size:10px;color:var(--err);border-color:var(--err);">Delete</span>
       `;
       list.appendChild(row);
     });
@@ -1047,16 +851,7 @@ La la la la la`;
 
   // Build payload for a given lyrics + prompt
   function buildPayload(lyrics, prompt) {
-    const p = {
-      model: "minimax-music-3.0",
-      payload: {
-        lyrics,
-        prompt,
-        sample_rate: parseInt($("sampleRate").value),
-        bitrate: parseInt($("bitrate").value),
-        format: $("format").value
-      }
-    };
+    const p = { model: "minimax-music-3.0", payload: { lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value } };
     if (!prompt) delete p.payload.prompt;
     return p;
   }
@@ -1069,13 +864,7 @@ La la la la la`;
   // Build meta string from result
   function buildMeta(result) {
     const dur = (result.outcome?.duration_ms || 0) / 1000;
-    return [
-      `⏱ ${dur.toFixed(1)}s`,
-      `${result.outcome?.sample_rate || 0} Hz`,
-      `${result.outcome?.channels || 0} ch`,
-      `${(result.outcome?.bitrate || 0) / 1000 | 0} kbps`,
-      result.outcome?.format || "mp3"
-    ].join(" · ");
+    return [`⏱ ${dur.toFixed(1)}s`, `${result.outcome?.sample_rate || 0} Hz`, `${result.outcome?.channels || 0} ch`, `${(result.outcome?.bitrate || 0) / 1000 | 0} kbps`, result.outcome?.format || "mp3"].join(" · ");
   }
 
   // Display a single result in the player card
@@ -1101,7 +890,7 @@ La la la la la`;
     grid.innerHTML = "";
     results.forEach((r, i) => {
       const item = document.createElement("div");
-      item.style.cssText = "background:#0e0e14;border:1px solid var(--border);border-radius:10px;padding:14px;";
+      item.style.cssText = "background:#08080d;border:1px solid #00ff8833;border-radius:4px;padding:14px;";
       item.innerHTML = `
         <div style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:6px;">${r.category}</div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${r.prompt}">${r.prompt.split(",").slice(0,3).join(",")}</div>
@@ -1116,14 +905,12 @@ La la la la la`;
       grid.appendChild(item);
     });
 
-    // Play first result automatically
     grid.querySelector("audio")?.play().catch(() => {});
 
-    // "Use style" buttons
     grid.querySelectorAll(".use-remix").forEach(btn => {
       btn.addEventListener("click", () => {
         $("prompt").value = decodeURIComponent(btn.dataset.prompt);
-        toast("Style loaded — edit and regenerate", "ok");
+        toast("Style loaded -- edit and regenerate", "ok");
       });
     });
   }
@@ -1135,7 +922,7 @@ La la la la la`;
 
     const prompt = $("prompt").value.trim();
     const lyrics = $("lyrics").value.trim();
-    if (!lyrics) { toast("Lyrics required by GMI (1–3500 chars)", "err"); $("lyrics").focus(); return; }
+    if (!lyrics) { toast("Lyrics required by GMI (1-3500 chars)", "err"); $("lyrics").focus(); return; }
     if (lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length + " / 3500 chars", "err"); return; }
 
     const btn = $("generateBtn");
@@ -1145,12 +932,10 @@ La la la la la`;
 
     try {
       if (remixOn) {
-        // REMIX MODE: parallel generation with random styles
         const count = parseInt(remixCount.value);
         const styles = pickRandomStyles(count);
         setStatus(`Submitting ${count} versions…`, "work");
 
-        // Submit all in parallel
         const payloads = styles.map(s => buildPayload(lyrics, s.prompt));
         const submitResults = await Promise.all(payloads.map(p => submitRequest(p)));
 
@@ -1161,10 +946,8 @@ La la la la la`;
 
         setStatus(`Composing ${count} versions…`, "work");
 
-        // Poll all in parallel
         const finals = await Promise.all(requestIds.map(id => pollRequest(id)));
 
-        // Collect results
         const remixResults = finals.map((f, i) => {
           const audioUrl = extractAudioUrl(f);
           if (!audioUrl) throw new Error("No audio URL for version " + (i+1));
@@ -1176,7 +959,6 @@ La la la la la`;
         completeProgress();
         toast(`${count} remixes ready`, "ok");
 
-        // Save each to history
         const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
         remixResults.forEach(r => {
           saveToHistory({
@@ -1192,7 +974,6 @@ La la la la la`;
         });
 
       } else {
-        // NORMAL MODE: single generation
         const payload = buildPayload(lyrics, prompt);
         const submitResult = await submitRequest(payload);
         const requestId = submitResult.request_id;
@@ -1210,9 +991,8 @@ La la la la la`;
 
         setStatus("Done", "ok");
         completeProgress();
-        toast("Song ready — playing now", "ok");
+        toast("Song ready -- playing now", "ok");
 
-        // Save to history
         const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
         saveToHistory({
           id: String(Date.now()),
