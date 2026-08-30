@@ -263,9 +263,6 @@
 
   #styleTabs .chip { padding: 4px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
 
-  .lyrics-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-  .lyrics-tag { color: var(--accent-2); font-size: 11px; font-family: var(--font-mono); cursor: pointer; }
-  .lyrics-tag:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
 
   details summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 6px 0; user-select: none; font-family: var(--font-mono); }
   details summary:hover { color: var(--accent); }
@@ -370,22 +367,6 @@
         <label for="lyrics">Lyrics <span style="color:var(--muted); text-transform:none;">(1-3500 chars, with [verse]/[chorus] tags)</span></label>
         <div id="templateChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;"></div>
         <textarea id="lyrics" rows="10"></textarea>
-        <div class="lyrics-tags">
-          <span class="lyrics-tag">[Intro]</span>
-          <span class="lyrics-tag">[Verse]</span>
-          <span class="lyrics-tag">[Pre Chorus]</span>
-          <span class="lyrics-tag">[Chorus]</span>
-          <span class="lyrics-tag">[Post Chorus]</span>
-          <span class="lyrics-tag">[Hook]</span>
-          <span class="lyrics-tag">[Bridge]</span>
-          <span class="lyrics-tag">[Interlude]</span>
-          <span class="lyrics-tag">[Transition]</span>
-          <span class="lyrics-tag">[Build Up]</span>
-          <span class="lyrics-tag">[Break]</span>
-          <span class="lyrics-tag">[Inst]</span>
-          <span class="lyrics-tag">[Solo]</span>
-          <span class="lyrics-tag">[Outro]</span>
-        </div>
         <details style="margin-top:10px;">
           <summary>Song structure for AI</summary>
           <div style="margin-top:8px;background:#08080d;border:1px solid #00ff8822;border-radius:4px;padding:12px;font-size:12px;line-height:1.8;color:var(--muted);font-family:var(--font-mono);">
