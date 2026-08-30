@@ -510,6 +510,10 @@
   const POLL_INTERVAL = 4000; // ms
   const POLL_TIMEOUT = 180000; // 3 min
 
+  // Persist API key
+  const apiKeyEl = $("apiKey");
+  const apiKeyStatus = $("apiKeyStatus");
+
   // Provider toggle (gmi | minimax)
   let activeProvider = localStorage.getItem("gmi_provider") || "gmi";
   const providerTabs = document.querySelectorAll(".provider-tab");
@@ -532,10 +536,6 @@
 
   providerTabs.forEach(t => t.addEventListener("click", () => switchProvider(t.dataset.provider)));
   switchProvider(activeProvider);
-
-  // Persist API key
-  const apiKeyEl = $("apiKey");
-  const apiKeyStatus = $("apiKeyStatus");
 
   function updateApiKeyStatus() {
     const hasKey = apiKeyEl.value.trim().length > 0;
