@@ -354,9 +354,10 @@
     </div>
 
     <div class="card">
-      <label for="prompt">Style / vibe prompt <span style="color:var(--muted); text-transform:none;">(genre, mood, instruments -- optional)</span></label>
+      <label for="prompt">Genre</label>
       <input type="text" id="prompt" placeholder="Cheerful children's song, ukulele, clapping, bright, preschool" />
       <div id="styleTabs" style="display:flex;gap:6px;margin-top:10px;margin-bottom:8px;flex-wrap:wrap;"></div>
+      <div id="subgenreDisplay" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;"></div>
       <div class="examples" id="promptChips"></div>
 
       <div style="margin-top:14px;">
@@ -592,6 +593,20 @@
       wrap.appendChild(c);
     });
     chipsEl.appendChild(wrap);
+
+    // Render subgenre names below tabs
+    const subgenreEl = $("subgenreDisplay");
+    subgenreEl.innerHTML = "";
+    const label = document.createElement("div");
+    label.style.cssText = "width:100%;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;font-family:var(--font-mono);";
+    label.textContent = category + " subgenres:";
+    subgenreEl.appendChild(label);
+    prompts.forEach(p => {
+      const sub = document.createElement("span");
+      sub.style.cssText = "font-size:11px;color:var(--accent);font-family:var(--font-mono);";
+      sub.textContent = p.split(",")[0];
+      subgenreEl.appendChild(sub);
+    });
   }
 
   Object.keys(samplePrompts).forEach((label, i) => {
