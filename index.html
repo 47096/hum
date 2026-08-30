@@ -30,6 +30,7 @@
     color: var(--fg);
     font: 14px/1.6 var(--font-mono);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   /* Scanline overlay */
@@ -48,7 +49,7 @@
     );
   }
 
-  .wrap { max-width: 640px; margin: 0 auto; padding: 32px 24px 80px; position: relative; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 32px 24px 80px; position: relative; overflow: hidden; }
 
   /* Header with glitch */
   header {
