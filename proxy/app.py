@@ -1,6 +1,11 @@
 from flask import Flask, request, Response
 import requests
 import json
+import logging
+import traceback
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -21,6 +26,7 @@ def get_api_url(provider, path=""):
 
 @app.errorhandler(Exception)
 def handle_exception(e):
+    logger.error(f"Unhandled exception: {e}\n{traceback.format_exc()}")
     return cors_response(json.dumps({"error": str(e)}), 500)
 
 @app.route("/", methods=["POST", "GET", "OPTIONS"])
@@ -33,6 +39,8 @@ def proxy(request_id=""):
         provider = request.headers.get("X-Provider", "gmi")
         api_key = request.headers.get("Authorization", "").replace("Bearer ", "")
 
+        logger.info(f"Request: {request.method} provider={provider} key_len={len(api_key)}")
+
         if not api_key:
             return cors_response(json.dumps({"error": "Missing API key"}), 401)
 
@@ -43,7 +51,9 @@ def proxy(request_id=""):
 
         if request.method == "GET":
             url = get_api_url(provider, f"/{request_id}" if request_id else "")
+            logger.info(f"GET {url}")
             resp = requests.get(url, headers=api_headers, timeout=30)
+            logger.info(f"Response: {resp.status_code}")
             return cors_response(resp.text, resp.status_code)
 
         # POST
@@ -52,8 +62,11 @@ def proxy(request_id=""):
         if not body:
             return cors_response(json.dumps({"error": "Missing body"}), 400)
 
+        logger.info(f"POST {url} body_keys={list(body.keys())}")
         resp = requests.post(url, json=body, headers=api_headers, timeout=600)
+        logger.info(f"Response: {resp.status_code} len={len(resp.text)}")
         return cors_response(resp.text, resp.status_code)
 
     except Exception as e:
+        logger.error(f"Request error: {e}\n{traceback.format_exc()}")
         return cors_response(json.dumps({"error": str(e)}), 500)
