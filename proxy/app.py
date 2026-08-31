@@ -26,7 +26,7 @@ def proxy():
     if provider == "minimax":
         url = "https://api.minimax.chat/v1/music_generation"
     else:
-        url = "https://api.gmicloud.com/api/v1/requests"
+        url = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests"
 
     api_headers = {
         "Authorization": f"Bearer {api_key}",
