@@ -4,5 +4,5 @@ services:
     runtime: python
     rootDir: proxy
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --timeout 600
     plan: free
