@@ -25,6 +25,20 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
 
+  :root.light {
+    --bg: #f5f5f7;
+    --panel: #ffffff;
+    --border: #00aa5533;
+    --fg: #1a1a2e;
+    --muted: #6a6a80;
+    --accent: #00aa55;
+    --accent-2: #aa00cc;
+    --ok: #00aa55;
+    --err: #cc0044;
+    --glow-green: 0 0 8px #00aa5522, 0 0 20px #00aa5511;
+    --glow-magenta: 0 0 8px #aa00cc22, 0 0 20px #aa00cc11;
+  }
+
   * { box-sizing: border-box; word-wrap: break-word; }
 
   html, body {
@@ -239,7 +253,10 @@
     width: 36px; height: 20px; background: #1a1a28; border-radius: 2px;
     position: relative; cursor: pointer; transition: background .2s;
     border: 1px solid #333345;
+    /* Expand touch target to 44px without changing visual size */
+    box-sizing: content-box; padding: 12px 0; margin: -12px 0;
   }
+  .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .toggle.on { background: transparent; border-color: var(--accent); box-shadow: var(--glow-green); }
   .toggle-knob {
     width: 14px; height: 14px; background: var(--muted); border-radius: 0;
@@ -327,23 +344,55 @@
     .row { grid-template-columns: 1fr; }
     .actions { flex-wrap: wrap; }
   }
+
+  /* Utility classes */
+  .text-label {
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--accent); font-weight: 600;
+  }
+  .text-small { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+  .text-tiny {
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted);
+  }
+  .text-muted { font-size: 12px; color: var(--muted); }
+  .btn-sm { font-size: 11px; padding: 6px 10px; }
+  .clickable { cursor: pointer; }
+  .truncate {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .history-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid #00ff8822; overflow: hidden;
+  }
+  .history-info { flex: 1; min-width: 0; max-width: 100%; overflow: hidden; }
+  .history-title { font-size: 13px; font-weight: 600; }
+  .history-prompt { font-size: 11px; color: var(--muted); }
+  .history-date { font-size: 11px; color: var(--muted); }
+  .remix-item {
+    background: #08080d; border: 1px solid #00ff8833;
+    border-radius: 4px; padding: 14px;
+  }
+  .remix-category { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+  .remix-prompt { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="logo">M3</div>
-    <div>
+    <div style="flex:1;">
       <h1 data-text="AI Music">AI Music<span class="endpoint-badge">GMI Cloud</span></h1>
       <div class="sub">prompt + lyrics -> MP3 :: powered by GMI Inference Engine</div>
     </div>
+    <button class="ghost" id="themeToggle" style="padding:8px;font-size:16px;" title="Toggle light/dark theme">🌙</button>
   </header>
 
   <div class="grid">
 
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:600;">API & proxy</span>
+        <span class="text-label">API & proxy</span>
         <span class="chip" id="apiKeyStatus" style="cursor:default;font-size:10px;">Not set</span>
       </div>
       <details style="margin-top:8px;">
@@ -351,8 +400,8 @@
         <div style="margin-top:8px;">
           <label>Provider</label>
           <div style="display:flex;gap:6px;margin-bottom:12px;">
-            <span class="chip provider-tab" data-provider="gmi" style="cursor:pointer;font-weight:700;border-color:var(--accent);color:var(--accent);">GMI Cloud</span>
-            <span class="chip provider-tab" data-provider="minimax" style="cursor:pointer;font-weight:700;">MiniMax</span>
+            <span class="chip provider-tab clickable" data-provider="gmi" style="font-weight:700;border-color:var(--accent);color:var(--accent);">GMI Cloud</span>
+            <span class="chip provider-tab clickable" data-provider="minimax" style="font-weight:700;">MiniMax</span>
           </div>
           <label for="apiKey" id="apiKeyLabel">GMI Cloud API key</label>
           <input type="password" id="apiKey" placeholder="paste key, stored only in this browser" autocomplete="off" />
@@ -380,10 +429,17 @@
       <div style="margin-top:14px;">
         <label for="lyrics">Lyrics templates <span style="color:var(--muted); text-transform:none;">(1-3500 chars, with [verse]/[chorus] tags)</span></label>
         <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;align-items:center;">
-          <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-right:4px;">Templates:</span>
+          <span class="text-tiny" style="margin-right:4px;">Templates:</span>
           <div id="templateChips" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
         </div>
-        <textarea id="lyrics" rows="10"></textarea>
+        <textarea id="lyrics" rows="10" placeholder="[verse]\nYour lyrics here...\n\n[chorus]\nThe catchy hook goes here"></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+          <label style="margin-bottom:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <span class="toggle" id="instrumentalToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
+            <span class="text-muted">Instrumental (no lyrics)</span>
+          </label>
+          <div id="lyricsCount" class="text-small">0 / 3,500</div>
+        </div>
         <details style="margin-top:10px;">
           <summary>Song structure for AI</summary>
           <div style="margin-top:8px;background:#08080d;border:1px solid #00ff8822;border-radius:4px;padding:12px;font-size:12px;line-height:1.8;color:var(--muted);font-family:var(--font-mono);">
@@ -447,18 +503,51 @@
               </select>
             </div>
           </div>
+          <div class="row" style="margin-top:12px;">
+            <div>
+              <label>BPM</label>
+              <input type="number" id="bpm" min="60" max="200" placeholder="Auto" style="width:100%;" />
+            </div>
+            <div>
+              <label>Key</label>
+              <select id="songKey">
+                <option value="">Auto</option>
+                <option value="C">C</option>
+                <option value="C#">C#</option>
+                <option value="D">D</option>
+                <option value="D#">D#</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="F#">F#</option>
+                <option value="G">G</option>
+                <option value="G#">G#</option>
+                <option value="A">A</option>
+                <option value="A#">A#</option>
+                <option value="B">B</option>
+              </select>
+            </div>
+            <div>
+              <label>Mode</label>
+              <select id="songMode">
+                <option value="">Auto</option>
+                <option value="major">Major</option>
+                <option value="minor">Minor</option>
+              </select>
+            </div>
+          </div>
           <div style="display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap;">
             <label style="margin-bottom:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
-              <span class="toggle" id="remixToggle"><span class="toggle-knob"></span></span>
-              <span style="font-size:12px;color:var(--muted);">Style remix</span>
+              <span class="toggle" id="remixToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
+              <span class="text-muted">Style remix</span>
             </label>
             <select id="remixCount" style="width:auto;padding:4px 8px;font-size:11px;display:none;">
               <option value="2">2 versions</option>
               <option value="3" selected>3 versions</option>
             </select>
             <div style="margin-left:auto;display:flex;gap:6px;">
-              <button class="ghost" id="copySettingsBtn" style="font-size:11px;padding:6px 10px;">Copy settings</button>
-              <button class="ghost" id="pasteSettingsBtn" style="font-size:11px;padding:6px 10px;">Paste settings</button>
+              <button class="ghost btn-sm" id="shareBtn">Share link</button>
+              <button class="ghost btn-sm" id="copySettingsBtn">Copy settings</button>
+              <button class="ghost btn-sm" id="pasteSettingsBtn">Paste settings</button>
             </div>
           </div>
         </div>
@@ -486,7 +575,7 @@
     <div class="card" id="historyCard" style="display:none;">
       <div style="display:flex; align-items:center; justify-content:space-between;">
         <label style="margin-bottom:0;">Song history</label>
-        <span class="chip" id="clearHistory" style="cursor:pointer;font-size:10px;">[ Clear all ]</span>
+        <span class="chip clickable" id="clearHistory" style="font-size:10px;">[ Clear all ]</span>
       </div>
       <div id="historyList" style="margin-top:12px;overflow:hidden;"></div>
     </div>
@@ -494,11 +583,23 @@
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
+
+  // Theme toggle
+  const themeToggle = $("themeToggle");
+  const savedTheme = localStorage.getItem("gmi_theme") || "dark";
+  if (savedTheme === "light") document.documentElement.classList.add("light");
+  themeToggle.textContent = savedTheme === "light" ? "☀️" : "🌙";
+
+  themeToggle.addEventListener("click", () => {
+    const isLight = document.documentElement.classList.toggle("light");
+    localStorage.setItem("gmi_theme", isLight ? "light" : "dark");
+    themeToggle.textContent = isLight ? "☀️" : "🌙";
+  });
 
   // Proxy endpoint — Cloudflare Worker URL for GitHub Pages,
   // or "/requests" for local proxy (gmi_proxy.py on port 8765).
@@ -562,6 +663,17 @@
     toast("Proxy URL saved", "ok");
   });
 
+  // Lyrics character counter
+  const lyricsEl = $("lyrics");
+  const lyricsCountEl = $("lyricsCount");
+  function updateLyricsCount() {
+    const len = lyricsEl.value.length;
+    lyricsCountEl.textContent = len.toLocaleString() + " / 3,500";
+    lyricsCountEl.style.color = len > 3500 ? "var(--err)" : "var(--muted)";
+  }
+  lyricsEl.addEventListener("input", updateLyricsCount);
+  updateLyricsCount();
+
   // Style prompt chips (categorised)
   const samplePrompts = {
     "Pop": ["Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads, catchy melodic hook, 120 BPM, feel-good summer anthem energy","Electropop, glossy production, sidechain compression, vocoder harmonies, pulsing bassline, futuristic neon atmosphere, radio-ready polish","Indie pop, jangly reverb guitar, soft brushed drums, warm lo-fi texture, dreamy and wistful, slightly off-kilter charm, cassette aesthetic","Synthpop, 80s analog warmth, arpeggiated Juno synths, gated reverb snare, nostalgic and cinematic, John Hughes movie soundtrack feel","Cantopop ballad, 深情款款, 鋼琴弦樂編曲, 懷舊經典氣息, 張學友式深情演繹, 夜色浪漫氛圍","Mandopop ballad, 華語抒情鋼琴, 深情弦樂編曲, 周杰倫式旋律美感, 深夜思念情緒, 電台經典情歌"],
@@ -589,9 +701,8 @@
   const templateChipsEl = $("templateChips");
   Object.keys(lyricsTemplates).forEach(name => {
     const chip = document.createElement("span");
-    chip.className = "chip";
+    chip.className = "chip clickable";
     chip.textContent = name;
-    chip.style.cursor = "pointer";
     chip.addEventListener("click", () => {
       const t = lyricsTemplates[name];
       $("lyrics").value = t.lyrics;
@@ -608,7 +719,9 @@
     const subgenreEl = $("subgenreDisplay");
     subgenreEl.innerHTML = "";
     const label = document.createElement("div");
-    label.style.cssText = "width:100%;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:6px;font-weight:600;font-family:var(--font-mono);";
+    label.className = "text-label";
+    label.style.width = "100%";
+    label.style.marginBottom = "6px";
     label.textContent = "Subgenres";
     subgenreEl.appendChild(label);
     prompts.forEach((p, i) => {
@@ -634,9 +747,9 @@
 
   Object.keys(samplePrompts).forEach((label, i) => {
     const btn = document.createElement("span");
-    btn.className = "chip";
+    btn.className = "chip clickable";
     btn.textContent = label;
-    btn.style.cssText = "cursor:pointer;font-weight:700;";
+    btn.style.fontWeight = "700";
     btn.addEventListener("click", () => {
       document.querySelectorAll("#styleTabs .chip").forEach(el => el.style.borderColor = "");
       btn.style.borderColor = "var(--accent)";
@@ -704,10 +817,35 @@
   let remixOn = false;
   const remixToggle = $("remixToggle");
   const remixCount = $("remixCount");
-  remixToggle.addEventListener("click", () => {
+  function toggleRemix() {
     remixOn = !remixOn;
     remixToggle.classList.toggle("on", remixOn);
+    remixToggle.setAttribute("aria-checked", String(remixOn));
     remixCount.style.display = remixOn ? "block" : "none";
+  }
+  remixToggle.addEventListener("click", toggleRemix);
+  remixToggle.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleRemix(); }
+  });
+
+  // Instrumental toggle
+  let instrumentalOn = false;
+  const instrumentalToggle = $("instrumentalToggle");
+  const lyricsEl2 = $("lyrics");
+  function toggleInstrumental() {
+    instrumentalOn = !instrumentalOn;
+    instrumentalToggle.classList.toggle("on", instrumentalOn);
+    instrumentalToggle.setAttribute("aria-checked", String(instrumentalOn));
+    lyricsEl2.disabled = instrumentalOn;
+    lyricsEl2.style.opacity = instrumentalOn ? "0.4" : "1";
+    if (instrumentalOn) {
+      lyricsEl2.value = "";
+      $("lyricsCount").textContent = "0 / 3,500";
+    }
+  }
+  instrumentalToggle.addEventListener("click", toggleInstrumental);
+  instrumentalToggle.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleInstrumental(); }
   });
 
   // Pick N random prompts from different categories
@@ -758,6 +896,31 @@
     }
   });
 
+  // Share link
+  $("shareBtn").addEventListener("click", async () => {
+    const data = { p: $("prompt").value, l: $("lyrics").value };
+    if (!data.p && !data.l) { toast("Nothing to share — add a prompt or lyrics", "err"); return; }
+    const hash = btoa(encodeURIComponent(JSON.stringify(data)));
+    const url = window.location.origin + window.location.pathname + "#" + hash;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast("Share link copied to clipboard", "ok");
+    } catch {
+      toast("Failed to copy link", "err");
+    }
+  });
+
+  // Load shared settings from URL hash
+  if (window.location.hash.length > 1) {
+    try {
+      const data = JSON.parse(decodeURIComponent(atob(window.location.hash.slice(1))));
+      if (data.p) $("prompt").value = data.p;
+      if (data.l) $("lyrics").value = data.l;
+      toast("Loaded shared settings", "ok");
+      history.replaceState(null, "", window.location.pathname); // Clean URL
+    } catch {}
+  }
+
   // Toast
   const toastEl = $("toast");
   let toastTimer;
@@ -775,7 +938,8 @@
   async function submitRequest(payload, retries = 2) {
     const key = apiKeyEl.value.trim();
     const headers = { "Authorization": "Bearer " + key, "Content-Type": "application/json", "X-Provider": activeProvider };
-    const resp = await fetch(GMI_ENDPOINT, { method: "POST", headers, body: JSON.stringify(payload) });
+    const signal = abortController?.signal;
+    const resp = await fetch(GMI_ENDPOINT, { method: "POST", headers, body: JSON.stringify(payload), signal });
     if (!resp.ok) {
       const t = await resp.text();
       if (resp.status === 524 && retries > 0) {
@@ -785,18 +949,30 @@
       }
       throw new Error("Submit HTTP " + resp.status + ": " + t);
     }
-    return resp.json();
+    try { return await resp.json(); }
+    catch { throw new Error("Server returned invalid response (not JSON)"); }
   }
 
   // Poll (GMI only — MiniMax returns result directly)
   async function pollRequest(requestId) {
     const key = apiKeyEl.value.trim();
     const url = GMI_ENDPOINT + "/" + requestId;
+    const signal = abortController?.signal;
     const t0 = Date.now();
     while (Date.now() - t0 < POLL_TIMEOUT) {
-      const r = await fetch(url, { headers: { "Authorization": "Bearer " + key, "X-Provider": activeProvider } });
-      if (!r.ok) { const t = await r.text(); throw new Error("Poll HTTP " + r.status + ": " + t); }
-      const j = await r.json();
+      let r, j;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          r = await fetch(url, { headers: { "Authorization": "Bearer " + key, "X-Provider": activeProvider }, signal });
+          if (!r.ok) { const t = await r.text(); throw new Error("Poll HTTP " + r.status + ": " + t); }
+          j = await r.json();
+          break; // Success
+        } catch (err) {
+          if (err.name === "AbortError") throw err;
+          if (attempt === 2) throw err; // Final attempt failed
+          await sleep(2000); // Wait before retry
+        }
+      }
       if (j.status === "success") return j;
       if (j.status === "failed") throw new Error("Generation failed: " + JSON.stringify(j));
       setStatus(`Composing… (${Math.round((Date.now() - t0) / 1000)}s)`, "work");
@@ -837,19 +1013,36 @@
     list.innerHTML = "";
     history.forEach(h => {
       const row = document.createElement("div");
-      row.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #00ff8822;overflow:hidden;";
+      row.className = "history-row";
       const truncatedPrompt = (h.prompt || "No style prompt").length > 80
         ? (h.prompt || "No style prompt").substring(0, 80) + "…"
         : (h.prompt || "No style prompt");
-      row.innerHTML = `
-        <div style="flex:1;min-width:0;max-width:100%;overflow:hidden;">
-          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.title || "Untitled"}</div>
-          <div style="font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${truncatedPrompt}</div>
-          <div style="font-size:11px;color:var(--muted);">${h.date}</div>
-        </div>
-        <span class="chip play-history" data-id="${h.id}" style="cursor:pointer;font-size:10px;">Play</span>
-        <span class="chip delete-history" data-id="${h.id}" style="cursor:pointer;font-size:10px;color:var(--err);border-color:var(--err);">Delete</span>
-      `;
+      const info = document.createElement("div");
+      info.className = "history-info";
+      const titleDiv = document.createElement("div");
+      titleDiv.className = "history-title truncate";
+      titleDiv.textContent = h.title || "Untitled";
+      const promptDiv = document.createElement("div");
+      promptDiv.className = "history-prompt truncate";
+      promptDiv.textContent = truncatedPrompt;
+      const dateDiv = document.createElement("div");
+      dateDiv.className = "history-date";
+      dateDiv.textContent = h.date;
+      info.append(titleDiv, promptDiv, dateDiv);
+
+      const playBtn = document.createElement("span");
+      playBtn.className = "chip play-history clickable";
+      playBtn.dataset.id = h.id;
+      playBtn.style.fontSize = "10px";
+      playBtn.textContent = "Play";
+
+      const deleteBtn = document.createElement("span");
+      deleteBtn.className = "chip delete-history clickable";
+      deleteBtn.dataset.id = h.id;
+      deleteBtn.style.cssText = "font-size:10px;color:var(--err);border-color:var(--err);";
+      deleteBtn.textContent = "Delete";
+
+      row.append(info, playBtn, deleteBtn);
       list.appendChild(row);
     });
 
@@ -869,7 +1062,7 @@
         $("filenameChip").textContent = entry.filename || "";
         $("meta").textContent = entry.meta || "";
         setStatus("Playing from history", "ok");
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        $("playerCard").scrollIntoView({ behavior: "smooth" });
       });
     });
 
@@ -889,6 +1082,10 @@
 
   // Build payload for a given lyrics + prompt
   function buildPayload(lyrics, prompt) {
+    const bpm = $("bpm").value ? parseInt($("bpm").value) : undefined;
+    const key = $("songKey").value || undefined;
+    const mode = $("songMode").value || undefined;
+
     if (activeProvider === "minimax") {
       const p = {
         model: "music-3.0",
@@ -903,10 +1100,17 @@
         }
       };
       if (!prompt) delete p.prompt;
+      if (bpm) p.audio_setting.bpm = bpm;
+      if (key) p.audio_setting.key = key;
+      if (mode) p.audio_setting.mode = mode;
       return p;
     }
     // GMI Cloud
-    const p = { model: "minimax-music-3.0", payload: { lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value } };
+    const payload = { lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value };
+    if (bpm) payload.bpm = bpm;
+    if (key) payload.key = key;
+    if (mode) payload.mode = mode;
+    const p = { model: "minimax-music-3.0", payload };
     if (!prompt) delete p.payload.prompt;
     return p;
   }
@@ -952,18 +1156,36 @@
     grid.innerHTML = "";
     results.forEach((r, i) => {
       const item = document.createElement("div");
-      item.style.cssText = "background:#08080d;border:1px solid #00ff8833;border-radius:4px;padding:14px;";
-      item.innerHTML = `
-        <div style="font-size:12px;color:var(--accent);font-weight:600;margin-bottom:6px;">${r.category}</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${r.prompt}">${r.prompt.split(",").slice(0,3).join(",")}</div>
-        <audio controls style="width:100%;"></audio>
-        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
-          <a class="chip" href="${r.audioUrl}" download="remix-${i+1}.${$("format").value}" style="font-size:11px;">Download</a>
-          <a class="chip" href="${r.audioUrl}" target="_blank" style="font-size:11px;">Open</a>
-          <span class="chip use-remix" data-prompt="${encodeURIComponent(r.prompt)}" style="cursor:pointer;font-size:11px;">Use style</span>
-        </div>
-      `;
-      item.querySelector("audio").src = r.audioUrl;
+      item.className = "remix-item";
+      const catDiv = document.createElement("div");
+      catDiv.className = "remix-category";
+      catDiv.textContent = r.category;
+      const promptDiv = document.createElement("div");
+      promptDiv.className = "remix-prompt truncate";
+      promptDiv.title = r.prompt;
+      promptDiv.textContent = r.prompt.split(",").slice(0,3).join(",");
+      const audio = document.createElement("audio");
+      audio.controls = true;
+      audio.style.width = "100%";
+      audio.src = r.audioUrl;
+      const actions = document.createElement("div");
+      actions.style.cssText = "margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;";
+      const dlLink = document.createElement("a");
+      dlLink.className = "chip btn-sm";
+      dlLink.href = r.audioUrl;
+      dlLink.download = `remix-${i+1}.${$("format").value}`;
+      dlLink.textContent = "Download";
+      const openLink = document.createElement("a");
+      openLink.className = "chip btn-sm";
+      openLink.href = r.audioUrl;
+      openLink.target = "_blank";
+      openLink.textContent = "Open";
+      const useBtn = document.createElement("span");
+      useBtn.className = "chip use-remix clickable btn-sm";
+      useBtn.dataset.prompt = encodeURIComponent(r.prompt);
+      useBtn.textContent = "Use style";
+      actions.append(dlLink, openLink, useBtn);
+      item.append(catDiv, promptDiv, audio, actions);
       grid.appendChild(item);
     });
 
@@ -978,18 +1200,41 @@
   }
 
   // Main generate
-  $("generateBtn").addEventListener("click", async () => {
+  let abortController = null;
+  const generateBtn = $("generateBtn");
+
+  // Keyboard shortcut: Cmd+Enter / Ctrl+Enter to generate
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      generateBtn.click();
+    }
+  });
+
+  generateBtn.addEventListener("click", async () => {
+    // If already generating, treat as cancel
+    if (abortController) {
+      abortController.abort();
+      abortController = null;
+      generateBtn.textContent = "Generate song";
+      setStatus("Cancelled", "err");
+      resetProgress();
+      toast("Generation cancelled", "ok");
+      return;
+    }
+
     const key = apiKeyEl.value.trim();
     const providerName = activeProvider === "gmi" ? "GMI" : "MiniMax";
-    if (!key) { toast("Paste your " + providerName + " API key first", "err"); apiKeyEl.focus(); return; }
+    if (!key) { apiKeyEl.closest("details").open = true; toast("Paste your " + providerName + " API key first", "err"); apiKeyEl.focus(); return; }
 
     const prompt = $("prompt").value.trim();
-    const lyrics = $("lyrics").value.trim();
-    if (!lyrics) { toast("Lyrics required (1-3500 chars, with [verse]/[chorus] tags)", "err"); $("lyrics").focus(); return; }
-    if (lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length + " / 3500 chars", "err"); return; }
+    const lyrics = instrumentalOn ? "" : $("lyrics").value.trim();
+    if (!instrumentalOn && !lyrics) { toast("Lyrics required (1-3500 chars, with [verse]/[chorus] tags)", "err"); $("lyrics").focus(); return; }
+    if (!instrumentalOn && lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length + " / 3500 chars", "err"); return; }
+    if (instrumentalOn && !prompt) { toast("Prompt required for instrumental mode — describe the style", "err"); $("prompt").focus(); return; }
 
-    const btn = $("generateBtn");
-    btn.disabled = true;
+    abortController = new AbortController();
+    generateBtn.textContent = "Cancel";
     setStatus("Submitting…", "work");
     showProgress();
 
@@ -1081,12 +1326,14 @@
         });
       }
     } catch (err) {
+      if (err.name === "AbortError") return; // Already handled in cancel branch
       console.error(err);
       setStatus("Error", "err");
       resetProgress();
       toast(err.message || String(err), "err");
     } finally {
-      btn.disabled = false;
+      abortController = null;
+      generateBtn.textContent = "Generate song";
     }
   });
 
