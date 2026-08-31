@@ -504,7 +504,9 @@
   // Proxy endpoint — Cloudflare Worker URL for GitHub Pages,
   // or "/requests" for local proxy (gmi_proxy.py on port 8765).
   const DEFAULT_PROXY = "https://gmi-music-proxy.minimax-bf7.workers.dev";
-  const GMI_ENDPOINT = localStorage.getItem("gmi_proxy_url") || DEFAULT_PROXY;
+  let _proxy = localStorage.getItem("gmi_proxy_url") || DEFAULT_PROXY;
+  if (_proxy && !_proxy.startsWith("http://") && !_proxy.startsWith("https://") && !_proxy.startsWith("/")) _proxy = "https://" + _proxy;
+  const GMI_ENDPOINT = _proxy;
   const POLL_INTERVAL = 4000; // ms
   const POLL_TIMEOUT = 180000; // 3 min
 
@@ -554,7 +556,10 @@
   const proxyUrlEl = $("proxyUrl");
   proxyUrlEl.value = localStorage.getItem("gmi_proxy_url") || "";
   proxyUrlEl.addEventListener("change", () => {
-    localStorage.setItem("gmi_proxy_url", proxyUrlEl.value.replace(/\/+$/, ""));
+    let v = proxyUrlEl.value.replace(/\/+$/, "");
+    if (v && !v.startsWith("http://") && !v.startsWith("https://") && !v.startsWith("/")) v = "https://" + v;
+    proxyUrlEl.value = v;
+    localStorage.setItem("gmi_proxy_url", v);
     toast("Proxy URL saved", "ok");
   });
 
