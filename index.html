@@ -489,7 +489,7 @@
         <label style="margin-bottom:0;">Song history</label>
         <span class="chip" id="clearHistory" style="cursor:pointer;font-size:10px;">[ Clear all ]</span>
       </div>
-      <div id="historyList" style="margin-top:12px;"></div>
+      <div id="historyList" style="margin-top:12px;overflow:hidden;"></div>
     </div>
 
   </div>
@@ -842,7 +842,7 @@
     list.innerHTML = "";
     history.forEach(h => {
       const row = document.createElement("div");
-      row.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #00ff8822;";
+      row.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #00ff8822;overflow:hidden;";
       row.innerHTML = `
         <div style="flex:1;min-width:0;">
           <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.title || "Untitled"}</div>
