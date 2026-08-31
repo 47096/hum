@@ -36,6 +36,13 @@
     min-height: 100vh;
   }
 
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
   /* Scanline overlay */
   body::after {
     content: "";
@@ -52,7 +59,7 @@
     );
   }
 
-  .wrap { max-width: 640px; width: 100%; margin: 0 auto; padding: 32px 18px 80px; position: relative; box-sizing: border-box; }
+  .wrap { max-width: 640px; width: 100%; padding: 32px 18px 80px; position: relative; box-sizing: border-box; }
 
   /* Header with glitch */
   header {
@@ -162,7 +169,7 @@
 
   .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
-  .actions { display: flex; gap: 10px; align-items: center; margin-top: 18px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
 
   button {
     background: transparent;
