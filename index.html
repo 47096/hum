@@ -1061,6 +1061,24 @@
     renderPlaylist();
   }
 
+  async function downloadTrack(url, filename) {
+    try {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+      toast("Downloaded", "ok");
+    } catch {
+      toast("Download failed", "err");
+    }
+  }
+
   function formatDuration(secs) {
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
@@ -1112,12 +1130,13 @@
       const dur = document.createElement("div");
       dur.className = "track-duration";
       dur.textContent = h.duration || "—";
-      const dl = document.createElement("a");
+      const dl = document.createElement("button");
       dl.className = "track-download";
       dl.textContent = "↓";
-      dl.href = h.audioUrl;
-      dl.download = (h.title || "song") + ".mp3";
-      dl.addEventListener("click", (e) => e.stopPropagation());
+      dl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        downloadTrack(h.audioUrl, (h.title || "song") + ".mp3");
+      });
       const del = document.createElement("button");
       del.className = "track-delete";
       del.textContent = "✕";
