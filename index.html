@@ -679,8 +679,8 @@
   </div>
 
   <div class="player-right">
-    <span class="vol-icon">🔊</span>
-    <div class="vol-bar"><div class="vol-fill"></div></div>
+    <span class="vol-icon" id="volIcon">🔊</span>
+    <div class="vol-bar" id="volBar"><div class="vol-fill" id="volFill"></div></div>
   </div>
 </div>
 
@@ -1151,6 +1151,42 @@
   // ─── Audio player ───
   const audio = $("audioPlayer");
   let isPlaying = false;
+
+  // Volume control
+  const VOL_KEY = "gmi_volume";
+  let volume = parseFloat(localStorage.getItem(VOL_KEY)) || 0.7;
+  audio.volume = volume;
+  $("volFill").style.width = (volume * 100) + "%";
+
+  function updateVolumeIcon(vol) {
+    if (vol === 0) $("volIcon").textContent = "🔇";
+    else if (vol < 0.3) $("volIcon").textContent = "🔈";
+    else if (vol < 0.7) $("volIcon").textContent = "🔉";
+    else $("volIcon").textContent = "🔊";
+  }
+
+  updateVolumeIcon(volume);
+
+  $("volBar").addEventListener("click", (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    volume = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    audio.volume = volume;
+    $("volFill").style.width = (volume * 100) + "%";
+    updateVolumeIcon(volume);
+    localStorage.setItem(VOL_KEY, String(volume));
+  });
+
+  $("volIcon").addEventListener("click", () => {
+    if (audio.volume > 0) {
+      audio.volume = 0;
+      $("volFill").style.width = "0%";
+      $("volIcon").textContent = "🔇";
+    } else {
+      audio.volume = volume || 0.7;
+      $("volFill").style.width = (audio.volume * 100) + "%";
+      updateVolumeIcon(audio.volume);
+    }
+  });
 
   function playTrack(index) {
     const history = getHistory();
