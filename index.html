@@ -1061,22 +1061,14 @@
     renderPlaylist();
   }
 
-  async function downloadTrack(url, filename) {
-    try {
-      const resp = await fetch(url);
-      const blob = await resp.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-      toast("Downloaded", "ok");
-    } catch {
-      toast("Download failed", "err");
-    }
+  function downloadTrack(url, filename) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   function formatDuration(secs) {
