@@ -1381,6 +1381,10 @@
 
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
+    // Don't trigger shortcuts when typing in inputs
+    const tag = e.target.tagName;
+    const isInput = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       e.preventDefault();
       generateBtn.click();
@@ -1388,6 +1392,10 @@
     if (e.key === "Escape" && abortController) {
       e.preventDefault();
       generateBtn.click();
+    }
+    if (e.key === " " && !isInput) {
+      e.preventDefault();
+      togglePlay();
     }
   });
 
