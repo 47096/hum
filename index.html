@@ -468,6 +468,7 @@
   }
 
   .ctrl-btn:hover { color: var(--fg); }
+  .ctrl-btn.active { color: var(--fg); }
 
   .ctrl-btn.play {
     width: 36px; height: 36px;
@@ -746,9 +747,11 @@
 
   <div class="player-center">
     <div class="player-controls">
+      <button class="ctrl-btn" id="shuffleBtn" title="Shuffle">🔀</button>
       <button class="ctrl-btn" id="prevBtn">⏮</button>
       <button class="ctrl-btn play" id="playBtn">▶</button>
       <button class="ctrl-btn" id="nextBtn">⏭</button>
+      <button class="ctrl-btn" id="repeatBtn" title="Repeat">🔁</button>
     </div>
     <div class="player-time">
       <span id="currentTime">0:00</span>
@@ -1337,18 +1340,52 @@
 
   $("playBtn").addEventListener("click", togglePlay);
 
-  $("prevBtn").addEventListener("click", () => {
+  // Shuffle & Repeat
+  let shuffleOn = false;
+  let repeatMode = 0; // 0=off, 1=repeat-all, 2=repeat-one
+
+  $("shuffleBtn").addEventListener("click", () => {
+    shuffleOn = !shuffleOn;
+    $("shuffleBtn").classList.toggle("active", shuffleOn);
+  });
+
+  $("repeatBtn").addEventListener("click", () => {
+    repeatMode = (repeatMode + 1) % 3;
+    $("repeatBtn").classList.toggle("active", repeatMode > 0);
+    $("repeatBtn").textContent = repeatMode === 2 ? "🔂" : "🔁";
+  });
+
+  function getNextIndex() {
     const history = getHistory();
-    if (history.length === 0) return;
-    const idx = currentTrackIndex <= 0 ? history.length - 1 : currentTrackIndex - 1;
-    playTrack(idx);
+    if (history.length === 0) return -1;
+    if (repeatMode === 2) return currentTrackIndex; // repeat one
+    if (shuffleOn) {
+      let idx;
+      do { idx = Math.floor(Math.random() * history.length); } while (idx === currentTrackIndex && history.length > 1);
+      return idx;
+    }
+    return currentTrackIndex >= history.length - 1 ? (repeatMode === 1 ? 0 : -1) : currentTrackIndex + 1;
+  }
+
+  function getPrevIndex() {
+    const history = getHistory();
+    if (history.length === 0) return -1;
+    if (shuffleOn) {
+      let idx;
+      do { idx = Math.floor(Math.random() * history.length); } while (idx === currentTrackIndex && history.length > 1);
+      return idx;
+    }
+    return currentTrackIndex <= 0 ? history.length - 1 : currentTrackIndex - 1;
+  }
+
+  $("prevBtn").addEventListener("click", () => {
+    const idx = getPrevIndex();
+    if (idx >= 0) playTrack(idx);
   });
 
   $("nextBtn").addEventListener("click", () => {
-    const history = getHistory();
-    if (history.length === 0) return;
-    const idx = currentTrackIndex >= history.length - 1 ? 0 : currentTrackIndex + 1;
-    playTrack(idx);
+    const idx = getNextIndex();
+    if (idx >= 0) playTrack(idx);
   });
 
   // Progress bar update
@@ -1365,10 +1402,10 @@
     isPlaying = false;
     $("playBtn").textContent = "▶";
     renderPlaylist();
-    // Auto-play next
-    const history = getHistory();
-    if (currentTrackIndex < history.length - 1) {
-      playTrack(currentTrackIndex + 1);
+    // Auto-play next (respects shuffle & repeat)
+    const nextIdx = getNextIndex();
+    if (nextIdx >= 0) {
+      playTrack(nextIdx);
     }
   });
 
