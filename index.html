@@ -1301,6 +1301,19 @@
     $("playerTitle").textContent = entry.title || "Untitled";
     $("playerMeta").textContent = (entry.prompt || "").split(",").slice(0, 2).join(",");
 
+    // MediaSession API — lock screen / headphone controls
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: entry.title || "Untitled",
+        artist: "AI Music",
+        album: (entry.prompt || "").split(",")[0] || "Generated"
+      });
+      navigator.mediaSession.setActionHandler("play", () => togglePlay());
+      navigator.mediaSession.setActionHandler("pause", () => togglePlay());
+      navigator.mediaSession.setActionHandler("previoustrack", () => $("prevBtn").click());
+      navigator.mediaSession.setActionHandler("nexttrack", () => $("nextBtn").click());
+    }
+
     renderPlaylist();
   }
 
