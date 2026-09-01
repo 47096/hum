@@ -165,7 +165,7 @@
     font-family: var(--font-mono);
   }
 
-  input[type="text"], input[type="password"], textarea, select {
+  input[type="text"], input[type="password"], input[type="number"], textarea, select {
     width: 100%; background: #08080d; border: 1px solid #00ff8833;
     color: var(--fg); padding: 10px 12px; border-radius: 4px;
     font: inherit; font-family: var(--font-mono);
@@ -361,6 +361,7 @@
   }
   .text-muted { font-size: 12px; color: var(--muted); }
   .btn-sm { font-size: 11px; padding: 10px 14px; min-height: 44px; }
+  .select-sm { width: auto; padding: 4px 8px; font-size: 11px; }
   .clickable { cursor: pointer; }
   .truncate {
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -520,7 +521,20 @@
           <div class="row" style="margin-top:12px;">
             <div>
               <label>BPM</label>
-              <input type="number" id="bpm" min="60" max="200" placeholder="Auto" style="width:100%;" />
+              <select id="bpm">
+                <option value="">Auto</option>
+                <option value="60">60 (very slow)</option>
+                <option value="70">70 (slow)</option>
+                <option value="80">80 (relaxed)</option>
+                <option value="90">90 (moderate)</option>
+                <option value="100">100 (medium)</option>
+                <option value="110">110 (upbeat)</option>
+                <option value="120">120 (energetic)</option>
+                <option value="130">130 (fast)</option>
+                <option value="140">140 (very fast)</option>
+                <option value="150">150 (rapid)</option>
+                <option value="160">160 (intense)</option>
+              </select>
             </div>
             <div>
               <label>Key</label>
@@ -554,7 +568,7 @@
               <span class="toggle" id="remixToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
               <span class="text-muted">Style remix</span>
             </label>
-            <select id="remixCount" style="width:auto;padding:4px 8px;font-size:11px;display:none;">
+            <select id="remixCount" class="select-sm" style="display:none;">
               <option value="2">2 versions</option>
               <option value="3" selected>3 versions</option>
             </select>
