@@ -1196,12 +1196,16 @@
     const entry = history[index];
 
     audio.src = entry.audioUrl;
-    audio.play().catch(() => {});
-    isPlaying = true;
+    audio.play().then(() => {
+      isPlaying = true;
+      $("playBtn").textContent = "⏸";
+      renderPlaylist();
+    }).catch(() => {
+      toast("Playback blocked — click play to start", "err");
+    });
 
     $("playerTitle").textContent = entry.title || "Untitled";
     $("playerMeta").textContent = (entry.prompt || "").split(",").slice(0, 2).join(",");
-    $("playBtn").textContent = "⏸";
 
     // Restore settings if clicking a history item
     if (entry.settings) restoreSettings(entry.settings);
@@ -1217,12 +1221,16 @@
       audio.pause();
       isPlaying = false;
       $("playBtn").textContent = "▶";
+      renderPlaylist();
     } else {
-      audio.play().catch(() => {});
-      isPlaying = true;
-      $("playBtn").textContent = "⏸";
+      audio.play().then(() => {
+        isPlaying = true;
+        $("playBtn").textContent = "⏸";
+        renderPlaylist();
+      }).catch(() => {
+        toast("Playback blocked — try again", "err");
+      });
     }
-    renderPlaylist();
   }
 
   $("playBtn").addEventListener("click", togglePlay);
