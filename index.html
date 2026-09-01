@@ -136,6 +136,11 @@
     transition: border-color .15s;
   }
 
+  #prompt {
+    min-height: 80px;
+    resize: vertical;
+  }
+
   input:focus, textarea:focus {
     outline: none;
     border-color: var(--fg);
@@ -609,7 +614,7 @@
       <div class="subgenre-row" id="subgenreDisplay"></div>
 
       <label>Style prompt</label>
-      <input type="text" id="prompt" placeholder="Upbeat dance pop, bright major key, punchy electronic drums" />
+      <textarea id="prompt" placeholder="Upbeat dance pop, bright major key, punchy electronic drums"></textarea>
 
       <label>Lyrics templates</label>
       <div class="template-row" id="templateChips"></div>
