@@ -1256,11 +1256,6 @@
     $("playerTitle").textContent = entry.title || "Untitled";
     $("playerMeta").textContent = (entry.prompt || "").split(",").slice(0, 2).join(",");
 
-    // Restore settings if clicking a history item
-    if (entry.settings) restoreSettings(entry.settings);
-    if (entry.prompt) $("prompt").value = entry.prompt;
-    if (entry.lyrics) { $("lyrics").value = entry.lyrics; updateLyricsCount(); }
-
     renderPlaylist();
   }
 
