@@ -206,6 +206,8 @@
     color: #0a0a0f;
     box-shadow: 0 0 16px #00ff8866, 0 0 40px #00ff8833;
   }
+  button:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
+  button { touch-action: manipulation; }
 
   button:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
 
@@ -281,21 +283,24 @@
     background: transparent;
     border: 1px solid #333345;
     border-radius: 2px;
-    padding: 4px 10px; font-size: 11px; color: var(--muted);
+    padding: 10px 12px; font-size: 11px; color: var(--muted);
     cursor: pointer; transition: all .12s; text-decoration: none;
-    display: inline-block;
+    display: inline-flex; align-items: center;
     font-family: var(--font-mono);
+    min-height: 44px;
+    touch-action: manipulation;
   }
   .chip:hover {
     color: var(--accent);
     border-color: var(--accent);
     box-shadow: var(--glow-green);
   }
+  .chip:active { transform: scale(0.97); opacity: 0.8; }
 
-  #styleTabs .chip { padding: 4px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
+  #styleTabs .chip { padding: 10px 14px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
 
 
-  details summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 6px 0; user-select: none; font-family: var(--font-mono); }
+  details summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 14px 0; user-select: none; font-family: var(--font-mono); touch-action: manipulation; }
   details summary:hover { color: var(--accent); }
 
   .toast {
@@ -356,7 +361,7 @@
     letter-spacing: 0.08em; color: var(--muted);
   }
   .text-muted { font-size: 12px; color: var(--muted); }
-  .btn-sm { font-size: 11px; padding: 6px 10px; }
+  .btn-sm { font-size: 11px; padding: 10px 14px; min-height: 44px; }
   .clickable { cursor: pointer; }
   .truncate {
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -383,12 +388,22 @@
     <div class="logo">M3</div>
     <div style="flex:1;">
       <h1 data-text="AI Music">AI Music<span class="endpoint-badge">GMI Cloud</span></h1>
-      <div class="sub">prompt + lyrics -> MP3 :: powered by GMI Inference Engine</div>
+      <div class="sub">Describe your song, add lyrics, generate an MP3 in ~60s</div>
     </div>
     <button class="ghost" id="themeToggle" style="padding:8px;font-size:16px;" title="Toggle light/dark theme">🌙</button>
   </header>
 
   <div class="grid">
+
+    <div class="card" id="gettingStarted" style="border-color:var(--accent);display:none;">
+      <div class="text-label" style="margin-bottom:8px;">Getting started</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8;">
+        <div>1. <strong style="color:var(--fg);">Set your API key</strong> — expand the section below and paste your key</div>
+        <div>2. <strong style="color:var(--fg);">Pick a genre</strong> — click a genre tab, then a subgenre to auto-fill the prompt</div>
+        <div>3. <strong style="color:var(--fg);">Add lyrics</strong> — write your own or use a template</div>
+        <div>4. <strong style="color:var(--fg);">Generate</strong> — hit the button or press <kbd style="background:#08080d;padding:2px 6px;border-radius:2px;border:1px solid #333345;">⌘ Enter</kbd></div>
+      </div>
+    </div>
 
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -642,8 +657,17 @@
     apiKeyStatus.textContent = hasKey ? "Set" : "Not set";
     apiKeyStatus.style.borderColor = hasKey ? "var(--ok)" : "var(--border)";
     apiKeyStatus.style.color = hasKey ? "var(--ok)" : "var(--muted)";
+    // Hide getting started card once key is set
+    if (hasKey) $("gettingStarted").style.display = "none";
   }
   updateApiKeyStatus();
+
+  // Onboarding: show getting started and auto-expand API key section on first visit
+  const hasAnyKey = localStorage.getItem("gmi_api_key") || localStorage.getItem("minimax_api_key");
+  if (!hasAnyKey) {
+    $("gettingStarted").style.display = "block";
+    document.querySelector("details").open = true;
+  }
 
   apiKeyEl.addEventListener("change", () => {
     const storageKey = activeProvider === "gmi" ? "gmi_api_key" : "minimax_api_key";
@@ -661,6 +685,34 @@
     proxyUrlEl.value = v;
     localStorage.setItem("gmi_proxy_url", v);
     toast("Proxy URL saved", "ok");
+  });
+
+  // Persist advanced settings
+  const settingsFields = ["sampleRate", "bitrate", "format", "bpm", "songKey", "songMode"];
+  const SETTINGS_KEY = "gmi_advanced_settings";
+
+  function saveSettings() {
+    const settings = {};
+    settingsFields.forEach(id => {
+      settings[id] = $(id).value;
+    });
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }
+
+  function loadSettings() {
+    try {
+      const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+      settingsFields.forEach(id => {
+        if (settings[id] !== undefined && settings[id] !== "") {
+          $(id).value = settings[id];
+        }
+      });
+    } catch {}
+  }
+
+  loadSettings();
+  settingsFields.forEach(id => {
+    $(id).addEventListener("change", saveSettings);
   });
 
   // Lyrics character counter
@@ -947,7 +999,7 @@
         await sleep(3000);
         return submitRequest(payload, retries - 1);
       }
-      throw new Error("Submit HTTP " + resp.status + ": " + t);
+      throw new Error("Server error (" + resp.status + ") — check your API key and try again");
     }
     try { return await resp.json(); }
     catch { throw new Error("Server returned invalid response (not JSON)"); }
@@ -964,7 +1016,7 @@
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
           r = await fetch(url, { headers: { "Authorization": "Bearer " + key, "X-Provider": activeProvider }, signal });
-          if (!r.ok) { const t = await r.text(); throw new Error("Poll HTTP " + r.status + ": " + t); }
+          if (!r.ok) throw new Error("Server error (" + r.status + ") — check your API key and try again");
           j = await r.json();
           break; // Success
         } catch (err) {
@@ -974,11 +1026,11 @@
         }
       }
       if (j.status === "success") return j;
-      if (j.status === "failed") throw new Error("Generation failed: " + JSON.stringify(j));
+      if (j.status === "failed") throw new Error("Generation failed — check your API key and try again");
       setStatus(`Composing… (${Math.round((Date.now() - t0) / 1000)}s)`, "work");
       await sleep(POLL_INTERVAL);
     }
-    throw new Error("Timed out after 3 minutes");
+    throw new Error("Timed out after 3 minutes — the server may be busy, try again");
   }
 
   // Song history
@@ -988,6 +1040,32 @@
   function getHistory() {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
     catch { return []; }
+  }
+
+  function getCurrentSettings() {
+    return {
+      sampleRate: $("sampleRate").value,
+      bitrate: $("bitrate").value,
+      format: $("format").value,
+      bpm: $("bpm").value,
+      songKey: $("songKey").value,
+      songMode: $("songMode").value,
+      instrumental: instrumentalOn,
+      provider: activeProvider
+    };
+  }
+
+  function restoreSettings(settings) {
+    if (!settings) return;
+    if (settings.sampleRate) $("sampleRate").value = settings.sampleRate;
+    if (settings.bitrate) $("bitrate").value = settings.bitrate;
+    if (settings.format) $("format").value = settings.format;
+    if (settings.bpm) $("bpm").value = settings.bpm;
+    if (settings.songKey) $("songKey").value = settings.songKey;
+    if (settings.songMode) $("songMode").value = settings.songMode;
+    if (settings.instrumental && !instrumentalOn) toggleInstrumental();
+    if (!settings.instrumental && instrumentalOn) toggleInstrumental();
+    if (settings.provider && settings.provider !== activeProvider) switchProvider(settings.provider);
   }
 
   function saveToHistory(entry) {
@@ -1052,6 +1130,7 @@
         if (!entry) return;
         $("prompt").value = entry.prompt || "";
         $("lyrics").value = entry.lyrics || "";
+        if (entry.settings) restoreSettings(entry.settings);
         const player = $("player");
         player.src = entry.audioUrl;
         $("playerCard").style.display = "block";
@@ -1203,9 +1282,15 @@
   let abortController = null;
   const generateBtn = $("generateBtn");
 
-  // Keyboard shortcut: Cmd+Enter / Ctrl+Enter to generate
+  // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
+    // Cmd+Enter / Ctrl+Enter to generate
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      generateBtn.click();
+    }
+    // Escape to cancel generation
+    if (e.key === "Escape" && abortController) {
       e.preventDefault();
       generateBtn.click();
     }
@@ -1229,9 +1314,9 @@
 
     const prompt = $("prompt").value.trim();
     const lyrics = instrumentalOn ? "" : $("lyrics").value.trim();
-    if (!instrumentalOn && !lyrics) { toast("Lyrics required (1-3500 chars, with [verse]/[chorus] tags)", "err"); $("lyrics").focus(); return; }
-    if (!instrumentalOn && lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length + " / 3500 chars", "err"); return; }
-    if (instrumentalOn && !prompt) { toast("Prompt required for instrumental mode — describe the style", "err"); $("prompt").focus(); return; }
+    if (!instrumentalOn && !lyrics) { toast("Add some lyrics first, or enable Instrumental mode", "err"); $("lyrics").focus(); return; }
+    if (!instrumentalOn && lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length.toLocaleString() + " / 3,500 characters", "err"); return; }
+    if (instrumentalOn && !prompt) { toast("Instrumental mode needs a style prompt — try 'Acoustic guitar, warm and mellow, 90 BPM'", "err"); $("prompt").focus(); return; }
 
     abortController = new AbortController();
     generateBtn.textContent = "Cancel";
@@ -1254,7 +1339,7 @@
         } else {
           // GMI: poll for results
           const requestIds = submitResults.map((r, i) => {
-            if (!r.request_id) throw new Error("No request_id for version " + (i+1));
+            if (!r.request_id) throw new Error("Server returned an unexpected response for version " + (i+1));
             return r.request_id;
           });
           setStatus(`Composing ${count} versions…`, "work");
@@ -1263,7 +1348,7 @@
 
         const remixResults = finals.map((f, i) => {
           const audioUrl = extractAudioUrl(f);
-          if (!audioUrl) throw new Error("No audio URL for version " + (i+1));
+          if (!audioUrl) throw new Error("No audio returned for version " + (i+1) + " — try again");
           return { category: styles[i].category, prompt: styles[i].prompt, audioUrl, meta: buildMeta(f) };
         });
 
@@ -1271,8 +1356,10 @@
         setStatus("Done", "ok");
         completeProgress();
         toast(`${count} remixes ready`, "ok");
+        $("remixCard").scrollIntoView({ behavior: "smooth" });
 
         const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
+        const settings = getCurrentSettings();
         remixResults.forEach(r => {
           saveToHistory({
             id: String(Date.now()) + "-" + r.category,
@@ -1282,7 +1369,8 @@
             audioUrl: r.audioUrl,
             filename: `remix-${r.category.toLowerCase()}.${$("format").value}`,
             meta: r.meta,
-            date: new Date().toLocaleString()
+            date: new Date().toLocaleString(),
+            settings
           });
         });
 
@@ -1297,13 +1385,13 @@
         } else {
           // GMI: poll for result
           const requestId = submitResult.request_id;
-          if (!requestId) throw new Error("No request_id in submit response: " + JSON.stringify(submitResult));
+          if (!requestId) throw new Error("Server returned an unexpected response — check your API key and try again");
           setStatus("Composing…", "work");
           final = await pollRequest(requestId);
         }
 
         const audioUrl = extractAudioUrl(final);
-        if (!audioUrl) throw new Error("No audio URL in result: " + JSON.stringify(final));
+        if (!audioUrl) throw new Error("No audio returned — the generation may have failed, try again");
 
         const filename = `song-${Date.now()}.${$("format").value}`;
         const meta = buildMeta(final);
@@ -1312,6 +1400,7 @@
         setStatus("Done", "ok");
         completeProgress();
         toast("Song ready -- playing now", "ok");
+        $("playerCard").scrollIntoView({ behavior: "smooth" });
 
         const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
         saveToHistory({
@@ -1322,7 +1411,8 @@
           audioUrl,
           filename,
           meta,
-          date: new Date().toLocaleString()
+          date: new Date().toLocaleString(),
+          settings: getCurrentSettings()
         });
       }
     } catch (err) {
