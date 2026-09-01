@@ -1251,20 +1251,16 @@
   function renderPlaylist() {
     const history = getHistory();
     const playlist = $("playlist");
-    const emptyState = $("emptyState");
     const title = $("playlistTitle");
     const scrollTop = playlist.scrollTop;
 
     title.textContent = history.length > 0 ? "Playlist · " + history.length + " tracks" : "Playlist";
 
     if (history.length === 0) {
-      playlist.innerHTML = "";
-      playlist.appendChild(emptyState);
-      emptyState.style.display = "flex";
+      playlist.innerHTML = '<div class="empty-state" id="emptyState"><div class="empty-icon">♪</div><div class="empty-text">No songs yet<br>Generate your first track</div></div>';
       return;
     }
 
-    emptyState.style.display = "none";
     playlist.innerHTML = "";
 
     history.forEach((h, i) => {
