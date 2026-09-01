@@ -15,7 +15,7 @@
     --panel: #1a1a1a;
     --border: #2a2a2a;
     --fg: #e8e8e8;
-    --muted: #666666;
+    --muted: #888888;
     --accent: #ffffff;
     --ok: #4ade80;
     --err: #f87171;
@@ -100,7 +100,7 @@
     border: 1px solid var(--border);
     padding: 6px 12px;
     font-family: var(--font-pixel);
-    font-size: 7px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
     cursor: pointer;
     transition: all .12s;
   }
@@ -202,7 +202,7 @@
 
   .char-count {
     font-family: var(--font-pixel);
-    font-size: 6px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
     margin-left: auto;
   }
 
@@ -263,7 +263,7 @@
 
   .gen-progress-text {
     font-family: var(--font-pixel);
-    font-size: 6px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
     text-align: center;
   }
 
@@ -283,7 +283,7 @@
 
   .playlist-title {
     font-family: var(--font-pixel);
-    font-size: 7px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
     text-transform: uppercase;
   }
 
@@ -293,7 +293,7 @@
     color: var(--muted);
     padding: 3px 8px;
     font-family: var(--font-pixel);
-    font-size: 6px;
+    font-size: 8px;
     cursor: pointer;
   }
 
@@ -316,7 +316,7 @@
 
   .track-num {
     font-family: var(--font-pixel);
-    font-size: 7px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
     width: 16px; text-align: center;
     flex-shrink: 0;
   }
@@ -338,7 +338,7 @@
 
   .track-duration {
     font-family: var(--font-pixel);
-    font-size: 7px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
   }
 
   .track-download {
@@ -399,12 +399,12 @@
   .empty-icon {
     font-size: 32px;
     margin-bottom: 12px;
-    opacity: 0.3;
+    opacity: 0.5;
   }
 
   .empty-text {
     font-family: var(--font-pixel);
-    font-size: 7px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
     line-height: 1.8;
   }
 
@@ -417,20 +417,6 @@
     height: 64px;
     position: relative;
     flex-shrink: 0;
-  }
-
-  .player-progress {
-    position: absolute;
-    top: -1px; left: 0; right: 0;
-    height: 2px;
-    background: var(--border);
-    cursor: pointer;
-  }
-
-  .player-progress-fill {
-    height: 100%;
-    background: var(--fg);
-    transition: width 0.3s ease;
   }
 
   .player-track {
@@ -470,7 +456,7 @@
     background: transparent;
     border: none;
     color: var(--muted);
-    width: 28px; height: 28px;
+    width: 36px; height: 36px;
     display: grid; place-items: center;
     cursor: pointer; font-size: 14px;
     transition: color .12s;
@@ -480,7 +466,7 @@
   .ctrl-btn.active { color: var(--fg); }
 
   .ctrl-btn.play {
-    width: 36px; height: 36px;
+    width: 44px; height: 44px;
     background: var(--fg);
     border-radius: 50%;
     color: var(--bg);
@@ -492,7 +478,7 @@
   .player-time {
     display: flex; align-items: center; gap: 8px;
     font-family: var(--font-pixel);
-    font-size: 6px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
   }
 
   .time-bar {
@@ -575,10 +561,14 @@
   .modal-close:hover { color: var(--err); }
 
   .settings-group { margin-bottom: 20px; }
+  .provider-row { display: flex; gap: 6px; margin-bottom: 12px; }
+  .remix-toggle-row { margin-bottom: 10px; }
+  .remix-count-select { display: none; }
+  .remix-count-select.remix-count-show { display: block; }
 
   .settings-label {
     font-family: var(--font-pixel);
-    font-size: 7px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
     text-transform: uppercase;
     margin-bottom: 10px;
     padding-bottom: 6px;
@@ -653,7 +643,7 @@
     color: var(--muted);
     padding: 4px 12px;
     font-family: var(--font-pixel);
-    font-size: 7px;
+    font-size: 8px;
     cursor: pointer;
     transition: all .12s;
   }
@@ -689,6 +679,18 @@
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); }
   ::-webkit-scrollbar-thumb:hover { background: var(--fg); }
+
+  /* Firefox scrollbar */
+  * { scrollbar-width: thin; scrollbar-color: var(--border) var(--bg); }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -758,9 +760,6 @@
 
 <!-- Player bar -->
 <div class="player-bar">
-  <div class="player-progress" id="progressBar">
-    <div class="player-progress-fill" id="progressFill" style="width:0%"></div>
-  </div>
 
   <div class="player-track">
     <div class="player-art" id="playerArt">♪</div>
@@ -804,7 +803,7 @@
     <div class="settings-group">
       <div class="settings-label">API</div>
       <label>Provider</label>
-      <div style="display:flex;gap:6px;margin-bottom:12px;">
+      <div class="provider-row">
         <span class="genre-chip provider-tab active" data-provider="gmi" role="button" tabindex="0">GMI Cloud</span>
         <span class="genre-chip provider-tab" data-provider="minimax" role="button" tabindex="0">MiniMax</span>
       </div>
@@ -883,11 +882,11 @@
 
     <div class="settings-group">
       <div class="settings-label">Style remix</div>
-      <div class="toggle-row" style="margin-bottom:10px;">
+      <div class="toggle-row remix-toggle-row">
         <span class="toggle" id="remixToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
         <span class="toggle-label">Generate multiple versions</span>
       </div>
-      <select id="remixCount" style="display:none;">
+      <select id="remixCount" class="remix-count-select">
         <option value="2">2 versions</option>
         <option value="3" selected>3 versions</option>
       </select>
@@ -905,7 +904,7 @@
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
 <!-- Hidden audio element -->
-<audio id="audioPlayer" preload="auto"></audio>
+<audio id="audioPlayer" preload="none"></audio>
 
 <script>
 (() => {
@@ -959,7 +958,13 @@
   // ─── Proxy URL ───
   $("proxyUrl").value = localStorage.getItem("gmi_proxy_url") || "";
   $("proxyUrl").addEventListener("change", () => {
-    const v = normalizeProxyUrl($("proxyUrl").value);
+    const raw = $("proxyUrl").value.trim();
+    if (raw && !/^https?:\/\/.+/.test(raw)) {
+      toast("Invalid URL — must start with http:// or https://", "err");
+      $("proxyUrl").value = localStorage.getItem("gmi_proxy_url") || "";
+      return;
+    }
+    const v = normalizeProxyUrl(raw);
     $("proxyUrl").value = v;
     localStorage.setItem("gmi_proxy_url", v);
     toast("Proxy URL saved", "ok");
@@ -1158,7 +1163,7 @@
     remixOn = !remixOn;
     remixToggle.classList.toggle("on", remixOn);
     remixToggle.setAttribute("aria-checked", String(remixOn));
-    remixCount.style.display = remixOn ? "block" : "none";
+    remixCount.classList.toggle("remix-count-show", remixOn);
   }
 
   remixToggle.addEventListener("click", toggleRemix);
@@ -1248,6 +1253,7 @@
     const playlist = $("playlist");
     const emptyState = $("emptyState");
     const title = $("playlistTitle");
+    const scrollTop = playlist.scrollTop;
 
     title.textContent = history.length > 0 ? "Playlist · " + history.length + " tracks" : "Playlist";
 
@@ -1315,6 +1321,7 @@
       item.addEventListener("click", () => playTrack(i));
       playlist.appendChild(item);
     });
+    playlist.scrollTop = scrollTop;
   }
 
   $("clearHistory").addEventListener("click", () => {
@@ -1462,7 +1469,7 @@
       do { idx = Math.floor(Math.random() * history.length); } while (idx === currentTrackIndex && history.length > 1);
       return idx;
     }
-    return currentTrackIndex <= 0 ? history.length - 1 : currentTrackIndex - 1;
+    return currentTrackIndex <= 0 ? (repeatMode === 1 ? history.length - 1 : -1) : currentTrackIndex - 1;
   }
 
   $("prevBtn").addEventListener("click", () => {
@@ -1479,7 +1486,6 @@
   audio.addEventListener("timeupdate", () => {
     if (!audio.duration) return;
     const pct = (audio.currentTime / audio.duration) * 100;
-    $("progressFill").style.width = pct + "%";
     $("timeFill").style.width = pct + "%";
     $("currentTime").textContent = formatDuration(audio.currentTime);
     $("totalTime").textContent = formatDuration(audio.duration);
@@ -1530,7 +1536,6 @@
     document.addEventListener("touchend", () => { seeking = false; });
   }
 
-  setupSeek($("progressBar"));
   setupSeek($("timeBar"));
 
   // ─── Generate ───
