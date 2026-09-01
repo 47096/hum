@@ -328,6 +328,7 @@
   }
 
   .track-genre { font-size: 10px; color: var(--muted); }
+  .track-date { font-size: 9px; color: var(--muted); opacity: 0.6; }
 
   .track-right {
     display: flex; align-items: center; gap: 8px;
@@ -1206,7 +1207,10 @@
       const genre = document.createElement("div");
       genre.className = "track-genre";
       genre.textContent = (h.prompt || "No style prompt").split(",").slice(0, 2).join(",");
-      info.append(name, genre);
+      const date = document.createElement("div");
+      date.className = "track-date";
+      date.textContent = h.date || "";
+      info.append(name, genre, date);
 
       const right = document.createElement("div");
       right.className = "track-right";
