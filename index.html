@@ -894,6 +894,7 @@
   const GMI_ENDPOINT = _proxy;
   const POLL_INTERVAL = 4000;
   const POLL_TIMEOUT = 180000;
+  const INSTRUMENTAL_LYRICS = "[instrumental]\n\n[inst]\n\n[outro]";
 
   // ─── Provider ───
   let activeProvider = localStorage.getItem("gmi_provider") || "gmi";
@@ -1494,11 +1495,11 @@
     const mode = $("songMode").value || undefined;
 
     if (activeProvider === "minimax") {
-      const instrumentalLyrics = "[instrumental]\n\n[inst]\n\n[outro]";
+      // Using INSTRUMENTAL_LYRICS constant
       const p = {
         model: "music-3.0",
         prompt: prompt || "",
-        lyrics: instrumentalOn ? instrumentalLyrics : lyrics,
+        lyrics: instrumentalOn ? INSTRUMENTAL_LYRICS : lyrics,
         stream: false,
         output_format: "url",
         audio_setting: {
@@ -1514,8 +1515,8 @@
       return p;
     }
 
-    const instrumentalLyrics = "[instrumental]\n\n[inst]\n\n[outro]";
-    const payload = { lyrics: instrumentalOn ? instrumentalLyrics : lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value };
+    // Using INSTRUMENTAL_LYRICS constant
+    const payload = { lyrics: instrumentalOn ? INSTRUMENTAL_LYRICS : lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value };
     if (bpm) payload.bpm = bpm;
     if (key) payload.key = key;
     if (mode) payload.mode = mode;
