@@ -146,7 +146,7 @@
     border-color: var(--fg);
   }
 
-  textarea { resize: vertical; min-height: 405px; }
+  #lyrics { resize: vertical; min-height: 405px; }
 
   .template-row {
     display: flex; flex-wrap: wrap; gap: 4px;
@@ -360,6 +360,13 @@
 
   .playlist-item:hover .track-delete { opacity: 1; }
   .track-delete:hover { color: var(--err); }
+
+  /* Always show download/delete on touch devices */
+  @media (hover: none) {
+    .track-download, .track-delete { opacity: 0.6; }
+    .playlist-item:hover .track-download,
+    .playlist-item:hover .track-delete { opacity: 1; }
+  }
 
   .playing-indicator {
     display: flex; gap: 2px; align-items: flex-end; height: 10px;
@@ -775,19 +782,19 @@
 </div>
 
 <!-- Settings modal -->
-<div class="modal-overlay" id="settingsModal">
+<div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">Settings</div>
-      <button class="modal-close" id="settingsClose">✕</button>
+      <div class="modal-title" id="settingsTitle">Settings</div>
+      <button class="modal-close" id="settingsClose" aria-label="Close settings">✕</button>
     </div>
 
     <div class="settings-group">
       <div class="settings-label">API</div>
       <label>Provider</label>
       <div style="display:flex;gap:6px;margin-bottom:12px;">
-        <span class="genre-chip provider-tab active" data-provider="gmi">GMI Cloud</span>
-        <span class="genre-chip provider-tab" data-provider="minimax">MiniMax</span>
+        <span class="genre-chip provider-tab active" data-provider="gmi" role="button" tabindex="0">GMI Cloud</span>
+        <span class="genre-chip provider-tab" data-provider="minimax" role="button" tabindex="0">MiniMax</span>
       </div>
       <label id="apiKeyLabel">GMI Cloud API key</label>
       <input type="password" id="apiKey" placeholder="Paste your key here" autocomplete="off" />
@@ -924,7 +931,10 @@
     $("apiKey").value = localStorage.getItem(provider === "gmi" ? "gmi_api_key" : "minimax_api_key") || "";
   }
 
-  providerTabs.forEach(t => t.addEventListener("click", () => switchProvider(t.dataset.provider)));
+  providerTabs.forEach(t => {
+    t.addEventListener("click", () => switchProvider(t.dataset.provider));
+    t.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); switchProvider(t.dataset.provider); } });
+  });
   switchProvider(activeProvider);
 
   // ─── API key ───
@@ -944,9 +954,31 @@
   });
 
   // ─── Settings modal ───
-  $("settingsBtn").addEventListener("click", () => $("settingsModal").classList.add("show"));
-  $("settingsClose").addEventListener("click", () => $("settingsModal").classList.remove("show"));
-  $("settingsModal").addEventListener("click", (e) => { if (e.target === $("settingsModal")) $("settingsModal").classList.remove("show"); });
+  function openSettings() {
+    $("settingsModal").classList.add("show");
+    $("settingsClose").focus();
+  }
+  function closeSettings() {
+    $("settingsModal").classList.remove("show");
+    $("settingsBtn").focus();
+  }
+  $("settingsBtn").addEventListener("click", openSettings);
+  $("settingsClose").addEventListener("click", closeSettings);
+  $("settingsModal").addEventListener("click", (e) => { if (e.target === $("settingsModal")) closeSettings(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && $("settingsModal").classList.contains("show")) {
+      closeSettings();
+    }
+    // Focus trap: keep Tab inside modal when open
+    if (e.key === "Tab" && $("settingsModal").classList.contains("show")) {
+      const modal = $("settingsModal").querySelector(".modal");
+      const focusable = modal.querySelectorAll("button, input, select, [tabindex]:not([tabindex='-1'])");
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
 
   // ─── Mobile tabs ───
   $("mobileCreateBtn").addEventListener("click", () => {
@@ -1030,11 +1062,14 @@
       c.className = "sub-chip" + (i === 0 ? " active" : "");
       c.textContent = p.split(",")[0];
       c.title = p;
+      c.setAttribute("role", "button");
+      c.setAttribute("tabindex", "0");
       c.addEventListener("click", () => {
         subgenreEl.querySelectorAll(".sub-chip").forEach(el => el.classList.remove("active"));
         c.classList.add("active");
         $("prompt").value = p;
       });
+      c.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); c.click(); } });
       subgenreEl.appendChild(c);
     });
     $("prompt").value = prompts[0];
@@ -1044,12 +1079,15 @@
     const btn = document.createElement("span");
     btn.className = "genre-chip" + (i === 0 ? " active" : "");
     btn.textContent = label;
+    btn.setAttribute("role", "button");
+    btn.setAttribute("tabindex", "0");
     btn.addEventListener("click", () => {
       tabsEl.querySelectorAll(".genre-chip").forEach(el => el.classList.remove("active"));
       btn.classList.add("active");
       activeTab = label;
       renderChips(label);
     });
+    btn.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); btn.click(); } });
     tabsEl.appendChild(btn);
     if (i === 0) activeTab = label;
   });
@@ -1061,6 +1099,8 @@
     const chip = document.createElement("span");
     chip.className = "template-chip";
     chip.textContent = name;
+    chip.setAttribute("role", "button");
+    chip.setAttribute("tabindex", "0");
     chip.addEventListener("click", () => {
       const t = lyricsTemplates[name];
       $("lyrics").value = t.lyrics;
@@ -1068,6 +1108,7 @@
       updateLyricsCount();
       toast("Loaded: " + name, "ok");
     });
+    chip.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); chip.click(); } });
     templateChipsEl.appendChild(chip);
   });
 
@@ -1173,8 +1214,15 @@
     renderPlaylist();
   }
 
-  function downloadTrack(url) {
-    window.open(url, "_blank");
+  function downloadTrack(url, title) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = (title || "track") + ".mp3";
+    a.target = "_blank";
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   function formatDuration(secs) {
@@ -1237,7 +1285,7 @@
       dl.setAttribute("aria-label", "Download track");
       dl.addEventListener("click", (e) => {
         e.stopPropagation();
-        downloadTrack(h.audioUrl);
+        downloadTrack(h.audioUrl, h.title);
       });
       const del = document.createElement("button");
       del.className = "track-delete";
@@ -1245,7 +1293,9 @@
       del.setAttribute("aria-label", "Delete track");
       del.addEventListener("click", (e) => {
         e.stopPropagation();
-        deleteFromHistory(h.id);
+        if (confirm("Delete \"" + (h.title || "Untitled") + "\"?")) {
+          deleteFromHistory(h.id);
+        }
       });
       right.append(dur, dl, del);
 
@@ -1601,7 +1651,7 @@
     isGenerating = true;
 
     const key = $("apiKey").value.trim();
-    if (!key) { $("settingsModal").classList.add("show"); toast("Set your API key first", "err"); return; }
+    if (!key) { openSettings(); toast("Set your API key first", "err"); return; }
 
     const prompt = $("prompt").value.trim();
     const lyrics = instrumentalOn ? "" : $("lyrics").value.trim();
