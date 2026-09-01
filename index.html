@@ -1168,7 +1168,7 @@
       const p = {
         model: "music-3.0",
         prompt: prompt || "",
-        lyrics: lyrics,
+        lyrics: lyrics || "",
         stream: false,
         output_format: "url",
         audio_setting: {
@@ -1178,20 +1178,16 @@
         }
       };
       if (!prompt) delete p.prompt;
-      // For instrumental mode, remove empty lyrics
-      if (instrumentalOn) delete p.lyrics;
       if (bpm) p.audio_setting.bpm = bpm;
       if (key) p.audio_setting.key = key;
       if (mode) p.audio_setting.mode = mode;
       return p;
     }
     // GMI Cloud
-    const payload = { lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value };
+    const payload = { lyrics: lyrics || "", prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value };
     if (bpm) payload.bpm = bpm;
     if (key) payload.key = key;
     if (mode) payload.mode = mode;
-    // For instrumental mode, remove empty lyrics
-    if (instrumentalOn) delete payload.lyrics;
     const p = { model: "minimax-music-3.0", payload };
     if (!prompt) delete p.payload.prompt;
     return p;
