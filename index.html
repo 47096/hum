@@ -1178,6 +1178,8 @@
         }
       };
       if (!prompt) delete p.prompt;
+      // For instrumental mode, remove empty lyrics
+      if (instrumentalOn) delete p.lyrics;
       if (bpm) p.audio_setting.bpm = bpm;
       if (key) p.audio_setting.key = key;
       if (mode) p.audio_setting.mode = mode;
@@ -1188,6 +1190,8 @@
     if (bpm) payload.bpm = bpm;
     if (key) payload.key = key;
     if (mode) payload.mode = mode;
+    // For instrumental mode, remove empty lyrics
+    if (instrumentalOn) delete payload.lyrics;
     const p = { model: "minimax-music-3.0", payload };
     if (!prompt) delete p.payload.prompt;
     return p;
