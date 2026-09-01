@@ -252,19 +252,18 @@
   }
 
   .toggle {
-    width: 36px; height: 20px; background: #1a1a28; border-radius: 2px;
-    position: relative; cursor: pointer; transition: background .2s;
+    width: 44px; height: 24px; background: #1a1a28; border-radius: 12px;
+    position: relative; cursor: pointer; transition: all .2s;
     border: 1px solid #333345;
-    /* Expand touch target to 44px without changing visual size */
-    box-sizing: content-box; padding: 12px 0; margin: -12px 0;
+    flex-shrink: 0;
   }
   .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .toggle.on { background: transparent; border-color: var(--accent); box-shadow: var(--glow-green); }
+  .toggle.on { background: var(--accent); border-color: var(--accent); box-shadow: var(--glow-green); }
   .toggle-knob {
-    width: 14px; height: 14px; background: var(--muted); border-radius: 0;
-    position: absolute; top: 2px; left: 2px; transition: transform .2s;
+    width: 18px; height: 18px; background: var(--muted); border-radius: 50%;
+    position: absolute; top: 2px; left: 2px; transition: all .2s;
   }
-  .toggle.on .toggle-knob { transform: translateX(16px); background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .toggle.on .toggle-knob { transform: translateX(20px); background: var(--bg); box-shadow: 0 0 6px rgba(0,0,0,0.3); }
 
   .player {
     margin-top: 16px; padding: 16px;
