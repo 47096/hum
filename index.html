@@ -40,7 +40,7 @@
     padding: 10px 16px;
     background: var(--panel);
     border-bottom: 1px solid var(--border);
-    height: 48px;
+    height: 56px;
   }
 
   .logo {
@@ -66,7 +66,7 @@
   .main {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    height: calc(100vh - 48px - 72px);
+    height: calc(100vh - 56px - 64px);
   }
 
   /* Left: Create form */
@@ -85,7 +85,7 @@
   label {
     display: block;
     font-family: var(--font-pixel);
-    font-size: 7px; color: var(--muted);
+    font-size: 8px; color: var(--muted);
     margin-bottom: 8px; text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -219,6 +219,7 @@
   }
 
   .generate-btn:hover { background: #cccccc; }
+  .generate-btn:active { background: #aaaaaa; transform: scale(0.97); }
   .generate-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .generate-btn.generating {
@@ -413,7 +414,7 @@
     padding: 0 16px;
     background: var(--panel);
     border-top: 1px solid var(--border);
-    height: 72px;
+    height: 64px;
     position: relative;
     flex-shrink: 0;
   }
@@ -498,7 +499,11 @@
     width: 200px; height: 3px;
     background: var(--border);
     cursor: pointer;
+    transition: height .15s;
+    position: relative;
   }
+
+  .time-bar:hover { height: 6px; }
 
   .time-fill {
     height: 100%;
@@ -532,16 +537,22 @@
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.7);
     z-index: 100;
+    opacity: 0;
+    transition: opacity .2s;
   }
 
-  .modal-overlay.show { display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto; }
+  .modal-overlay.show { display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto; opacity: 1; }
 
   .modal {
     background: var(--panel);
     border: 1px solid var(--fg);
     padding: 20px;
     max-width: 480px; width: 100%;
+    transform: translateY(-10px);
+    transition: transform .2s;
   }
+
+  .modal-overlay.show .modal { transform: translateY(0); }
 
   .modal-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -664,6 +675,7 @@
     .player-track { width: auto; flex: 1; }
     .player-right { display: none; }
     .time-bar { width: 120px; }
+    .settings-row { grid-template-columns: 1fr; }
   }
 
   :focus-visible {
@@ -735,7 +747,7 @@
       <button class="playlist-clear" id="clearHistory">Clear all</button>
     </div>
 
-    <div class="playlist" id="playlist">
+    <div class="playlist" id="playlist" aria-live="polite" aria-label="Playlist">
       <div class="empty-state" id="emptyState">
         <div class="empty-icon">♪</div>
         <div class="empty-text">No songs yet<br>Generate your first track</div>
@@ -760,11 +772,11 @@
 
   <div class="player-center">
     <div class="player-controls">
-      <button class="ctrl-btn" id="shuffleBtn" title="Shuffle">🔀</button>
+      <button class="ctrl-btn" id="shuffleBtn" title="Shuffle" aria-label="Shuffle">🔀</button>
       <button class="ctrl-btn" id="prevBtn" aria-label="Previous track">⏮</button>
       <button class="ctrl-btn play" id="playBtn" aria-label="Play">▶</button>
       <button class="ctrl-btn" id="nextBtn" aria-label="Next track">⏭</button>
-      <button class="ctrl-btn" id="repeatBtn" title="Repeat">🔁</button>
+      <button class="ctrl-btn" id="repeatBtn" title="Repeat" aria-label="Repeat">🔁</button>
     </div>
     <div class="player-time">
       <span id="currentTime">0:00</span>
@@ -776,7 +788,7 @@
   </div>
 
   <div class="player-right">
-    <span class="vol-icon" id="volIcon">🔊</span>
+    <span class="vol-icon" id="volIcon" role="button" tabindex="0" aria-label="Toggle mute">🔊</span>
     <div class="vol-bar" id="volBar"><div class="vol-fill" id="volFill"></div></div>
   </div>
 </div>
@@ -808,7 +820,7 @@
       <div class="settings-label">Audio quality</div>
       <div class="settings-row">
         <div>
-          <label>Sample rate</label>
+          <label for="sampleRate">Sample rate</label>
           <select id="sampleRate">
             <option value="44100">44100 Hz</option>
             <option value="32000">32000 Hz</option>
@@ -817,7 +829,7 @@
           </select>
         </div>
         <div>
-          <label>Bitrate</label>
+          <label for="bitrate">Bitrate</label>
           <select id="bitrate">
             <option value="256000">256 kbps</option>
             <option value="128000">128 kbps</option>
@@ -825,7 +837,7 @@
           </select>
         </div>
         <div>
-          <label>Format</label>
+          <label for="format">Format</label>
           <select id="format">
             <option value="mp3">MP3</option>
             <option value="wav">WAV</option>
@@ -839,7 +851,7 @@
       <div class="settings-label">Music theory</div>
       <div class="settings-row">
         <div>
-          <label>BPM</label>
+          <label for="bpm">BPM</label>
           <select id="bpm">
             <option value="">Auto</option>
             <option value="60">60</option><option value="70">70</option><option value="80">80</option>
@@ -849,7 +861,7 @@
           </select>
         </div>
         <div>
-          <label>Key</label>
+          <label for="songKey">Key</label>
           <select id="songKey">
             <option value="">Auto</option>
             <option value="C">C</option><option value="C#">C#</option><option value="D">D</option>
@@ -859,7 +871,7 @@
           </select>
         </div>
         <div>
-          <label>Mode</label>
+          <label for="songMode">Mode</label>
           <select id="songMode">
             <option value="">Auto</option>
             <option value="major">Major</option>
@@ -1161,7 +1173,7 @@
     toastEl.textContent = msg;
     toastEl.className = "toast show" + (kind ? " " + kind : "");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.className = "toast", 3500);
+    toastTimer = setTimeout(() => toastEl.className = "toast", 5000);
   };
 
   // ─── Song history / Playlist ───
@@ -1419,12 +1431,15 @@
   $("shuffleBtn").addEventListener("click", () => {
     shuffleOn = !shuffleOn;
     $("shuffleBtn").classList.toggle("active", shuffleOn);
+    $("shuffleBtn").setAttribute("aria-label", shuffleOn ? "Shuffle on" : "Shuffle");
   });
 
   $("repeatBtn").addEventListener("click", () => {
     repeatMode = (repeatMode + 1) % 3;
     $("repeatBtn").classList.toggle("active", repeatMode > 0);
     $("repeatBtn").textContent = repeatMode === 2 ? "🔂" : "🔁";
+    const repeatLabel = repeatMode === 0 ? "Repeat" : repeatMode === 1 ? "Repeat all" : "Repeat one";
+    $("repeatBtn").setAttribute("aria-label", repeatLabel);
   });
 
   function getNextIndex() {
@@ -1603,7 +1618,9 @@
         await new Promise(r => setTimeout(r, 3000));
         return submitRequest(payload, retries - 1);
       }
-      throw new Error("Server error (" + resp.status + ") — check your API key and try again");
+      if (resp.status === 401 || resp.status === 403) throw new Error("Invalid API key — check your settings");
+      if (resp.status === 429) throw new Error("Rate limited — wait a moment and try again");
+      throw new Error("Server error (" + resp.status + ") — try again later");
     }
     try { return await resp.json(); }
     catch { throw new Error("Server returned invalid response (not JSON)"); }
@@ -1619,7 +1636,10 @@
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
           r = await fetch(url, { headers: { "Authorization": "Bearer " + key, "X-Provider": activeProvider }, signal });
-          if (!r.ok) throw new Error("Server error (" + r.status + ")");
+          if (!r.ok) {
+            if (r.status === 401 || r.status === 403) throw new Error("Invalid API key — check your settings");
+            throw new Error("Server error (" + r.status + ")");
+          }
           j = await r.json();
           break;
         } catch (err) {
