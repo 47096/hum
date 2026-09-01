@@ -1066,6 +1066,10 @@
   const instrumentalToggle = $("instrumentalToggle");
 
   function toggleInstrumental() {
+    // Confirm before clearing lyrics
+    if (!instrumentalOn && lyricsEl.value.trim().length > 0) {
+      if (!confirm("Switch to instrumental? Your lyrics will be cleared.")) return;
+    }
     instrumentalOn = !instrumentalOn;
     instrumentalToggle.classList.toggle("on", instrumentalOn);
     instrumentalToggle.setAttribute("aria-checked", String(instrumentalOn));
