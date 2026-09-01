@@ -889,9 +889,14 @@
 
   // ─── Proxy & endpoints ───
   const DEFAULT_PROXY = "https://gmi-music-proxy.minimax-bf7.workers.dev";
-  let _proxy = localStorage.getItem("gmi_proxy_url") || DEFAULT_PROXY;
-  if (_proxy && !_proxy.startsWith("http://") && !_proxy.startsWith("https://") && !_proxy.startsWith("/")) _proxy = "https://" + _proxy;
-  const GMI_ENDPOINT = _proxy;
+
+  function normalizeProxyUrl(url) {
+    let v = url.replace(/\/+$/, "");
+    if (v && !v.startsWith("http://") && !v.startsWith("https://") && !v.startsWith("/")) v = "https://" + v;
+    return v;
+  }
+
+  const GMI_ENDPOINT = normalizeProxyUrl(localStorage.getItem("gmi_proxy_url") || DEFAULT_PROXY);
   const POLL_INTERVAL = 4000;
   const POLL_TIMEOUT = 180000;
   const INSTRUMENTAL_LYRICS = "[instrumental]\n\n[inst]\n\n[outro]";
@@ -927,8 +932,7 @@
   // ─── Proxy URL ───
   $("proxyUrl").value = localStorage.getItem("gmi_proxy_url") || "";
   $("proxyUrl").addEventListener("change", () => {
-    let v = $("proxyUrl").value.replace(/\/+$/, "");
-    if (v && !v.startsWith("http://") && !v.startsWith("https://") && !v.startsWith("/")) v = "https://" + v;
+    const v = normalizeProxyUrl($("proxyUrl").value);
     $("proxyUrl").value = v;
     localStorage.setItem("gmi_proxy_url", v);
     toast("Proxy URL saved", "ok");
