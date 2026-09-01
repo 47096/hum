@@ -289,6 +289,17 @@
     font-size: 7px; color: var(--muted);
   }
 
+  .track-download {
+    background: transparent; border: none;
+    color: var(--muted); font-size: 12px;
+    cursor: pointer; opacity: 0;
+    transition: opacity .15s;
+    text-decoration: none;
+  }
+
+  .playlist-item:hover .track-download { opacity: 1; }
+  .track-download:hover { color: var(--fg); }
+
   .track-delete {
     background: transparent; border: none;
     color: var(--muted); font-size: 12px;
@@ -1096,6 +1107,12 @@
       const dur = document.createElement("div");
       dur.className = "track-duration";
       dur.textContent = h.duration || "—";
+      const dl = document.createElement("a");
+      dl.className = "track-download";
+      dl.textContent = "↓";
+      dl.href = h.audioUrl;
+      dl.download = (h.title || "song") + ".mp3";
+      dl.addEventListener("click", (e) => e.stopPropagation());
       const del = document.createElement("button");
       del.className = "track-delete";
       del.textContent = "✕";
@@ -1103,7 +1120,7 @@
         e.stopPropagation();
         deleteFromHistory(h.id);
       });
-      right.append(dur, del);
+      right.append(dur, dl, del);
 
       item.append(num, info, right);
       item.addEventListener("click", () => playTrack(i));
