@@ -1165,10 +1165,11 @@
     const mode = $("songMode").value || undefined;
 
     if (activeProvider === "minimax") {
+      const instrumentalLyrics = "[instrumental]\n\n[inst]\n\n[outro]";
       const p = {
         model: "music-3.0",
         prompt: prompt || "",
-        lyrics: lyrics || "",
+        lyrics: instrumentalOn ? instrumentalLyrics : lyrics,
         stream: false,
         output_format: "url",
         audio_setting: {
@@ -1184,7 +1185,8 @@
       return p;
     }
     // GMI Cloud
-    const payload = { lyrics: lyrics || "", prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value };
+    const instrumentalLyrics = "[instrumental]\n\n[inst]\n\n[outro]";
+    const payload = { lyrics: instrumentalOn ? instrumentalLyrics : lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value };
     if (bpm) payload.bpm = bpm;
     if (key) payload.key = key;
     if (mode) payload.mode = mode;
