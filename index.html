@@ -749,9 +749,9 @@
   <div class="player-center">
     <div class="player-controls">
       <button class="ctrl-btn" id="shuffleBtn" title="Shuffle">🔀</button>
-      <button class="ctrl-btn" id="prevBtn">⏮</button>
-      <button class="ctrl-btn play" id="playBtn">▶</button>
-      <button class="ctrl-btn" id="nextBtn">⏭</button>
+      <button class="ctrl-btn" id="prevBtn" aria-label="Previous track">⏮</button>
+      <button class="ctrl-btn play" id="playBtn" aria-label="Play">▶</button>
+      <button class="ctrl-btn" id="nextBtn" aria-label="Next track">⏭</button>
       <button class="ctrl-btn" id="repeatBtn" title="Repeat">🔁</button>
     </div>
     <div class="player-time">
@@ -1229,6 +1229,7 @@
       const dl = document.createElement("button");
       dl.className = "track-download";
       dl.textContent = "↓";
+      dl.setAttribute("aria-label", "Download track");
       dl.addEventListener("click", (e) => {
         e.stopPropagation();
         downloadTrack(h.audioUrl);
@@ -1236,6 +1237,7 @@
       const del = document.createElement("button");
       del.className = "track-delete";
       del.textContent = "✕";
+      del.setAttribute("aria-label", "Delete track");
       del.addEventListener("click", (e) => {
         e.stopPropagation();
         deleteFromHistory(h.id);
