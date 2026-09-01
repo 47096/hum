@@ -1318,7 +1318,9 @@
       $("playBtn").textContent = "⏸";
       renderPlaylist();
     }).catch(() => {
-      toast("Playback blocked — click play to start", "err");
+      // Autoplay blocked — user can click play manually
+      isPlaying = false;
+      $("playBtn").textContent = "▶";
     });
 
     $("playerTitle").textContent = entry.title || "Untitled";
