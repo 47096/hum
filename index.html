@@ -1331,6 +1331,7 @@
 
   // ─── Generate ───
   let abortController = null;
+  let isGenerating = false;
   const generateBtn = $("generateBtn");
 
   // Keyboard shortcuts
@@ -1441,12 +1442,16 @@
     if (abortController) {
       abortController.abort();
       abortController = null;
+      isGenerating = false;
       generateBtn.textContent = "Generate";
       generateBtn.classList.remove("generating");
       $("genProgress").classList.remove("active");
       toast("Cancelled", "ok");
       return;
     }
+
+    if (isGenerating) return;
+    isGenerating = true;
 
     const key = $("apiKey").value.trim();
     if (!key) { $("settingsModal").classList.add("show"); toast("Set your API key first", "err"); return; }
@@ -1542,6 +1547,7 @@
     } finally {
       clearInterval(genTimer);
       abortController = null;
+      isGenerating = false;
       generateBtn.textContent = "Generate";
       generateBtn.classList.remove("generating");
       $("genProgress").classList.remove("active");
