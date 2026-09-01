@@ -1409,20 +1409,42 @@
     }
   });
 
-  // Click to seek
-  $("progressBar").addEventListener("click", (e) => {
+  // Click and drag to seek
+  function seekFromEvent(e, bar) {
     if (!audio.duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
+    const rect = bar.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     audio.currentTime = pct * audio.duration;
-  });
+  }
 
-  $("timeBar").addEventListener("click", (e) => {
-    if (!audio.duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-  });
+  function setupSeek(bar) {
+    let seeking = false;
+
+    bar.addEventListener("mousedown", (e) => {
+      seeking = true;
+      seekFromEvent(e, bar);
+    });
+
+    bar.addEventListener("touchstart", (e) => {
+      seeking = true;
+      seekFromEvent(e, bar);
+    }, { passive: true });
+
+    document.addEventListener("mousemove", (e) => {
+      if (seeking) seekFromEvent(e, bar);
+    });
+
+    document.addEventListener("touchmove", (e) => {
+      if (seeking) seekFromEvent(e, bar);
+    }, { passive: true });
+
+    document.addEventListener("mouseup", () => { seeking = false; });
+    document.addEventListener("touchend", () => { seeking = false; });
+  }
+
+  setupSeek($("progressBar"));
+  setupSeek($("timeBar"));
 
   // ─── Generate ───
   let abortController = null;
