@@ -1601,7 +1601,7 @@
           const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
           const dur = activeProvider === "minimax" ? (f.extra_info?.music_duration || 0) : ((f.outcome?.duration_ms || 0) / 1000);
           saveToHistory({
-            id: String(Date.now()) + "-" + i,
+            id: crypto.randomUUID() + "-" + i,
             title: (titleLine || "Untitled").slice(0, 60) + " (" + styles[i].category + ")",
             lyrics, prompt: styles[i].prompt,
             audioUrl, duration: formatDuration(dur),
@@ -1632,7 +1632,7 @@
         const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
         const dur = activeProvider === "minimax" ? (final.extra_info?.music_duration || 0) : ((final.outcome?.duration_ms || 0) / 1000);
         saveToHistory({
-          id: String(Date.now()),
+          id: crypto.randomUUID(),
           title: (titleLine || "Untitled").slice(0, 60),
           lyrics, prompt,
           audioUrl, duration: formatDuration(dur),
