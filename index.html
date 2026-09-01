@@ -8,641 +8,793 @@
 <meta http-equiv="Expires" content="0" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>" />
 <title>AI Music · GMI Cloud</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f;
-    --panel: #111118;
-    --border: #00ff8833;
-    --fg: #e0e0e8;
-    --muted: #6a6a80;
-    --accent: #00ff88;
-    --accent-2: #ff00ff;
-    --ok: #00ff88;
-    --err: #ff0055;
-    --radius: 6px;
-    --glow-green: 0 0 8px #00ff8844, 0 0 20px #00ff8822;
-    --glow-magenta: 0 0 8px #ff00ff44, 0 0 20px #ff00ff22;
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --bg: #111111;
+    --panel: #1a1a1a;
+    --border: #2a2a2a;
+    --fg: #e8e8e8;
+    --muted: #666666;
+    --accent: #ffffff;
+    --ok: #4ade80;
+    --err: #f87171;
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-body: 'Inter', sans-serif;
   }
 
-  :root.light {
-    --bg: #f5f5f7;
-    --panel: #ffffff;
-    --border: #00aa5533;
-    --fg: #1a1a2e;
-    --muted: #6a6a80;
-    --accent: #00aa55;
-    --accent-2: #aa00cc;
-    --ok: #00aa55;
-    --err: #cc0044;
-    --glow-green: 0 0 8px #00aa5522, 0 0 20px #00aa5511;
-    --glow-magenta: 0 0 8px #aa00cc22, 0 0 20px #aa00cc11;
-  }
-
-  * { box-sizing: border-box; word-wrap: break-word; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   html, body {
-    margin: 0; padding: 0;
     background: var(--bg);
     color: var(--fg);
-    font: 14px/1.6 var(--font-mono);
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-
-  /* Scanline overlay */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 999;
+    font: 14px/1.6 var(--font-body);
+    height: 100vh;
     overflow: hidden;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.08) 2px,
-      rgba(0, 0, 0, 0.08) 4px
-    );
+    -webkit-font-smoothing: antialiased;
   }
 
-  .wrap { max-width: 768px; width: 100%; padding: 32px 18px 80px; position: relative; box-sizing: border-box; }
-
-  /* Header with glitch */
-  header {
-    display: flex; align-items: center; gap: 14px; margin-bottom: 28px;
-    position: relative;
+  /* Top bar */
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    height: 48px;
   }
 
   .logo {
-    width: 48px; height: 48px; border-radius: 4px;
-    background: var(--bg);
-    border: 2px solid var(--accent);
-    box-shadow: var(--glow-green);
-    display: grid; place-items: center;
-    font-weight: 900; font-size: 16px; color: var(--accent);
-    font-family: var(--font-mono);
-    letter-spacing: -1px;
+    font-family: var(--font-pixel);
+    font-size: 10px; color: var(--fg);
   }
 
-  h1 {
-    font-size: 20px; margin: 0;
-    font-family: var(--font-mono);
-    font-weight: 800;
-    color: var(--fg);
-    letter-spacing: -0.02em;
-    position: relative;
-  }
+  .topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
 
-  /* Glitch effect on h1 */
-  h1::before,
-  h1::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-  }
-
-  h1::before {
-    color: var(--accent);
-    animation: glitch-1 3s infinite linear alternate-reverse;
-    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-    z-index: -1;
-  }
-
-  h1::after {
-    color: var(--accent-2);
-    animation: glitch-2 2.5s infinite linear alternate-reverse;
-    clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
-    z-index: -1;
-  }
-
-  @keyframes glitch-1 {
-    0%, 90% { transform: translate(0); }
-    91% { transform: translate(-3px, 1px); }
-    93% { transform: translate(3px, -1px); }
-    95% { transform: translate(-2px, 0); }
-    97% { transform: translate(2px, 1px); }
-    100% { transform: translate(0); }
-  }
-
-  @keyframes glitch-2 {
-    0%, 88% { transform: translate(0); }
-    89% { transform: translate(3px, -1px); }
-    92% { transform: translate(-3px, 1px); }
-    94% { transform: translate(1px, 2px); }
-    96% { transform: translate(-1px, -1px); }
-    100% { transform: translate(0); }
-  }
-
-  .sub { color: var(--muted); font-size: 12px; margin-top: 2px; font-family: var(--font-mono); }
-
-  .grid { display: grid; gap: 16px; }
-
-  .card {
-    background: var(--panel);
+  .topbar-btn {
+    background: transparent;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px;
-    box-shadow: var(--glow-green);
-    position: relative;
+    color: var(--muted);
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    cursor: pointer; font-size: 14px;
+    transition: all .15s;
+  }
+
+  .topbar-btn:hover { border-color: var(--fg); color: var(--fg); }
+
+  /* Main layout */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: calc(100vh - 48px - 72px);
+  }
+
+  /* Left: Create form */
+  .left {
+    display: flex; flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .form-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
   }
 
   label {
-    display: block; font-size: 11px; text-transform: uppercase;
-    letter-spacing: 0.12em; color: var(--accent);
-    margin-bottom: 6px; font-weight: 600;
-    font-family: var(--font-mono);
+    display: block;
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    margin-bottom: 8px; text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
-  input[type="text"], input[type="password"], input[type="number"], textarea, select {
-    width: 100%; background: #08080d; border: 1px solid #00ff8833;
-    color: var(--fg); padding: 10px 12px; border-radius: 4px;
-    font: inherit; font-family: var(--font-mono);
-    transition: border-color .15s, box-shadow .15s;
-    caret-color: var(--accent);
-    box-sizing: border-box;
-    max-width: 100%;
+  .genre-grid {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-bottom: 16px;
   }
 
-  input:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: var(--glow-green);
-  }
-
-  textarea { resize: vertical; min-height: 100px; }
-
-  .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-
-  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
-
-  button {
+  .genre-chip {
     background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    padding: 12px 22px; border-radius: 4px;
-    font-weight: 700; font-size: 13px; cursor: pointer;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    cursor: pointer;
     transition: all .12s;
-    box-shadow: var(--glow-green);
-    position: relative;
   }
 
-  button:hover:not(:disabled) {
-    background: var(--accent);
-    color: #0a0a0f;
-    box-shadow: 0 0 16px #00ff8866, 0 0 40px #00ff8833;
-  }
-  button:active:not(:disabled) { transform: scale(0.97); opacity: 0.85; }
-  button { touch-action: manipulation; }
+  .genre-chip:hover { border-color: var(--fg); color: var(--fg); }
+  .genre-chip.active { background: var(--fg); border-color: var(--fg); color: var(--bg); }
 
-  button:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
-
-  button.ghost {
-    background: transparent; color: var(--muted);
-    border: 1px solid #333345; box-shadow: none;
-    padding: 10px 14px; font-weight: 500;
-    text-transform: none; letter-spacing: normal;
+  .subgenre-row {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-bottom: 16px;
   }
-  button.ghost:hover:not(:disabled) {
-    color: var(--accent);
-    border-color: var(--accent);
+
+  .sub-chip {
     background: transparent;
-    box-shadow: var(--glow-green);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    font-size: 11px; color: var(--muted);
+    cursor: pointer;
+    transition: all .12s;
   }
 
-  .status { margin-left: auto; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); }
-  .dot { width: 8px; height: 8px; border-radius: 0; background: var(--muted); }
-  .dot.ok { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
-  .dot.err { background: var(--err); box-shadow: 0 0 8px var(--err); }
-  .dot.work { background: var(--accent-2); box-shadow: 0 0 8px var(--accent-2); animation: pulse 0.8s infinite; }
+  .sub-chip:hover { border-color: var(--fg); color: var(--fg); }
+  .sub-chip.active { border-color: var(--fg); color: var(--fg); }
 
-  @keyframes pulse { 50% { opacity: 0.2; } }
-
-  .progress-wrap {
-    width: 100%; height: 4px; background: #08080d; border-radius: 0;
-    margin-top: 10px; overflow: hidden; display: none;
-    border: 1px solid #00ff8822;
+  input[type="text"], input[type="password"], textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    padding: 10px 12px;
+    font: 14px/1.4 var(--font-body);
+    margin-bottom: 12px;
+    transition: border-color .15s;
   }
 
-  .progress-bar {
-    height: 100%; width: 0%; border-radius: 0;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    transition: width 0.3s ease;
-    box-shadow: 0 0 12px var(--accent);
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--fg);
   }
-  .progress-bar.complete { background: var(--accent); }
 
-  .queue-info {
-    display: none; font-size: 11px; color: var(--muted);
-    margin-top: 6px; text-align: center; font-family: var(--font-mono);
+  textarea { resize: vertical; min-height: 200px; }
+
+  .template-row {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .template-chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    font-size: 10px; color: var(--muted);
+    cursor: pointer;
+    transition: all .12s;
+  }
+
+  .template-chip:hover { border-color: var(--fg); color: var(--fg); }
+
+  /* Action bar */
+  .action-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .toggle-row {
+    display: flex; align-items: center; gap: 6px;
   }
 
   .toggle {
-    width: 44px; height: 24px; background: #1a1a28; border-radius: 12px;
-    position: relative; cursor: pointer; transition: all .2s;
-    border: 1px solid #333345;
+    width: 32px; height: 18px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    position: relative; cursor: pointer;
+    transition: all .15s;
+  }
+
+  .toggle.on { background: var(--fg); border-color: var(--fg); }
+
+  .toggle-knob {
+    width: 10px; height: 10px;
+    background: var(--muted);
+    position: absolute; top: 2px; left: 2px;
+    transition: all .15s;
+  }
+
+  .toggle.on .toggle-knob {
+    transform: translateX(14px);
+    background: var(--bg);
+  }
+
+  .toggle-label { font-size: 11px; color: var(--muted); }
+
+  .char-count {
+    font-family: var(--font-pixel);
+    font-size: 6px; color: var(--muted);
+    margin-left: auto;
+  }
+
+  .generate-btn {
+    background: var(--fg);
+    color: var(--bg);
+    border: none;
+    padding: 10px 20px;
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all .12s;
+  }
+
+  .generate-btn:hover { background: #cccccc; }
+  .generate-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* Right: Playlist */
+  .right {
+    display: flex; flex-direction: column;
+    background: var(--panel);
+    overflow: hidden;
+  }
+
+  .playlist-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
-  .toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .toggle.on { background: var(--accent); border-color: var(--accent); box-shadow: var(--glow-green); }
-  .toggle-knob {
-    width: 18px; height: 18px; background: var(--muted); border-radius: 50%;
-    position: absolute; top: 2px; left: 2px; transition: all .2s;
-  }
-  .toggle.on .toggle-knob { transform: translateX(20px); background: var(--bg); box-shadow: 0 0 6px rgba(0,0,0,0.3); }
 
-  .player {
-    margin-top: 16px; padding: 16px;
-    background: #08080d;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+  .playlist-title {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    text-transform: uppercase;
   }
 
-  audio { width: 100%; }
-
-  .meta { color: var(--muted); font-size: 11px; margin-top: 8px; font-family: var(--font-mono); }
-
-  .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-
-  .chip {
+  .playlist-clear {
     background: transparent;
-    border: 1px solid #333345;
-    border-radius: 2px;
-    padding: 10px 12px; font-size: 11px; color: var(--muted);
-    cursor: pointer; transition: all .12s; text-decoration: none;
-    display: inline-flex; align-items: center;
-    font-family: var(--font-mono);
-    min-height: 44px;
-    touch-action: manipulation;
-  }
-  .chip:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-    box-shadow: var(--glow-green);
-  }
-  .chip:active { transform: scale(0.97); opacity: 0.8; }
-
-  #styleTabs .chip { padding: 10px 14px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; }
-
-
-  details summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 14px 0; user-select: none; font-family: var(--font-mono); touch-action: manipulation; }
-  details summary:hover { color: var(--accent); }
-
-  .toast {
-    position: fixed; bottom: 24px; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--panel); border: 1px solid var(--accent);
-    padding: 10px 18px; border-radius: 4px; font-size: 12px;
-    font-family: var(--font-mono);
-    opacity: 0; pointer-events: none; transition: all .25s; z-index: 1000;
-    max-width: 90vw; text-align: center;
-    box-shadow: var(--glow-green);
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast.err { border-color: var(--err); color: var(--err); box-shadow: 0 0 8px #ff005544; }
-  .toast.ok { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow-green); }
-
-  .endpoint-badge {
-    display: inline-block; padding: 2px 8px; border-radius: 2px;
-    background: transparent; border: 1px solid var(--accent-2);
-    font-family: var(--font-mono); font-size: 10px;
-    color: var(--accent-2); margin-left: 8px;
-    text-transform: uppercase; letter-spacing: 0.05em;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 3px 8px;
+    font-family: var(--font-pixel);
+    font-size: 6px;
+    cursor: pointer;
   }
 
-  /* Neon accent line under header */
-  header::after {
-    content: "";
-    position: absolute;
-    bottom: -14px; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, var(--accent), transparent 30%, transparent 70%, var(--accent-2));
-    box-shadow: 0 0 10px var(--accent);
+  .playlist-clear:hover { border-color: var(--err); color: var(--err); }
+
+  .playlist {
+    flex: 1; overflow-y: auto;
   }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: #333345; border-radius: 0; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-  /* Selection */
-  ::selection { background: var(--accent); color: var(--bg); }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .row { grid-template-columns: 1fr; }
-    .actions { flex-wrap: wrap; }
+  .playlist-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .1s;
   }
 
-  /* Utility classes */
-  .text-label {
-    font-size: 11px; text-transform: uppercase;
-    letter-spacing: 0.12em; color: var(--accent); font-weight: 600;
+  .playlist-item:hover { background: rgba(255,255,255,0.03); }
+  .playlist-item.active { background: rgba(255,255,255,0.06); }
+
+  .track-num {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    width: 16px; text-align: center;
+    flex-shrink: 0;
   }
-  .text-small { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
-  .text-tiny {
-    font-size: 10px; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--muted);
-  }
-  .text-muted { font-size: 12px; color: var(--muted); }
-  .btn-sm { font-size: 11px; padding: 10px 14px; min-height: 44px; }
-  .select-sm { width: auto; padding: 4px 8px; font-size: 11px; }
-  .clickable { cursor: pointer; }
-  .truncate {
+
+  .track-info { flex: 1; min-width: 0; }
+
+  .track-name {
+    font-size: 12px; font-weight: 500;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .history-row {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 0; border-bottom: 1px solid #00ff8822; overflow: hidden;
+
+  .track-genre { font-size: 10px; color: var(--muted); }
+
+  .track-right {
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
   }
-  .history-info { flex: 1; min-width: 0; max-width: 100%; overflow: hidden; }
-  .history-title { font-size: 13px; font-weight: 600; }
-  .history-prompt { font-size: 11px; color: var(--muted); }
-  .history-date { font-size: 11px; color: var(--muted); }
-  .remix-item {
-    background: #08080d; border: 1px solid #00ff8833;
-    border-radius: 4px; padding: 14px;
+
+  .track-duration {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
   }
-  .remix-category { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 6px; }
-  .remix-prompt { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+
+  .track-delete {
+    background: transparent; border: none;
+    color: var(--muted); font-size: 12px;
+    cursor: pointer; opacity: 0;
+    transition: opacity .15s;
+  }
+
+  .playlist-item:hover .track-delete { opacity: 1; }
+  .track-delete:hover { color: var(--err); }
+
+  .playing-indicator {
+    display: flex; gap: 2px; align-items: flex-end; height: 10px;
+  }
+
+  .playing-bar {
+    width: 2px; background: var(--fg);
+    animation: wave 1s ease-in-out infinite;
+  }
+
+  .playing-bar:nth-child(1) { height: 5px; animation-delay: 0s; }
+  .playing-bar:nth-child(2) { height: 8px; animation-delay: 0.2s; }
+  .playing-bar:nth-child(3) { height: 3px; animation-delay: 0.4s; }
+
+  @keyframes wave {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.5); }
+  }
+
+  /* Empty state */
+  .empty-state {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    flex: 1;
+  }
+
+  .empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.3;
+  }
+
+  .empty-text {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    line-height: 1.8;
+  }
+
+  /* Player bar */
+  .player-bar {
+    display: flex; align-items: center;
+    padding: 0 16px;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    height: 72px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .player-progress {
+    position: absolute;
+    top: -1px; left: 0; right: 0;
+    height: 2px;
+    background: var(--border);
+    cursor: pointer;
+  }
+
+  .player-progress-fill {
+    height: 100%;
+    background: var(--fg);
+    transition: width 0.3s ease;
+  }
+
+  .player-track {
+    display: flex; align-items: center; gap: 12px;
+    width: 240px;
+    flex-shrink: 0;
+  }
+
+  .player-art {
+    width: 48px; height: 48px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: grid; place-items: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .player-info { min-width: 0; }
+
+  .player-title {
+    font-size: 13px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .player-meta { font-size: 11px; color: var(--muted); }
+
+  .player-center {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+
+  .player-controls {
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .ctrl-btn {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    cursor: pointer; font-size: 14px;
+    transition: color .12s;
+  }
+
+  .ctrl-btn:hover { color: var(--fg); }
+
+  .ctrl-btn.play {
+    width: 36px; height: 36px;
+    background: var(--fg);
+    border-radius: 50%;
+    color: var(--bg);
+    font-size: 16px;
+  }
+
+  .ctrl-btn.play:hover { background: #cccccc; }
+
+  .player-time {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-pixel);
+    font-size: 6px; color: var(--muted);
+  }
+
+  .time-bar {
+    width: 200px; height: 3px;
+    background: var(--border);
+    cursor: pointer;
+  }
+
+  .time-fill {
+    height: 100%;
+    background: var(--fg);
+    transition: width 0.3s ease;
+  }
+
+  .player-right {
+    display: flex; align-items: center; gap: 8px;
+    width: 160px;
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
+
+  .vol-icon { color: var(--muted); font-size: 14px; }
+
+  .vol-bar {
+    width: 80px; height: 3px;
+    background: var(--border);
+    cursor: pointer;
+  }
+
+  .vol-fill {
+    width: 70%; height: 100%;
+    background: var(--fg);
+  }
+
+  /* Settings modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+  }
+
+  .modal-overlay.show { display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto; }
+
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--fg);
+    padding: 20px;
+    max-width: 480px; width: 100%;
+  }
+
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-title {
+    font-family: var(--font-pixel);
+    font-size: 10px; color: var(--fg);
+  }
+
+  .modal-close {
+    background: transparent; border: none;
+    color: var(--muted); font-size: 18px;
+    cursor: pointer;
+  }
+
+  .modal-close:hover { color: var(--err); }
+
+  .settings-group { margin-bottom: 20px; }
+
+  .settings-label {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    padding: 8px 10px;
+    font: 13px/1.4 var(--font-body);
+    margin-bottom: 10px;
+    transition: border-color .15s;
+  }
+
+  select:focus { outline: none; border-color: var(--fg); }
+
+  .help-text {
+    font-size: 10px; color: var(--muted);
+    margin-top: -8px; margin-bottom: 12px;
+  }
+
+  .settings-actions {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .settings-action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 12px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .12s;
+  }
+
+  .settings-action-btn:hover { border-color: var(--fg); color: var(--fg); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 84px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--fg);
+    color: var(--bg);
+    padding: 10px 20px;
+    font-size: 12px;
+    opacity: 0; pointer-events: none;
+    transition: all .25s; z-index: 1000;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.err { background: var(--err); color: #fff; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; }
+    .right { display: none; }
+    .player-track { width: auto; flex: 1; }
+    .player-right { display: none; }
+    .time-bar { width: 120px; }
+  }
+
+  ::selection { background: var(--fg); color: var(--bg); }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--fg); }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="logo">M3</div>
-    <div style="flex:1;">
-      <h1 data-text="AI Music">AI Music<span class="endpoint-badge">GMI Cloud</span></h1>
-      <div class="sub">Describe your song, add lyrics, generate an MP3 in ~60s</div>
-    </div>
-    <button class="ghost" id="themeToggle" style="padding:8px;font-size:16px;" title="Toggle light/dark theme">🌙</button>
-  </header>
 
-  <div class="grid">
-
-    <div class="card" id="gettingStarted" style="border-color:var(--accent);display:none;">
-      <div class="text-label" style="margin-bottom:8px;">Getting started</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.8;">
-        <div>1. <strong style="color:var(--fg);">Set your API key</strong> — expand the section below and paste your key</div>
-        <div>2. <strong style="color:var(--fg);">Pick a genre</strong> — click a genre tab, then a subgenre to auto-fill the prompt</div>
-        <div>3. <strong style="color:var(--fg);">Add lyrics</strong> — write your own or use a template</div>
-        <div>4. <strong style="color:var(--fg);">Generate</strong> — hit the button or press <kbd style="background:#08080d;padding:2px 6px;border-radius:2px;border:1px solid #333345;">⌘ Enter</kbd></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <span class="text-label">API & proxy</span>
-        <span class="chip" id="apiKeyStatus" style="cursor:default;font-size:10px;">Not set</span>
-      </div>
-      <details style="margin-top:8px;">
-        <summary>API key & proxy settings</summary>
-        <div style="margin-top:8px;">
-          <label>Provider</label>
-          <div style="display:flex;gap:6px;margin-bottom:12px;">
-            <span class="chip provider-tab clickable" data-provider="gmi" style="font-weight:700;border-color:var(--accent);color:var(--accent);">GMI Cloud</span>
-            <span class="chip provider-tab clickable" data-provider="minimax" style="font-weight:700;">MiniMax</span>
-          </div>
-          <label for="apiKey" id="apiKeyLabel">GMI Cloud API key</label>
-          <input type="password" id="apiKey" placeholder="paste key, stored only in this browser" autocomplete="off" />
-          <div class="sub" style="margin-top:6px;" id="apiKeyHelp">
-            Get one at <code style="color:var(--accent);">console.gmicloud.ai -> API Keys</code>. Free during the campaign (ends Sep 6, 2026).
-          </div>
-          <div style="margin-top:12px;">
-            <label for="proxyUrl">CORS Proxy URL</label>
-            <input type="text" id="proxyUrl" placeholder="https://gmi-music-proxy.minimax-bf7.workers.dev" />
-            <div class="sub" style="margin-top:4px;">
-              Pre-configured for GitHub Pages. Only change if you deploy your own Worker.
-            </div>
-          </div>
-        </div>
-      </details>
-    </div>
-
-    <div class="card">
-      <label>Genre</label>
-      <div id="styleTabs" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"></div>
-      <div id="subgenreDisplay" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;"></div>
-      <label for="prompt">Prompt <span style="color:var(--muted); text-transform:none; font-weight:400;">(auto-fills from subgenre — edit to customise)</span></label>
-      <input type="text" id="prompt" placeholder="Cheerful children's song, ukulele, clapping, bright, preschool" />
-
-      <div style="margin-top:14px;">
-        <label for="lyrics">Lyrics templates <span style="color:var(--muted); text-transform:none;">(1-3500 chars, with [verse]/[chorus] tags)</span></label>
-        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;align-items:center;">
-          <span class="text-tiny" style="margin-right:4px;">Templates:</span>
-          <div id="templateChips" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
-        </div>
-        <textarea id="lyrics" rows="10" placeholder="[verse]\nYour lyrics here...\n\n[chorus]\nThe catchy hook goes here"></textarea>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
-          <label style="margin-bottom:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <span class="toggle" id="instrumentalToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
-            <span class="text-muted">Instrumental (no lyrics)</span>
-          </label>
-          <div id="lyricsCount" class="text-small">0 / 3,500</div>
-        </div>
-        <details style="margin-top:10px;">
-          <summary>Song structure for AI</summary>
-          <div style="margin-top:8px;background:#08080d;border:1px solid #00ff8822;border-radius:4px;padding:12px;font-size:12px;line-height:1.8;color:var(--muted);font-family:var(--font-mono);">
-            <div style="font-weight:700;color:var(--accent);margin-bottom:6px;">Song structure:</div>
-            <div><code style="color:var(--accent-2);">[Intro]</code> -- short opening, set the mood<br></div>
-            <div><code style="color:var(--accent-2);">[Verse]</code> -- tell the story, build the narrative<br></div>
-            <div><code style="color:var(--accent-2);">[Pre Chorus]</code> -- build tension before the hook<br></div>
-            <div><code style="color:var(--accent-2);">[Chorus]</code> -- the main hook, catchy and repeatable<br></div>
-            <div><code style="color:var(--accent-2);">[Post Chorus]</code> -- reinforcement after the hook<br></div>
-            <div><code style="color:var(--accent-2);">[Hook]</code> -- the most memorable part, the earworm<br></div>
-            <div><code style="color:var(--accent-2);">[Bridge]</code> -- change of perspective or new angle<br></div>
-            <div><code style="color:var(--accent-2);">[Interlude]</code> -- instrumental break between sections<br></div>
-            <div><code style="color:var(--accent-2);">[Transition]</code> -- connect two sections smoothly<br></div>
-            <div><code style="color:var(--accent-2);">[Build Up]</code> -- rising energy before a drop or chorus<br></div>
-            <div><code style="color:var(--accent-2);">[Break]</code> -- stripped-back moment, tension release<br></div>
-            <div><code style="color:var(--accent-2);">[Inst]</code> -- instrumental section, no vocals<br></div>
-            <div><code style="color:var(--accent-2);">[Solo]</code> -- featured instrument performance<br></div>
-            <div><code style="color:var(--accent-2);">[Outro]</code> -- wrap it up, fade or strong ending</div>
-            <button class="ghost" id="copyStructureBtn" style="margin-top:10px;font-size:11px;padding:6px 10px;">Copy structure</button>
-          </div>
-        </details>
-      </div>
-
-      <div class="actions">
-        <button id="generateBtn">Generate song</button>
-        <div class="status" id="status">
-          <span class="dot"></span>
-          <span id="statusText">Ready</span>
-        </div>
-      </div>
-      <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
-      <div class="queue-info" id="queueInfo"></div>
-
-      <details style="margin-top:16px;">
-        <summary>Advanced settings</summary>
-        <div style="margin-top:12px;">
-          <div class="row">
-            <div>
-              <label>Sample rate</label>
-              <select id="sampleRate">
-                <option value="44100" selected>44100 Hz (CD quality)</option>
-                <option value="32000">32000 Hz (radio quality)</option>
-                <option value="24000">24000 Hz (decent)</option>
-                <option value="16000">16000 Hz (phone call)</option>
-              </select>
-            </div>
-            <div>
-              <label>Bitrate</label>
-              <select id="bitrate">
-                <option value="256000" selected>256 kbps (high quality)</option>
-                <option value="128000">128 kbps (standard)</option>
-                <option value="64000">64 kbps (low quality)</option>
-              </select>
-            </div>
-            <div>
-              <label>Format</label>
-              <select id="format">
-                <option value="mp3" selected>MP3</option>
-                <option value="wav">WAV</option>
-                <option value="pcm">PCM</option>
-              </select>
-            </div>
-          </div>
-          <div class="row" style="margin-top:12px;">
-            <div>
-              <label>BPM</label>
-              <select id="bpm">
-                <option value="">Auto</option>
-                <option value="60">60 (very slow)</option>
-                <option value="70">70 (slow)</option>
-                <option value="80">80 (relaxed)</option>
-                <option value="90">90 (moderate)</option>
-                <option value="100">100 (medium)</option>
-                <option value="110">110 (upbeat)</option>
-                <option value="120">120 (energetic)</option>
-                <option value="130">130 (fast)</option>
-                <option value="140">140 (very fast)</option>
-                <option value="150">150 (rapid)</option>
-                <option value="160">160 (intense)</option>
-              </select>
-            </div>
-            <div>
-              <label>Key</label>
-              <select id="songKey">
-                <option value="">Auto</option>
-                <option value="C">C</option>
-                <option value="C#">C#</option>
-                <option value="D">D</option>
-                <option value="D#">D#</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="F#">F#</option>
-                <option value="G">G</option>
-                <option value="G#">G#</option>
-                <option value="A">A</option>
-                <option value="A#">A#</option>
-                <option value="B">B</option>
-              </select>
-            </div>
-            <div>
-              <label>Mode</label>
-              <select id="songMode">
-                <option value="">Auto</option>
-                <option value="major">Major</option>
-                <option value="minor">Minor</option>
-              </select>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap;">
-            <label style="margin-bottom:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
-              <span class="toggle" id="remixToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
-              <span class="text-muted">Style remix</span>
-            </label>
-            <select id="remixCount" class="select-sm" style="display:none;">
-              <option value="2">2 versions</option>
-              <option value="3" selected>3 versions</option>
-            </select>
-            <div style="margin-left:auto;display:flex;gap:6px;">
-              <button class="ghost btn-sm" id="shareBtn">Share link</button>
-              <button class="ghost btn-sm" id="copySettingsBtn">Copy settings</button>
-              <button class="ghost btn-sm" id="pasteSettingsBtn">Paste settings</button>
-            </div>
-          </div>
-        </div>
-      </details>
-    </div>
-
-    <div class="card" id="playerCard" style="display:none;">
-      <label>Output</label>
-      <div class="player">
-        <audio id="player" controls></audio>
-        <div class="meta" id="meta"></div>
-        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-          <a id="downloadLink" class="chip" download="song.mp3">[ Download MP3 ]</a>
-          <a id="openTab" class="chip" target="_blank">[ Open in new tab ]</a>
-          <span class="chip" id="filenameChip" style="cursor:default;"></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" id="remixCard" style="display:none;">
-      <label>Style remix</label>
-      <div id="remixGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px;"></div>
-    </div>
-
-    <div class="card" id="historyCard" style="display:none;">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <label style="margin-bottom:0;">Song history</label>
-        <span class="chip clickable" id="clearHistory" style="font-size:10px;">[ Clear all ]</span>
-      </div>
-      <div id="historyList" style="margin-top:12px;overflow:hidden;"></div>
-    </div>
-
+<!-- Top bar -->
+<div class="topbar">
+  <div class="logo">♪ AI Music</div>
+  <div class="topbar-right">
+    <button class="topbar-btn" id="settingsBtn" title="Settings">⚙</button>
   </div>
 </div>
 
+<!-- Main: split -->
+<div class="main">
+  <!-- Left: Create form -->
+  <div class="left">
+    <div class="form-area">
+      <label>Genre</label>
+      <div class="genre-grid" id="styleTabs"></div>
+
+      <label>Subgenre</label>
+      <div class="subgenre-row" id="subgenreDisplay"></div>
+
+      <label>Style prompt</label>
+      <input type="text" id="prompt" placeholder="Upbeat dance pop, bright major key, punchy electronic drums" />
+
+      <label>Lyrics templates</label>
+      <div class="template-row" id="templateChips"></div>
+
+      <label>Lyrics</label>
+      <textarea id="lyrics" placeholder="[verse]&#10;Write your lyrics here...&#10;&#10;[chorus]&#10;The catchy hook goes here&#10;&#10;[verse]&#10;Second verse...&#10;&#10;[chorus]&#10;Repeat the hook&#10;&#10;[outro]&#10;Wrap it up"></textarea>
+    </div>
+
+    <div class="action-bar">
+      <div class="toggle-row">
+        <span class="toggle" id="instrumentalToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
+        <span class="toggle-label">Instrumental</span>
+      </div>
+      <div class="char-count" id="lyricsCount">0 / 3500</div>
+      <button class="generate-btn" id="generateBtn">Generate</button>
+    </div>
+  </div>
+
+  <!-- Right: Playlist -->
+  <div class="right">
+    <div class="playlist-header">
+      <div class="playlist-title" id="playlistTitle">Playlist</div>
+      <button class="playlist-clear" id="clearHistory">Clear all</button>
+    </div>
+
+    <div class="playlist" id="playlist">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">♪</div>
+        <div class="empty-text">No songs yet<br>Generate your first track</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Player bar -->
+<div class="player-bar">
+  <div class="player-progress" id="progressBar">
+    <div class="player-progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+
+  <div class="player-track">
+    <div class="player-art" id="playerArt">♪</div>
+    <div class="player-info">
+      <div class="player-title" id="playerTitle">No track selected</div>
+      <div class="player-meta" id="playerMeta">—</div>
+    </div>
+  </div>
+
+  <div class="player-center">
+    <div class="player-controls">
+      <button class="ctrl-btn" id="prevBtn">⏮</button>
+      <button class="ctrl-btn play" id="playBtn">▶</button>
+      <button class="ctrl-btn" id="nextBtn">⏭</button>
+    </div>
+    <div class="player-time">
+      <span id="currentTime">0:00</span>
+      <div class="time-bar" id="timeBar">
+        <div class="time-fill" id="timeFill" style="width:0%"></div>
+      </div>
+      <span id="totalTime">0:00</span>
+    </div>
+  </div>
+
+  <div class="player-right">
+    <span class="vol-icon">🔊</span>
+    <div class="vol-bar"><div class="vol-fill"></div></div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Settings</div>
+      <button class="modal-close" id="settingsClose">✕</button>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">API</div>
+      <label>Provider</label>
+      <div style="display:flex;gap:6px;margin-bottom:12px;">
+        <span class="genre-chip provider-tab active" data-provider="gmi">GMI Cloud</span>
+        <span class="genre-chip provider-tab" data-provider="minimax">MiniMax</span>
+      </div>
+      <label id="apiKeyLabel">GMI Cloud API key</label>
+      <input type="password" id="apiKey" placeholder="Paste your key here" autocomplete="off" />
+      <div class="help-text" id="apiKeyHelp">Get one at console.gmicloud.ai → API Keys. Free until Sep 6, 2026.</div>
+      <label>CORS Proxy URL</label>
+      <input type="text" id="proxyUrl" placeholder="https://gmi-music-proxy.minimax-bf7.workers.dev" />
+      <div class="help-text">Pre-configured for GitHub Pages. Only change if you deploy your own Worker.</div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">Audio quality</div>
+      <div class="settings-row">
+        <div>
+          <label>Sample rate</label>
+          <select id="sampleRate">
+            <option value="44100">44100 Hz</option>
+            <option value="32000">32000 Hz</option>
+            <option value="24000">24000 Hz</option>
+            <option value="16000">16000 Hz</option>
+          </select>
+        </div>
+        <div>
+          <label>Bitrate</label>
+          <select id="bitrate">
+            <option value="256000">256 kbps</option>
+            <option value="128000">128 kbps</option>
+            <option value="64000">64 kbps</option>
+          </select>
+        </div>
+        <div>
+          <label>Format</label>
+          <select id="format">
+            <option value="mp3">MP3</option>
+            <option value="wav">WAV</option>
+            <option value="pcm">PCM</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">Music theory</div>
+      <div class="settings-row">
+        <div>
+          <label>BPM</label>
+          <select id="bpm">
+            <option value="">Auto</option>
+            <option value="60">60</option><option value="70">70</option><option value="80">80</option>
+            <option value="90">90</option><option value="100">100</option><option value="110">110</option>
+            <option value="120">120</option><option value="130">130</option><option value="140">140</option>
+            <option value="150">150</option><option value="160">160</option>
+          </select>
+        </div>
+        <div>
+          <label>Key</label>
+          <select id="songKey">
+            <option value="">Auto</option>
+            <option value="C">C</option><option value="C#">C#</option><option value="D">D</option>
+            <option value="D#">D#</option><option value="E">E</option><option value="F">F</option>
+            <option value="F#">F#</option><option value="G">G</option><option value="G#">G#</option>
+            <option value="A">A</option><option value="A#">A#</option><option value="B">B</option>
+          </select>
+        </div>
+        <div>
+          <label>Mode</label>
+          <select id="songMode">
+            <option value="">Auto</option>
+            <option value="major">Major</option>
+            <option value="minor">Minor</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-label">Style remix</div>
+      <div class="toggle-row" style="margin-bottom:10px;">
+        <span class="toggle" id="remixToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
+        <span class="toggle-label">Generate multiple versions</span>
+      </div>
+      <select id="remixCount" style="display:none;">
+        <option value="2">2 versions</option>
+        <option value="3" selected>3 versions</option>
+      </select>
+    </div>
+
+    <div class="settings-actions">
+      <button class="settings-action-btn" id="shareBtn">Share link</button>
+      <button class="settings-action-btn" id="copySettingsBtn">Copy settings</button>
+      <button class="settings-action-btn" id="pasteSettingsBtn">Paste settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<!-- Hidden audio element -->
+<audio id="audioPlayer" preload="auto"></audio>
 
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
 
-  // Theme toggle
-  const themeToggle = $("themeToggle");
-  const savedTheme = localStorage.getItem("gmi_theme") || "dark";
-  if (savedTheme === "light") document.documentElement.classList.add("light");
-  themeToggle.textContent = savedTheme === "light" ? "☀️" : "🌙";
-
-  themeToggle.addEventListener("click", () => {
-    const isLight = document.documentElement.classList.toggle("light");
-    localStorage.setItem("gmi_theme", isLight ? "light" : "dark");
-    themeToggle.textContent = isLight ? "☀️" : "🌙";
-  });
-
-  // Proxy endpoint — Cloudflare Worker URL for GitHub Pages,
-  // or "/requests" for local proxy (gmi_proxy.py on port 8765).
+  // ─── Proxy & endpoints ───
   const DEFAULT_PROXY = "https://gmi-music-proxy.minimax-bf7.workers.dev";
   let _proxy = localStorage.getItem("gmi_proxy_url") || DEFAULT_PROXY;
   if (_proxy && !_proxy.startsWith("http://") && !_proxy.startsWith("https://") && !_proxy.startsWith("/")) _proxy = "https://" + _proxy;
   const GMI_ENDPOINT = _proxy;
-  const POLL_INTERVAL = 4000; // ms
-  const POLL_TIMEOUT = 180000; // 3 min
+  const POLL_INTERVAL = 4000;
+  const POLL_TIMEOUT = 180000;
 
-  // Persist API key
-  const apiKeyEl = $("apiKey");
-  const apiKeyStatus = $("apiKeyStatus");
-
-  // Provider toggle (gmi | minimax)
+  // ─── Provider ───
   let activeProvider = localStorage.getItem("gmi_provider") || "gmi";
   const providerTabs = document.querySelectorAll(".provider-tab");
 
@@ -651,64 +803,47 @@
     localStorage.setItem("gmi_provider", provider);
     providerTabs.forEach(t => {
       const isActive = t.dataset.provider === provider;
-      t.style.borderColor = isActive ? "var(--accent)" : "";
-      t.style.color = isActive ? "var(--accent)" : "";
+      t.classList.toggle("active", isActive);
     });
     $("apiKeyLabel").textContent = provider === "gmi" ? "GMI Cloud API key" : "MiniMax API key";
-    $("apiKeyHelp").innerHTML = provider === "gmi"
-      ? 'Get one at <code style="color:var(--accent);">console.gmicloud.ai -> API Keys</code>. Free during the campaign (ends Sep 6, 2026).'
-      : 'Get one at <code style="color:var(--accent);">platform.minimax.io -> API Keys</code>. Paid users only.';
-    apiKeyEl.value = localStorage.getItem(provider === "gmi" ? "gmi_api_key" : "minimax_api_key") || "";
-    updateApiKeyStatus();
+    $("apiKeyHelp").textContent = provider === "gmi"
+      ? "Get one at console.gmicloud.ai → API Keys. Free until Sep 6, 2026."
+      : "Get one at platform.minimax.io → API Keys. Paid users only.";
+    $("apiKey").value = localStorage.getItem(provider === "gmi" ? "gmi_api_key" : "minimax_api_key") || "";
   }
 
   providerTabs.forEach(t => t.addEventListener("click", () => switchProvider(t.dataset.provider)));
   switchProvider(activeProvider);
 
-  function updateApiKeyStatus() {
-    const hasKey = apiKeyEl.value.trim().length > 0;
-    apiKeyStatus.textContent = hasKey ? "Set" : "Not set";
-    apiKeyStatus.style.borderColor = hasKey ? "var(--ok)" : "var(--border)";
-    apiKeyStatus.style.color = hasKey ? "var(--ok)" : "var(--muted)";
-    // Hide getting started card once key is set
-    if (hasKey) $("gettingStarted").style.display = "none";
-  }
-  updateApiKeyStatus();
-
-  // Onboarding: show getting started and auto-expand API key section on first visit
-  const hasAnyKey = localStorage.getItem("gmi_api_key") || localStorage.getItem("minimax_api_key");
-  if (!hasAnyKey) {
-    $("gettingStarted").style.display = "block";
-    document.querySelector("details").open = true;
-  }
-
-  apiKeyEl.addEventListener("change", () => {
+  // ─── API key ───
+  $("apiKey").addEventListener("change", () => {
     const storageKey = activeProvider === "gmi" ? "gmi_api_key" : "minimax_api_key";
-    localStorage.setItem(storageKey, apiKeyEl.value);
-    updateApiKeyStatus();
-    toast("Key saved to this browser only", "ok");
+    localStorage.setItem(storageKey, $("apiKey").value);
+    toast("Key saved", "ok");
   });
 
-  // Persist proxy URL
-  const proxyUrlEl = $("proxyUrl");
-  proxyUrlEl.value = localStorage.getItem("gmi_proxy_url") || "";
-  proxyUrlEl.addEventListener("change", () => {
-    let v = proxyUrlEl.value.replace(/\/+$/, "");
+  // ─── Proxy URL ───
+  $("proxyUrl").value = localStorage.getItem("gmi_proxy_url") || "";
+  $("proxyUrl").addEventListener("change", () => {
+    let v = $("proxyUrl").value.replace(/\/+$/, "");
     if (v && !v.startsWith("http://") && !v.startsWith("https://") && !v.startsWith("/")) v = "https://" + v;
-    proxyUrlEl.value = v;
+    $("proxyUrl").value = v;
     localStorage.setItem("gmi_proxy_url", v);
     toast("Proxy URL saved", "ok");
   });
 
-  // Persist advanced settings
+  // ─── Settings modal ───
+  $("settingsBtn").addEventListener("click", () => $("settingsModal").classList.add("show"));
+  $("settingsClose").addEventListener("click", () => $("settingsModal").classList.remove("show"));
+  $("settingsModal").addEventListener("click", (e) => { if (e.target === $("settingsModal")) $("settingsModal").classList.remove("show"); });
+
+  // ─── Advanced settings persistence ───
   const settingsFields = ["sampleRate", "bitrate", "format", "bpm", "songKey", "songMode"];
   const SETTINGS_KEY = "gmi_advanced_settings";
 
   function saveSettings() {
     const settings = {};
-    settingsFields.forEach(id => {
-      settings[id] = $(id).value;
-    });
+    settingsFields.forEach(id => { settings[id] = $(id).value; });
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   }
 
@@ -716,30 +851,25 @@
     try {
       const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
       settingsFields.forEach(id => {
-        if (settings[id] !== undefined && settings[id] !== "") {
-          $(id).value = settings[id];
-        }
+        if (settings[id] !== undefined && settings[id] !== "") $(id).value = settings[id];
       });
     } catch {}
   }
 
   loadSettings();
-  settingsFields.forEach(id => {
-    $(id).addEventListener("change", saveSettings);
-  });
+  settingsFields.forEach(id => { $(id).addEventListener("change", saveSettings); });
 
-  // Lyrics character counter
+  // ─── Lyrics counter ───
   const lyricsEl = $("lyrics");
-  const lyricsCountEl = $("lyricsCount");
   function updateLyricsCount() {
     const len = lyricsEl.value.length;
-    lyricsCountEl.textContent = len.toLocaleString() + " / 3,500";
-    lyricsCountEl.style.color = len > 3500 ? "var(--err)" : "var(--muted)";
+    $("lyricsCount").textContent = len.toLocaleString() + " / 3500";
+    $("lyricsCount").style.color = len > 3500 ? "var(--err)" : "var(--muted)";
   }
   lyricsEl.addEventListener("input", updateLyricsCount);
   updateLyricsCount();
 
-  // Style prompt chips (categorised)
+  // ─── Genre data ───
   const samplePrompts = {
     "Pop": ["Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads, catchy melodic hook, 120 BPM, feel-good summer anthem energy","Electropop, glossy production, sidechain compression, vocoder harmonies, pulsing bassline, futuristic neon atmosphere, radio-ready polish","Indie pop, jangly reverb guitar, soft brushed drums, warm lo-fi texture, dreamy and wistful, slightly off-kilter charm, cassette aesthetic","Synthpop, 80s analog warmth, arpeggiated Juno synths, gated reverb snare, nostalgic and cinematic, John Hughes movie soundtrack feel","Cantopop ballad, 深情款款, 鋼琴弦樂編曲, 懷舊經典氣息, 張學友式深情演繹, 夜色浪漫氛圍","Mandopop ballad, 華語抒情鋼琴, 深情弦樂編曲, 周杰倫式旋律美感, 深夜思念情緒, 電台經典情歌"],
     "R&B": ["Smooth R&B slow jam, silky Rhodes piano, deep sub-bass, finger-snapped rhythm, candlelit intimacy, late-night bedroom vibes, breathy vocals","Neo-soul, live bass groove, warm Fender Rhodes, D'Angelo-inspired looseness, organic and earthy, Sunday afternoon warmth","Contemporary R&B, polished pop production, trap-influenced hi-hats, layered vocal harmonies, confident and sleek, chart-ready sound","Alternative R&B, dark atmospheric pads, sparse beats, reverb-drenched vocals, moody and introspective, Frank Ocean-esque vulnerability","Classic soul, punchy brass section, handclaps, walking bassline, gospel choir backing, joyful and uplifting, vintage Motown warmth"],
@@ -752,9 +882,8 @@
     "K-pop": ["K-pop dance track, bright synth hooks, powerful choreography energy, polished production, BTS-inspired precision, stadium-ready anthem","K-pop ballad, emotional piano, soaring strings, heartfelt vocals, dramatic build-up, IU-inspired tenderness, tear-jerking beauty","K-pop hip-hop, hard-hitting rap verses, trap beats, confident swagger, Stray Kids-inspired intensity, fierce and commanding","Cute concept, bubblegum synths, aegyo sweetness, playful rhythm, TWICE-inspired charm, bright and innocent, feel-good energy","K-pop R&B, smooth grooves, falsetto vocals, sophisticated production, Dean-inspired coolness, late-night Seoul atmosphere"],
     "Metal": ["Heavy metal, thunderous double-kick drums, screaming guitar solos, powerful riffs, Iron Maiden-inspired gallop, epic and triumphant","Death metal, guttural growls, blast beats, downtuned guitars, dark and brutal, Cannibal Corpse-inspired intensity, relentless aggression","Power metal, soaring clean vocals, symphonic keyboards, fantasy themes, DragonForce-inspired speed, epic quest energy","Progressive metal, complex time signatures, extended compositions, Tool-inspired depth, technical virtuosity, cerebral and evolving","Metalcore, breakdowns with crushing heaviness, screaming verses, melodic choruses, Architects-inspired dynamics, emotional catharsis"],
   };
-  const tabsEl = $("styleTabs");
 
-  // Lyrics templates
+  // ─── Lyrics templates ───
   const lyricsTemplates = {
     "Morning coffee": { prompt: "Chill acoustic, warm fingerpicked guitar, soft brushed drums, gentle and cozy, morning sunlight, indie folk, 95 BPM, D major, optimistic and peaceful", lyrics: `[verse]\nSunlight through the window pane\nSteam is rising, chasing rain\nOne more sip before the day begins\nThe quiet world outside spins\n\n[chorus]\nThis is my morning, slow and sweet\nJust the coffee and the beat\nOf a heart that's finding peace\nIn the small things, in the release\n\n[verse]\nThe birds are singing, soft and low\nThe garden's starting out to grow\nA moment here, a moment still\nBefore the world demands my will\n\n[chorus]\nThis is my morning, slow and sweet\nJust the coffee and the beat\nOf a heart that's finding peace\nIn the small things, in the release\n\n[outro]\nOne more sip, then I'll go` },
     "Gym pump-up": { prompt: "Aggressive trap, booming 808 bass, rapid hi-hats, dark piano melody, hard-hitting and intense, motivational energy, 140 BPM, D minor, no pain no gain", lyrics: `[intro]\nLet's go, no excuses\n\n[verse]\nAlarm hits five, I'm on my feet\nWhile the world sleeps, I don't retreat\nIron calls, I answer back\nEvery rep is an attack\n\n[chorus]\nPush harder, break the wall\nRise every time you fall\nSweat drips, eyes on the prize\nNo limits, no goodbyes\n\n[verse]\nThey said I couldn't, watch me now\nHeavy weight, I show them how\nBurning lungs, shaking legs\nI'm the one who never begs\n\n[chorus]\nPush harder, break the wall\nRise every time you fall\nSweat drips, eyes on the prize\nNo limits, no goodbyes\n\n[outro]\nOne more set, one more round` },
@@ -763,19 +892,8 @@
     "Party starter": { prompt: "Dance pop, four-on-the-floor kick, funky bassline, bright synth hooks, crowd energy, festival-ready, 125 BPM, G major, feel-good and infectious", lyrics: `[intro]\nTurn it up, here we go\n\n[verse]\nFriday night, the lights go down\nBass is shaking through the ground\nGrab your friends, hit the floor\nThis is what the night is for\n\n[chorus]\nMove your body, lose your mind\nLeave the stress and rules behind\nEvery beat is running through\nTonight we dance, me and you\n\n[verse]\nThe DJ's spinning, crowd's alive\nEvery single soul will thrive\nHands up high, feel the sound\nThis is where we're heaven-bound\n\n[chorus]\nMove your body, lose your mind\nLeave the stress and rules behind\nEvery beat is running through\nTonight we dance, me and you\n\n[outro]\nOne more song before we go` },
   };
 
-  const templateChipsEl = $("templateChips");
-  Object.keys(lyricsTemplates).forEach(name => {
-    const chip = document.createElement("span");
-    chip.className = "chip clickable";
-    chip.textContent = name;
-    chip.addEventListener("click", () => {
-      const t = lyricsTemplates[name];
-      $("lyrics").value = t.lyrics;
-      $("prompt").value = t.prompt;
-      toast("Loaded: " + name, "ok");
-    });
-    templateChipsEl.appendChild(chip);
-  });
+  // ─── Render genre chips ───
+  const tabsEl = $("styleTabs");
   let activeTab = null;
 
   function renderChips(category) {
@@ -783,210 +901,91 @@
     if (!prompts) return;
     const subgenreEl = $("subgenreDisplay");
     subgenreEl.innerHTML = "";
-    const label = document.createElement("div");
-    label.className = "text-label";
-    label.style.width = "100%";
-    label.style.marginBottom = "6px";
-    label.textContent = "Subgenres";
-    subgenreEl.appendChild(label);
     prompts.forEach((p, i) => {
       const c = document.createElement("span");
-      c.className = "chip";
+      c.className = "sub-chip" + (i === 0 ? " active" : "");
       c.textContent = p.split(",")[0];
       c.title = p;
-      if (i === 0) {
-        c.style.borderColor = "var(--accent)";
-        c.style.color = "var(--accent)";
-      }
       c.addEventListener("click", () => {
-        subgenreEl.querySelectorAll(".chip").forEach(el => { el.style.borderColor = ""; el.style.color = ""; });
-        c.style.borderColor = "var(--accent)";
-        c.style.color = "var(--accent)";
+        subgenreEl.querySelectorAll(".sub-chip").forEach(el => el.classList.remove("active"));
+        c.classList.add("active");
         $("prompt").value = p;
       });
       subgenreEl.appendChild(c);
     });
-    // Auto-fill prompt with first subgenre
     $("prompt").value = prompts[0];
   }
 
   Object.keys(samplePrompts).forEach((label, i) => {
     const btn = document.createElement("span");
-    btn.className = "chip clickable";
+    btn.className = "genre-chip" + (i === 0 ? " active" : "");
     btn.textContent = label;
-    btn.style.fontWeight = "700";
     btn.addEventListener("click", () => {
-      document.querySelectorAll("#styleTabs .chip").forEach(el => el.style.borderColor = "");
-      btn.style.borderColor = "var(--accent)";
+      tabsEl.querySelectorAll(".genre-chip").forEach(el => el.classList.remove("active"));
+      btn.classList.add("active");
       activeTab = label;
       renderChips(label);
     });
     tabsEl.appendChild(btn);
-    if (i === 0) {
-      btn.style.borderColor = "var(--accent)";
-      activeTab = label;
-    }
+    if (i === 0) activeTab = label;
   });
   renderChips(Object.keys(samplePrompts)[0]);
 
-  // Status
-  const setStatus = (text, kind) => {
-    $("statusText").textContent = text;
-    const dot = $("status").querySelector(".dot");
-    dot.className = "dot" + (kind ? " " + kind : "");
-  };
+  // ─── Render template chips ───
+  const templateChipsEl = $("templateChips");
+  Object.keys(lyricsTemplates).forEach(name => {
+    const chip = document.createElement("span");
+    chip.className = "template-chip";
+    chip.textContent = name;
+    chip.addEventListener("click", () => {
+      const t = lyricsTemplates[name];
+      $("lyrics").value = t.lyrics;
+      $("prompt").value = t.prompt;
+      updateLyricsCount();
+      toast("Loaded: " + name, "ok");
+    });
+    templateChipsEl.appendChild(chip);
+  });
 
-  // Progress bar
-  const ESTIMATED_MS = 60000; // 60s estimated generation time
-  let progressTimer = null;
-  let progressStart = 0;
+  // ─── Instrumental toggle ───
+  let instrumentalOn = false;
+  const instrumentalToggle = $("instrumentalToggle");
 
-  function showProgress() {
-    $("progressWrap").style.display = "block";
-    $("queueInfo").style.display = "block";
-    $("progressBar").style.width = "0%";
-    $("progressBar").classList.remove("complete");
-    progressStart = Date.now();
-    updateProgress();
-    progressTimer = setInterval(updateProgress, 500);
+  function toggleInstrumental() {
+    instrumentalOn = !instrumentalOn;
+    instrumentalToggle.classList.toggle("on", instrumentalOn);
+    instrumentalToggle.setAttribute("aria-checked", String(instrumentalOn));
+    lyricsEl.disabled = instrumentalOn;
+    lyricsEl.style.opacity = instrumentalOn ? "0.4" : "1";
+    if (instrumentalOn) {
+      lyricsEl.value = "";
+      updateLyricsCount();
+    }
   }
 
-  function updateProgress() {
-    const elapsed = Date.now() - progressStart;
-    const pct = Math.min(95, (elapsed / ESTIMATED_MS) * 100);
-    $("progressBar").style.width = pct + "%";
-    const secs = Math.round(elapsed / 1000);
-    $("queueInfo").textContent = `${secs}s elapsed` + (secs > 30 ? " · almost there…" : "");
-  }
+  instrumentalToggle.addEventListener("click", toggleInstrumental);
+  instrumentalToggle.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleInstrumental(); }
+  });
 
-  function completeProgress() {
-    clearInterval(progressTimer);
-    $("progressBar").style.width = "100%";
-    $("progressBar").classList.add("complete");
-    const elapsed = Math.round((Date.now() - progressStart) / 1000);
-    $("queueInfo").textContent = `Done in ${elapsed}s`;
-    setTimeout(() => {
-      $("progressWrap").style.display = "none";
-      $("queueInfo").style.display = "none";
-    }, 3000);
-  }
-
-  function resetProgress() {
-    clearInterval(progressTimer);
-    $("progressWrap").style.display = "none";
-    $("queueInfo").style.display = "none";
-    $("progressBar").style.width = "0%";
-  }
-
-  // Remix toggle
+  // ─── Remix toggle ───
   let remixOn = false;
   const remixToggle = $("remixToggle");
   const remixCount = $("remixCount");
+
   function toggleRemix() {
     remixOn = !remixOn;
     remixToggle.classList.toggle("on", remixOn);
     remixToggle.setAttribute("aria-checked", String(remixOn));
     remixCount.style.display = remixOn ? "block" : "none";
   }
+
   remixToggle.addEventListener("click", toggleRemix);
   remixToggle.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleRemix(); }
   });
 
-  // Instrumental toggle
-  let instrumentalOn = false;
-  const instrumentalToggle = $("instrumentalToggle");
-  const lyricsEl2 = $("lyrics");
-  function toggleInstrumental() {
-    instrumentalOn = !instrumentalOn;
-    instrumentalToggle.classList.toggle("on", instrumentalOn);
-    instrumentalToggle.setAttribute("aria-checked", String(instrumentalOn));
-    lyricsEl2.disabled = instrumentalOn;
-    lyricsEl2.style.opacity = instrumentalOn ? "0.4" : "1";
-    if (instrumentalOn) {
-      lyricsEl2.value = "";
-      $("lyricsCount").textContent = "0 / 3,500";
-    }
-  }
-  instrumentalToggle.addEventListener("click", toggleInstrumental);
-  instrumentalToggle.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleInstrumental(); }
-  });
-
-  // Pick N random prompts from different categories
-  function pickRandomStyles(n) {
-    const categories = Object.keys(samplePrompts);
-    const shuffled = categories.sort(() => Math.random() - 0.5).slice(0, n);
-    return shuffled.map(cat => {
-      const prompts = samplePrompts[cat];
-      return { category: cat, prompt: prompts[Math.floor(Math.random() * prompts.length)] };
-    });
-  }
-
-  // Copy song structure
-  const songStructure = `Song structure:\n[Intro] -- short opening, set the mood\n[Verse] -- tell the story, build the narrative\n[Pre Chorus] -- build tension before the hook\n[Chorus] -- the main hook, catchy and repeatable\n[Post Chorus] -- reinforcement after the hook\n[Hook] -- the most memorable part, the earworm\n[Bridge] -- change of perspective or new angle\n[Interlude] -- instrumental break between sections\n[Transition] -- connect two sections smoothly\n[Build Up] -- rising energy before a drop or chorus\n[Break] -- stripped-back moment, tension release\n[Inst] -- instrumental section, no vocals\n[Solo] -- featured instrument performance\n[Outro] -- wrap it up, fade or strong ending`;
-
-  $("copyStructureBtn").addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(songStructure);
-      toast("Structure copied -- paste into ChatGPT/Claude", "ok");
-    } catch {
-      toast("Failed to copy -- try again", "err");
-    }
-  });
-
-  // Copy/Paste settings
-  $("copySettingsBtn").addEventListener("click", async () => {
-    const data = { style: $("prompt").value, lyrics: $("lyrics").value, sampleRate: $("sampleRate").value, bitrate: $("bitrate").value, format: $("format").value };
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(data));
-      toast("Settings copied to clipboard", "ok");
-    } catch {
-      toast("Failed to copy -- try again", "err");
-    }
-  });
-
-  $("pasteSettingsBtn").addEventListener("click", async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      const data = JSON.parse(text);
-      if (data.style !== undefined) $("prompt").value = data.style;
-      if (data.lyrics !== undefined) $("lyrics").value = data.lyrics;
-      if (data.sampleRate) $("sampleRate").value = data.sampleRate;
-      if (data.bitrate) $("bitrate").value = data.bitrate;
-      if (data.format) $("format").value = data.format;
-      toast("Settings pasted", "ok");
-    } catch {
-      toast("No valid settings in clipboard", "err");
-    }
-  });
-
-  // Share link
-  $("shareBtn").addEventListener("click", async () => {
-    const data = { p: $("prompt").value, l: $("lyrics").value };
-    if (!data.p && !data.l) { toast("Nothing to share — add a prompt or lyrics", "err"); return; }
-    const hash = btoa(encodeURIComponent(JSON.stringify(data)));
-    const url = window.location.origin + window.location.pathname + "#" + hash;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast("Share link copied to clipboard", "ok");
-    } catch {
-      toast("Failed to copy link", "err");
-    }
-  });
-
-  // Load shared settings from URL hash
-  if (window.location.hash.length > 1) {
-    try {
-      const data = JSON.parse(decodeURIComponent(atob(window.location.hash.slice(1))));
-      if (data.p) $("prompt").value = data.p;
-      if (data.l) $("lyrics").value = data.l;
-      toast("Loaded shared settings", "ok");
-      history.replaceState(null, "", window.location.pathname); // Clean URL
-    } catch {}
-  }
-
-  // Toast
+  // ─── Toast ───
   const toastEl = $("toast");
   let toastTimer;
   const toast = (msg, kind) => {
@@ -996,59 +995,10 @@
     toastTimer = setTimeout(() => toastEl.className = "toast", 3500);
   };
 
-  // Sleep
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-  // Submit (with retry for 524 Cloudflare timeout)
-  async function submitRequest(payload, retries = 2) {
-    const key = apiKeyEl.value.trim();
-    const headers = { "Authorization": "Bearer " + key, "Content-Type": "application/json", "X-Provider": activeProvider };
-    const signal = abortController?.signal;
-    const resp = await fetch(GMI_ENDPOINT, { method: "POST", headers, body: JSON.stringify(payload), signal });
-    if (!resp.ok) {
-      const t = await resp.text();
-      if (resp.status === 524 && retries > 0) {
-        setStatus("Server slow, retrying…", "work");
-        await sleep(3000);
-        return submitRequest(payload, retries - 1);
-      }
-      throw new Error("Server error (" + resp.status + ") — check your API key and try again");
-    }
-    try { return await resp.json(); }
-    catch { throw new Error("Server returned invalid response (not JSON)"); }
-  }
-
-  // Poll (GMI only — MiniMax returns result directly)
-  async function pollRequest(requestId) {
-    const key = apiKeyEl.value.trim();
-    const url = GMI_ENDPOINT + "/" + requestId;
-    const signal = abortController?.signal;
-    const t0 = Date.now();
-    while (Date.now() - t0 < POLL_TIMEOUT) {
-      let r, j;
-      for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-          r = await fetch(url, { headers: { "Authorization": "Bearer " + key, "X-Provider": activeProvider }, signal });
-          if (!r.ok) throw new Error("Server error (" + r.status + ") — check your API key and try again");
-          j = await r.json();
-          break; // Success
-        } catch (err) {
-          if (err.name === "AbortError") throw err;
-          if (attempt === 2) throw err; // Final attempt failed
-          await sleep(2000); // Wait before retry
-        }
-      }
-      if (j.status === "success") return j;
-      if (j.status === "failed") throw new Error("Generation failed — check your API key and try again");
-      setStatus(`Composing… (${Math.round((Date.now() - t0) / 1000)}s)`, "work");
-      await sleep(POLL_INTERVAL);
-    }
-    throw new Error("Timed out after 3 minutes — the server may be busy, try again");
-  }
-
-  // Song history
+  // ─── Song history / Playlist ───
   const HISTORY_KEY = "gmi_song_history";
   const MAX_HISTORY = 50;
+  let currentTrackIndex = -1;
 
   function getHistory() {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
@@ -1086,93 +1036,209 @@
     history.unshift(entry);
     if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-    renderHistory();
+    renderPlaylist();
   }
 
   function deleteFromHistory(id) {
     const history = getHistory().filter(h => h.id !== id);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-    renderHistory();
+    renderPlaylist();
   }
 
-  function renderHistory() {
+  function formatDuration(secs) {
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  function renderPlaylist() {
     const history = getHistory();
-    const card = $("historyCard");
-    const list = $("historyList");
-    if (history.length === 0) { card.style.display = "none"; return; }
-    card.style.display = "block";
-    list.innerHTML = "";
-    history.forEach(h => {
-      const row = document.createElement("div");
-      row.className = "history-row";
-      const truncatedPrompt = (h.prompt || "No style prompt").length > 80
-        ? (h.prompt || "No style prompt").substring(0, 80) + "…"
-        : (h.prompt || "No style prompt");
+    const playlist = $("playlist");
+    const emptyState = $("emptyState");
+    const title = $("playlistTitle");
+
+    title.textContent = history.length > 0 ? "Playlist · " + history.length + " tracks" : "Playlist";
+
+    if (history.length === 0) {
+      playlist.innerHTML = "";
+      playlist.appendChild(emptyState);
+      emptyState.style.display = "flex";
+      return;
+    }
+
+    emptyState.style.display = "none";
+    playlist.innerHTML = "";
+
+    history.forEach((h, i) => {
+      const item = document.createElement("div");
+      item.className = "playlist-item" + (i === currentTrackIndex ? " active" : "");
+
+      const num = document.createElement("div");
+      num.className = "track-num";
+      if (i === currentTrackIndex && isPlaying) {
+        num.innerHTML = '<div class="playing-indicator"><div class="playing-bar"></div><div class="playing-bar"></div><div class="playing-bar"></div></div>';
+      } else {
+        num.textContent = i + 1;
+      }
+
       const info = document.createElement("div");
-      info.className = "history-info";
-      const titleDiv = document.createElement("div");
-      titleDiv.className = "history-title truncate";
-      titleDiv.textContent = h.title || "Untitled";
-      const promptDiv = document.createElement("div");
-      promptDiv.className = "history-prompt truncate";
-      promptDiv.textContent = truncatedPrompt;
-      const dateDiv = document.createElement("div");
-      dateDiv.className = "history-date";
-      dateDiv.textContent = h.date;
-      info.append(titleDiv, promptDiv, dateDiv);
+      info.className = "track-info";
+      const name = document.createElement("div");
+      name.className = "track-name";
+      name.textContent = h.title || "Untitled";
+      const genre = document.createElement("div");
+      genre.className = "track-genre";
+      genre.textContent = (h.prompt || "No style prompt").split(",").slice(0, 2).join(",");
+      info.append(name, genre);
 
-      const playBtn = document.createElement("span");
-      playBtn.className = "chip play-history clickable";
-      playBtn.dataset.id = h.id;
-      playBtn.style.fontSize = "10px";
-      playBtn.textContent = "Play";
-
-      const deleteBtn = document.createElement("span");
-      deleteBtn.className = "chip delete-history clickable";
-      deleteBtn.dataset.id = h.id;
-      deleteBtn.style.cssText = "font-size:10px;color:var(--err);border-color:var(--err);";
-      deleteBtn.textContent = "Delete";
-
-      row.append(info, playBtn, deleteBtn);
-      list.appendChild(row);
-    });
-
-    list.querySelectorAll(".play-history").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const entry = history.find(h => h.id === btn.dataset.id);
-        if (!entry) return;
-        $("prompt").value = entry.prompt || "";
-        $("lyrics").value = entry.lyrics || "";
-        if (entry.settings) restoreSettings(entry.settings);
-        const player = $("player");
-        player.src = entry.audioUrl;
-        $("playerCard").style.display = "block";
-        player.play().catch(() => {});
-        $("downloadLink").href = entry.audioUrl;
-        $("downloadLink").download = entry.filename || "song.mp3";
-        $("openTab").href = entry.audioUrl;
-        $("filenameChip").textContent = entry.filename || "";
-        $("meta").textContent = entry.meta || "";
-        setStatus("Playing from history", "ok");
-        $("playerCard").scrollIntoView({ behavior: "smooth" });
+      const right = document.createElement("div");
+      right.className = "track-right";
+      const dur = document.createElement("div");
+      dur.className = "track-duration";
+      dur.textContent = h.duration || "—";
+      const del = document.createElement("button");
+      del.className = "track-delete";
+      del.textContent = "✕";
+      del.addEventListener("click", (e) => {
+        e.stopPropagation();
+        deleteFromHistory(h.id);
       });
-    });
+      right.append(dur, del);
 
-    list.querySelectorAll(".delete-history").forEach(btn => {
-      btn.addEventListener("click", () => deleteFromHistory(btn.dataset.id));
+      item.append(num, info, right);
+      item.addEventListener("click", () => playTrack(i));
+      playlist.appendChild(item);
     });
   }
 
   $("clearHistory").addEventListener("click", () => {
     if (!confirm("Delete all saved songs?")) return;
     localStorage.removeItem(HISTORY_KEY);
-    renderHistory();
+    currentTrackIndex = -1;
+    renderPlaylist();
     toast("History cleared", "ok");
   });
 
-  renderHistory();
+  renderPlaylist();
 
-  // Build payload for a given lyrics + prompt
+  // ─── Audio player ───
+  const audio = $("audioPlayer");
+  let isPlaying = false;
+
+  function playTrack(index) {
+    const history = getHistory();
+    if (index < 0 || index >= history.length) return;
+
+    currentTrackIndex = index;
+    const entry = history[index];
+
+    audio.src = entry.audioUrl;
+    audio.play().catch(() => {});
+    isPlaying = true;
+
+    $("playerTitle").textContent = entry.title || "Untitled";
+    $("playerMeta").textContent = (entry.prompt || "").split(",").slice(0, 2).join(",");
+    $("playBtn").textContent = "⏸";
+
+    // Restore settings if clicking a history item
+    if (entry.settings) restoreSettings(entry.settings);
+    if (entry.prompt) $("prompt").value = entry.prompt;
+    if (entry.lyrics) { $("lyrics").value = entry.lyrics; updateLyricsCount(); }
+
+    renderPlaylist();
+  }
+
+  function togglePlay() {
+    if (!audio.src) return;
+    if (isPlaying) {
+      audio.pause();
+      isPlaying = false;
+      $("playBtn").textContent = "▶";
+    } else {
+      audio.play().catch(() => {});
+      isPlaying = true;
+      $("playBtn").textContent = "⏸";
+    }
+    renderPlaylist();
+  }
+
+  $("playBtn").addEventListener("click", togglePlay);
+
+  $("prevBtn").addEventListener("click", () => {
+    const history = getHistory();
+    if (history.length === 0) return;
+    const idx = currentTrackIndex <= 0 ? history.length - 1 : currentTrackIndex - 1;
+    playTrack(idx);
+  });
+
+  $("nextBtn").addEventListener("click", () => {
+    const history = getHistory();
+    if (history.length === 0) return;
+    const idx = currentTrackIndex >= history.length - 1 ? 0 : currentTrackIndex + 1;
+    playTrack(idx);
+  });
+
+  // Progress bar update
+  audio.addEventListener("timeupdate", () => {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    $("progressFill").style.width = pct + "%";
+    $("timeFill").style.width = pct + "%";
+    $("currentTime").textContent = formatDuration(audio.currentTime);
+    $("totalTime").textContent = formatDuration(audio.duration);
+  });
+
+  audio.addEventListener("ended", () => {
+    isPlaying = false;
+    $("playBtn").textContent = "▶";
+    renderPlaylist();
+    // Auto-play next
+    const history = getHistory();
+    if (currentTrackIndex < history.length - 1) {
+      playTrack(currentTrackIndex + 1);
+    }
+  });
+
+  // Click to seek
+  $("progressBar").addEventListener("click", (e) => {
+    if (!audio.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = pct * audio.duration;
+  });
+
+  $("timeBar").addEventListener("click", (e) => {
+    if (!audio.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = pct * audio.duration;
+  });
+
+  // ─── Generate ───
+  let abortController = null;
+  const generateBtn = $("generateBtn");
+
+  // Keyboard shortcuts
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      generateBtn.click();
+    }
+    if (e.key === "Escape" && abortController) {
+      e.preventDefault();
+      generateBtn.click();
+    }
+  });
+
+  function pickRandomStyles(n) {
+    const categories = Object.keys(samplePrompts);
+    const shuffled = categories.sort(() => Math.random() - 0.5).slice(0, n);
+    return shuffled.map(cat => {
+      const prompts = samplePrompts[cat];
+      return { category: cat, prompt: prompts[Math.floor(Math.random() * prompts.length)] };
+    });
+  }
+
   function buildPayload(lyrics, prompt) {
     const bpm = $("bpm").value ? parseInt($("bpm").value) : undefined;
     const key = $("songKey").value || undefined;
@@ -1198,7 +1264,7 @@
       if (mode) p.audio_setting.mode = mode;
       return p;
     }
-    // GMI Cloud
+
     const instrumentalLyrics = "[instrumental]\n\n[inst]\n\n[outro]";
     const payload = { lyrics: instrumentalOn ? instrumentalLyrics : lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value };
     if (bpm) payload.bpm = bpm;
@@ -1209,185 +1275,109 @@
     return p;
   }
 
-  // Extract audio URL from result
   function extractAudioUrl(result) {
-    if (activeProvider === "minimax") {
-      return result.data?.audio || result.audio;
-    }
+    if (activeProvider === "minimax") return result.data?.audio || result.audio;
     return result.outcome?.audio_url || result.outcome?.media_urls?.[0]?.url;
   }
 
-  // Build meta string from result
-  function buildMeta(result) {
-    if (activeProvider === "minimax") {
-      const dur = (result.extra_info?.music_duration || 0);
-      return [`⏱ ${dur.toFixed(1)}s`, `${$("sampleRate").value} Hz`, `${$("bitrate").value / 1000} kbps`, $("format").value].join(" · ");
+  async function submitRequest(payload, retries = 2) {
+    const key = $("apiKey").value.trim();
+    const headers = { "Authorization": "Bearer " + key, "Content-Type": "application/json", "X-Provider": activeProvider };
+    const signal = abortController?.signal;
+    const resp = await fetch(GMI_ENDPOINT, { method: "POST", headers, body: JSON.stringify(payload), signal });
+    if (!resp.ok) {
+      if (resp.status === 524 && retries > 0) {
+        await new Promise(r => setTimeout(r, 3000));
+        return submitRequest(payload, retries - 1);
+      }
+      throw new Error("Server error (" + resp.status + ") — check your API key and try again");
     }
-    const dur = (result.outcome?.duration_ms || 0) / 1000;
-    return [`⏱ ${dur.toFixed(1)}s`, `${result.outcome?.sample_rate || 0} Hz`, `${result.outcome?.channels || 0} ch`, `${(result.outcome?.bitrate || 0) / 1000 | 0} kbps`, result.outcome?.format || "mp3"].join(" · ");
+    try { return await resp.json(); }
+    catch { throw new Error("Server returned invalid response (not JSON)"); }
   }
 
-  // Display a single result in the player card
-  function displaySingleResult(audioUrl, filename, meta) {
-    const player = $("player");
-    player.src = audioUrl;
-    $("playerCard").style.display = "block";
-    $("remixCard").style.display = "none";
-    player.play().catch(() => {});
-    $("downloadLink").href = audioUrl;
-    $("downloadLink").download = filename;
-    $("openTab").href = audioUrl;
-    $("filenameChip").textContent = filename;
-    $("meta").textContent = meta;
-  }
-
-  // Display remix results in grid
-  function displayRemixResults(results) {
-    $("playerCard").style.display = "none";
-    const card = $("remixCard");
-    card.style.display = "block";
-    const grid = $("remixGrid");
-    grid.innerHTML = "";
-    results.forEach((r, i) => {
-      const item = document.createElement("div");
-      item.className = "remix-item";
-      const catDiv = document.createElement("div");
-      catDiv.className = "remix-category";
-      catDiv.textContent = r.category;
-      const promptDiv = document.createElement("div");
-      promptDiv.className = "remix-prompt truncate";
-      promptDiv.title = r.prompt;
-      promptDiv.textContent = r.prompt.split(",").slice(0,3).join(",");
-      const audio = document.createElement("audio");
-      audio.controls = true;
-      audio.style.width = "100%";
-      audio.src = r.audioUrl;
-      const actions = document.createElement("div");
-      actions.style.cssText = "margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;";
-      const dlLink = document.createElement("a");
-      dlLink.className = "chip btn-sm";
-      dlLink.href = r.audioUrl;
-      dlLink.download = `remix-${i+1}.${$("format").value}`;
-      dlLink.textContent = "Download";
-      const openLink = document.createElement("a");
-      openLink.className = "chip btn-sm";
-      openLink.href = r.audioUrl;
-      openLink.target = "_blank";
-      openLink.textContent = "Open";
-      const useBtn = document.createElement("span");
-      useBtn.className = "chip use-remix clickable btn-sm";
-      useBtn.dataset.prompt = encodeURIComponent(r.prompt);
-      useBtn.textContent = "Use style";
-      actions.append(dlLink, openLink, useBtn);
-      item.append(catDiv, promptDiv, audio, actions);
-      grid.appendChild(item);
-    });
-
-    grid.querySelector("audio")?.play().catch(() => {});
-
-    grid.querySelectorAll(".use-remix").forEach(btn => {
-      btn.addEventListener("click", () => {
-        $("prompt").value = decodeURIComponent(btn.dataset.prompt);
-        toast("Style loaded -- edit and regenerate", "ok");
-      });
-    });
-  }
-
-  // Main generate
-  let abortController = null;
-  const generateBtn = $("generateBtn");
-
-  // Keyboard shortcuts
-  document.addEventListener("keydown", (e) => {
-    // Cmd+Enter / Ctrl+Enter to generate
-    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-      e.preventDefault();
-      generateBtn.click();
+  async function pollRequest(requestId) {
+    const key = $("apiKey").value.trim();
+    const url = GMI_ENDPOINT + "/" + requestId;
+    const signal = abortController?.signal;
+    const t0 = Date.now();
+    while (Date.now() - t0 < POLL_TIMEOUT) {
+      let r, j;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          r = await fetch(url, { headers: { "Authorization": "Bearer " + key, "X-Provider": activeProvider }, signal });
+          if (!r.ok) throw new Error("Server error (" + r.status + ")");
+          j = await r.json();
+          break;
+        } catch (err) {
+          if (err.name === "AbortError") throw err;
+          if (attempt === 2) throw err;
+          await new Promise(r => setTimeout(r, 2000));
+        }
+      }
+      if (j.status === "success") return j;
+      if (j.status === "failed") throw new Error("Generation failed — check your API key");
+      await new Promise(r => setTimeout(r, POLL_INTERVAL));
     }
-    // Escape to cancel generation
-    if (e.key === "Escape" && abortController) {
-      e.preventDefault();
-      generateBtn.click();
-    }
-  });
+    throw new Error("Timed out after 3 minutes");
+  }
 
   generateBtn.addEventListener("click", async () => {
-    // If already generating, treat as cancel
     if (abortController) {
       abortController.abort();
       abortController = null;
-      generateBtn.textContent = "Generate song";
-      setStatus("Cancelled", "err");
-      resetProgress();
-      toast("Generation cancelled", "ok");
+      generateBtn.textContent = "Generate";
+      toast("Cancelled", "ok");
       return;
     }
 
-    const key = apiKeyEl.value.trim();
-    const providerName = activeProvider === "gmi" ? "GMI" : "MiniMax";
-    if (!key) { apiKeyEl.closest("details").open = true; toast("Paste your " + providerName + " API key first", "err"); apiKeyEl.focus(); return; }
+    const key = $("apiKey").value.trim();
+    if (!key) { $("settingsModal").classList.add("show"); toast("Set your API key first", "err"); return; }
 
     const prompt = $("prompt").value.trim();
     const lyrics = instrumentalOn ? "" : $("lyrics").value.trim();
-    if (!instrumentalOn && !lyrics) { toast("Add some lyrics first, or enable Instrumental mode", "err"); $("lyrics").focus(); return; }
-    if (!instrumentalOn && lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length.toLocaleString() + " / 3,500 characters", "err"); return; }
-    if (instrumentalOn && !prompt) { toast("Instrumental mode needs a style prompt — try 'Acoustic guitar, warm and mellow, 90 BPM'", "err"); $("prompt").focus(); return; }
+    if (!instrumentalOn && !lyrics) { toast("Add lyrics or enable Instrumental", "err"); return; }
+    if (!instrumentalOn && lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length.toLocaleString() + " / 3,500", "err"); return; }
+    if (instrumentalOn && !prompt) { toast("Instrumental needs a style prompt", "err"); return; }
 
     abortController = new AbortController();
     generateBtn.textContent = "Cancel";
-    setStatus("Submitting…", "work");
-    showProgress();
 
     try {
       if (remixOn) {
         const count = parseInt(remixCount.value);
         const styles = pickRandomStyles(count);
-        setStatus(`Submitting ${count} versions…`, "work");
-
         const payloads = styles.map(s => buildPayload(lyrics, s.prompt));
         const submitResults = await Promise.all(payloads.map(p => submitRequest(p)));
 
         let finals;
         if (activeProvider === "minimax") {
-          // MiniMax returns result directly
           finals = submitResults;
         } else {
-          // GMI: poll for results
-          const requestIds = submitResults.map((r, i) => {
-            if (!r.request_id) throw new Error("Server returned an unexpected response for version " + (i+1));
+          const requestIds = submitResults.map(r => {
+            if (!r.request_id) throw new Error("Unexpected response from server");
             return r.request_id;
           });
-          setStatus(`Composing ${count} versions…`, "work");
           finals = await Promise.all(requestIds.map(id => pollRequest(id)));
         }
 
-        const remixResults = finals.map((f, i) => {
+        finals.forEach((f, i) => {
           const audioUrl = extractAudioUrl(f);
-          if (!audioUrl) throw new Error("No audio returned for version " + (i+1) + " — try again");
-          return { category: styles[i].category, prompt: styles[i].prompt, audioUrl, meta: buildMeta(f) };
-        });
-
-        displayRemixResults(remixResults);
-        setStatus("Done", "ok");
-        completeProgress();
-        toast(`${count} remixes ready`, "ok");
-        $("remixCard").scrollIntoView({ behavior: "smooth" });
-
-        const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
-        const settings = getCurrentSettings();
-        remixResults.forEach(r => {
+          if (!audioUrl) throw new Error("No audio returned for version " + (i + 1));
+          const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
+          const dur = activeProvider === "minimax" ? (f.extra_info?.music_duration || 0) : ((f.outcome?.duration_ms || 0) / 1000);
           saveToHistory({
-            id: String(Date.now()) + "-" + r.category,
-            title: (titleLine || "Untitled").slice(0, 60) + " (" + r.category + ")",
-            lyrics,
-            prompt: r.prompt,
-            audioUrl: r.audioUrl,
-            filename: `remix-${r.category.toLowerCase()}.${$("format").value}`,
-            meta: r.meta,
+            id: String(Date.now()) + "-" + i,
+            title: (titleLine || "Untitled").slice(0, 60) + " (" + styles[i].category + ")",
+            lyrics, prompt: styles[i].prompt,
+            audioUrl, duration: formatDuration(dur),
             date: new Date().toLocaleString(),
-            settings
+            settings: getCurrentSettings()
           });
         });
+
+        toast(count + " remixes ready", "ok");
+        playTrack(0);
 
       } else {
         const payload = buildPayload(lyrics, prompt);
@@ -1395,52 +1385,79 @@
 
         let final;
         if (activeProvider === "minimax") {
-          // MiniMax returns result directly
           final = submitResult;
         } else {
-          // GMI: poll for result
           const requestId = submitResult.request_id;
-          if (!requestId) throw new Error("Server returned an unexpected response — check your API key and try again");
-          setStatus("Composing…", "work");
+          if (!requestId) throw new Error("Unexpected response from server");
           final = await pollRequest(requestId);
         }
 
         const audioUrl = extractAudioUrl(final);
-        if (!audioUrl) throw new Error("No audio returned — the generation may have failed, try again");
-
-        const filename = `song-${Date.now()}.${$("format").value}`;
-        const meta = buildMeta(final);
-        displaySingleResult(audioUrl, filename, meta);
-
-        setStatus("Done", "ok");
-        completeProgress();
-        toast("Song ready -- playing now", "ok");
-        $("playerCard").scrollIntoView({ behavior: "smooth" });
+        if (!audioUrl) throw new Error("No audio returned");
 
         const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
+        const dur = activeProvider === "minimax" ? (final.extra_info?.music_duration || 0) : ((final.outcome?.duration_ms || 0) / 1000);
         saveToHistory({
           id: String(Date.now()),
           title: (titleLine || "Untitled").slice(0, 60),
-          lyrics,
-          prompt,
-          audioUrl,
-          filename,
-          meta,
+          lyrics, prompt,
+          audioUrl, duration: formatDuration(dur),
           date: new Date().toLocaleString(),
           settings: getCurrentSettings()
         });
+
+        playTrack(0);
+        toast("Song ready", "ok");
       }
     } catch (err) {
-      if (err.name === "AbortError") return; // Already handled in cancel branch
+      if (err.name === "AbortError") return;
       console.error(err);
-      setStatus("Error", "err");
-      resetProgress();
       toast(err.message || String(err), "err");
     } finally {
       abortController = null;
-      generateBtn.textContent = "Generate song";
+      generateBtn.textContent = "Generate";
     }
   });
+
+  // ─── Share / Copy / Paste ───
+  $("shareBtn").addEventListener("click", async () => {
+    const data = { p: $("prompt").value, l: $("lyrics").value };
+    if (!data.p && !data.l) { toast("Nothing to share", "err"); return; }
+    const hash = btoa(encodeURIComponent(JSON.stringify(data)));
+    const url = window.location.origin + window.location.pathname + "#" + hash;
+    try { await navigator.clipboard.writeText(url); toast("Share link copied", "ok"); }
+    catch { toast("Failed to copy", "err"); }
+  });
+
+  $("copySettingsBtn").addEventListener("click", async () => {
+    const data = { style: $("prompt").value, lyrics: $("lyrics").value, sampleRate: $("sampleRate").value, bitrate: $("bitrate").value, format: $("format").value };
+    try { await navigator.clipboard.writeText(JSON.stringify(data)); toast("Settings copied", "ok"); }
+    catch { toast("Failed to copy", "err"); }
+  });
+
+  $("pasteSettingsBtn").addEventListener("click", async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const data = JSON.parse(text);
+      if (data.style !== undefined) $("prompt").value = data.style;
+      if (data.lyrics !== undefined) { $("lyrics").value = data.lyrics; updateLyricsCount(); }
+      if (data.sampleRate) $("sampleRate").value = data.sampleRate;
+      if (data.bitrate) $("bitrate").value = data.bitrate;
+      if (data.format) $("format").value = data.format;
+      toast("Settings pasted", "ok");
+    } catch { toast("No valid settings in clipboard", "err"); }
+  });
+
+  // ─── Load shared settings from URL hash ───
+  if (window.location.hash.length > 1) {
+    try {
+      const data = JSON.parse(decodeURIComponent(atob(window.location.hash.slice(1))));
+      if (data.p) $("prompt").value = data.p;
+      if (data.l) { $("lyrics").value = data.l; updateLyricsCount(); }
+      toast("Loaded shared settings", "ok");
+      history.replaceState(null, "", window.location.pathname);
+    } catch {}
+  }
 
 })();
 </script>
