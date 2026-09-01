@@ -620,10 +620,38 @@
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.err { background: var(--err); color: #fff; }
 
+  /* Mobile tabs */
+  .mobile-tabs {
+    display: none;
+    gap: 2px;
+    margin-left: 16px;
+  }
+
+  .mobile-tab {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 4px 12px;
+    font-family: var(--font-pixel);
+    font-size: 7px;
+    cursor: pointer;
+    transition: all .12s;
+  }
+
+  .mobile-tab.active {
+    background: var(--fg);
+    border-color: var(--fg);
+    color: var(--bg);
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     .main { grid-template-columns: 1fr; }
     .right { display: none; }
+    .left { display: flex; }
+    .main.show-playlist .right { display: flex; }
+    .main.show-playlist .left { display: none; }
+    .mobile-tabs { display: flex; }
     .player-track { width: auto; flex: 1; }
     .player-right { display: none; }
     .time-bar { width: 120px; }
@@ -642,6 +670,10 @@
 <!-- Top bar -->
 <div class="topbar">
   <div class="logo">♪ AI Music</div>
+  <div class="mobile-tabs" id="mobileTabs">
+    <button class="mobile-tab active" id="mobileCreateBtn">Create</button>
+    <button class="mobile-tab" id="mobilePlaylistBtn">Playlist</button>
+  </div>
   <div class="topbar-right">
     <button class="topbar-btn" id="settingsBtn" title="Settings">⚙</button>
   </div>
@@ -901,6 +933,19 @@
   $("settingsBtn").addEventListener("click", () => $("settingsModal").classList.add("show"));
   $("settingsClose").addEventListener("click", () => $("settingsModal").classList.remove("show"));
   $("settingsModal").addEventListener("click", (e) => { if (e.target === $("settingsModal")) $("settingsModal").classList.remove("show"); });
+
+  // ─── Mobile tabs ───
+  $("mobileCreateBtn").addEventListener("click", () => {
+    document.querySelector(".main").classList.remove("show-playlist");
+    $("mobileCreateBtn").classList.add("active");
+    $("mobilePlaylistBtn").classList.remove("active");
+  });
+
+  $("mobilePlaylistBtn").addEventListener("click", () => {
+    document.querySelector(".main").classList.add("show-playlist");
+    $("mobilePlaylistBtn").classList.add("active");
+    $("mobileCreateBtn").classList.remove("active");
+  });
 
   // ─── Advanced settings persistence ───
   const settingsFields = ["sampleRate", "bitrate", "format", "bpm", "songKey", "songMode"];
