@@ -24,10 +24,42 @@ def get_api_url(provider, path=""):
         return "https://api.minimax.chat/v1/music_generation"
     return f"https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests{path}"
 
+def get_llm_url():
+    return "https://api.minimax.chat/v1/text/chatcompletion_v2"
+
 @app.errorhandler(Exception)
 def handle_exception(e):
     logger.error(f"Unhandled exception: {e}\n{traceback.format_exc()}")
     return cors_response(json.dumps({"error": str(e)}), 500)
+
+@app.route("/llm", methods=["POST", "OPTIONS"])
+def llm_proxy():
+    try:
+        if request.method == "OPTIONS":
+            return ("", 204, CORS_HEADERS)
+
+        api_key = request.headers.get("Authorization", "").replace("Bearer ", "")
+        if not api_key:
+            return cors_response(json.dumps({"error": "Missing API key"}), 401)
+
+        body = request.get_json(silent=True)
+        if not body:
+            return cors_response(json.dumps({"error": "Missing body"}), 400)
+
+        url = get_llm_url()
+        api_headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+
+        logger.info(f"LLM POST {url}")
+        resp = requests.post(url, json=body, headers=api_headers, timeout=60)
+        logger.info(f"LLM Response: {resp.status_code}")
+        return cors_response(resp.text, resp.status_code)
+
+    except Exception as e:
+        logger.error(f"LLM error: {e}\n{traceback.format_exc()}")
+        return cors_response(json.dumps({"error": str(e)}), 500)
 
 @app.route("/", methods=["POST", "GET", "OPTIONS"])
 @app.route("/<path:request_id>", methods=["GET", "OPTIONS"])
