@@ -104,6 +104,13 @@
     letter-spacing: 0.05em;
   }
 
+  .label-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .label-row label { margin-bottom: 0; }
+
   .genre-grid {
     display: flex; flex-wrap: wrap; gap: 4px;
     margin-bottom: 16px;
@@ -734,7 +741,13 @@
       <label>Subgenre</label>
       <div class="subgenre-row" id="subgenreDisplay"></div>
 
-      <label>Style prompt</label>
+      <div class="label-row">
+        <label>Style prompt</label>
+        <div class="toggle-row">
+          <span class="toggle-label">Instrumental</span>
+          <span class="toggle" id="instrumentalToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
+        </div>
+      </div>
       <textarea id="prompt" placeholder="Upbeat dance pop, bright major key, punchy electronic drums"></textarea>
 
       <label>Lyrics templates</label>
@@ -745,10 +758,6 @@
     </div>
 
     <div class="action-bar">
-      <div class="toggle-row">
-        <span class="toggle" id="instrumentalToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
-        <span class="toggle-label">Instrumental</span>
-      </div>
       <div class="char-count" id="lyricsCount">0 / 3500</div>
       <button class="generate-btn" id="generateBtn">Generate</button>
     </div>
