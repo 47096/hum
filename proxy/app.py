@@ -52,9 +52,9 @@ def llm_proxy():
             "Content-Type": "application/json",
         }
 
-        logger.info(f"LLM POST {url}")
+        logger.info(f"LLM POST {url} api_key_len={len(api_key)}")
         resp = requests.post(url, json=body, headers=api_headers, timeout=60)
-        logger.info(f"LLM Response: {resp.status_code}")
+        logger.info(f"LLM Response: {resp.status_code} {resp.text[:200]}")
         return cors_response(resp.text, resp.status_code)
 
     except Exception as e:
