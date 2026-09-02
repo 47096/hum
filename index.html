@@ -1690,6 +1690,7 @@
       item.addEventListener("click", () => playTrack(i));
       playlist.appendChild(item);
     });
+    lucide.createIcons({ nodes: playlist.querySelectorAll("[data-lucide]") });
     playlist.scrollTop = scrollTop;
   }
 
