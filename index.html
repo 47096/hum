@@ -982,7 +982,7 @@
       <input type="password" id="apiKey" placeholder="Paste your key here" autocomplete="off" />
       <div class="help-text" id="apiKeyHelp">Get one at console.gmicloud.ai → API Keys. Free until Sep 6, 2026.</div>
       <label>CORS Proxy URL</label>
-      <input type="text" id="proxyUrl" placeholder="https://gmi-music-proxy.minimax-bf7.workers.dev" />
+      <input type="text" id="proxyUrl" placeholder="https://your-proxy-url.com" />
       <div class="help-text">Pre-configured for GitHub Pages. Only change if you deploy your own Worker.</div>
     </div>
 
@@ -1091,15 +1091,13 @@
   }
 
   // ─── Proxy & endpoints ───
-  const DEFAULT_PROXY = "https://gmi-music-proxy.minimax-bf7.workers.dev";
-
   function normalizeProxyUrl(url) {
     let v = url.replace(/\/+$/, "");
     if (v && !v.startsWith("http://") && !v.startsWith("https://") && !v.startsWith("/")) v = "https://" + v;
     return v;
   }
 
-  const GMI_ENDPOINT = normalizeProxyUrl(localStorage.getItem("gmi_proxy_url") || DEFAULT_PROXY);
+  const GMI_ENDPOINT = normalizeProxyUrl(localStorage.getItem("gmi_proxy_url") || "");
   const POLL_INTERVAL = 4000;
   const POLL_TIMEOUT = 180000;
   const INSTRUMENTAL_LYRICS = "[instrumental]\n\n[inst]\n\n[outro]";
@@ -1996,6 +1994,8 @@
 
     const key = $("apiKey").value.trim();
     if (!key) { openSettings(); toast("Set your API key first", "err"); return; }
+
+    if (!GMI_ENDPOINT) { openSettings(); toast("Set your proxy URL first", "err"); return; }
 
     const prompt = $("prompt").value.trim();
     const lyrics = instrumentalOn ? "" : $("lyrics").value.trim();
