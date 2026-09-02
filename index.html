@@ -1192,6 +1192,7 @@
   // ─── Sparkle AI generation ───
 
   async function generateWithAI(field, prompt) {
+    console.log("generateWithAI called:", field);
     const btn = field === "style" ? $("sparkleStyle") : $("sparkleLyrics");
     const target = field === "style" ? $("prompt") : $("lyrics");
     const currentValue = target.value.trim();
@@ -1201,6 +1202,7 @@
       return;
     }
 
+    console.log("GMI_ENDPOINT:", GMI_ENDPOINT);
     btn.classList.add("loading");
     btn.disabled = true;
 
