@@ -247,6 +247,38 @@
     transition: all .12s;
   }
 
+  .sparkle-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .sparkle-btn:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .sparkle-btn.loading {
+    opacity: 0.5;
+    cursor: not-allowed;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+  }
+
   .generate-btn:hover { background: #cccccc; }
   .generate-btn:active { background: #aaaaaa; transform: scale(0.97); }
   .generate-btn:disabled { opacity: 0.3; cursor: not-allowed; }
@@ -870,6 +902,7 @@
       <div class="label-row">
         <label>Style prompt</label>
         <div class="toggle-row">
+          <button class="sparkle-btn" id="sparkleStyle" title="Generate style with AI">&#10024;</button>
           <span class="toggle-label">Instrumental</span>
           <span class="toggle" id="instrumentalToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
         </div>
@@ -879,7 +912,10 @@
       <label>Lyrics templates</label>
       <div class="template-row" id="templateChips"></div>
 
-      <label>Lyrics</label>
+      <div class="label-row">
+        <label>Lyrics</label>
+        <button class="sparkle-btn" id="sparkleLyrics" title="Generate lyrics with AI">&#10024;</button>
+      </div>
       <div class="lyrics-wrap">
         <textarea id="lyrics" placeholder="[verse]&#10;Write your lyrics here...&#10;&#10;[chorus]&#10;The catchy hook goes here&#10;&#10;[verse]&#10;Second verse...&#10;&#10;[chorus]&#10;Repeat the hook&#10;&#10;[outro]&#10;Wrap it up"></textarea>
         <div class="char-count" id="lyricsCount">0 / 3500</div>
@@ -1063,6 +1099,13 @@
       </select>
     </div>
 
+    <div class="settings-group">
+      <div class="settings-label">AI Lyrics & Style</div>
+      <label for="llmProxyUrl">LLM Proxy URL</label>
+      <input type="text" id="llmProxyUrl" placeholder="https://your-llm-proxy.com" />
+      <div class="help-text">Proxy for MiniMax-M3 or other LLM. Used for sparkle button AI generation.</div>
+    </div>
+
     <div class="settings-actions">
       <button class="settings-action-btn" id="shareBtn">Share link</button>
       <button class="settings-action-btn" id="copySettingsBtn">Copy settings</button>
@@ -1147,6 +1190,81 @@
     localStorage.setItem("gmi_proxy_url", v);
     toast("Proxy URL saved", "ok");
   });
+
+  // ─── LLM Proxy URL ───
+  $("llmProxyUrl").value = localStorage.getItem("llm_proxy_url") || "";
+  $("llmProxyUrl").addEventListener("change", () => {
+    const raw = $("llmProxyUrl").value.trim();
+    if (raw && !/^https?:\/\/.+/.test(raw)) {
+      toast("Invalid URL — must start with http:// or https://", "err");
+      $("llmProxyUrl").value = localStorage.getItem("llm_proxy_url") || "";
+      return;
+    }
+    const v = normalizeProxyUrl(raw);
+    $("llmProxyUrl").value = v;
+    localStorage.setItem("llm_proxy_url", v);
+    toast("LLM proxy URL saved", "ok");
+  });
+
+  // ─── Sparkle AI generation ───
+  const LLM_ENDPOINT = normalizeProxyUrl(localStorage.getItem("llm_proxy_url") || "");
+
+  async function generateWithAI(field, prompt) {
+    const btn = field === "style" ? $("sparkleStyle") : $("sparkleLyrics");
+    const target = field === "style" ? $("prompt") : $("lyrics");
+    const currentValue = target.value.trim();
+
+    if (!LLM_ENDPOINT) {
+      toast("Set LLM proxy URL in settings first", "err");
+      return;
+    }
+
+    btn.classList.add("loading");
+    btn.disabled = true;
+
+    try {
+      const systemPrompt = field === "style"
+        ? "You are a music style prompt generator. Given a brief idea, generate a detailed style prompt for AI music generation. Include genre, mood, instruments, tempo, and vocal style. Keep it under 200 characters. Output ONLY the style prompt, nothing else."
+        : "You are a lyrics writer. Given a brief idea, generate full song lyrics with structure tags like [verse], [chorus], [bridge], [outro]. Make it emotional and singable. Output ONLY the lyrics, nothing else.";
+
+      const userPrompt = currentValue || (field === "style" ? "upbeat pop song" : "song about missing someone");
+
+      const resp = await fetch(LLM_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "minimax-m3",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          max_tokens: 500,
+          temperature: 0.8
+        })
+      });
+
+      if (!resp.ok) throw new Error("API error (" + resp.status + ")");
+
+      const data = await resp.json();
+      const generated = data.choices?.[0]?.message?.content?.trim();
+
+      if (generated) {
+        target.value = generated;
+        if (field === "lyrics") updateLyricsCount();
+        toast("Generated!", "ok");
+      } else {
+        throw new Error("No content returned");
+      }
+    } catch (err) {
+      toast("Generation failed: " + err.message, "err");
+    } finally {
+      btn.classList.remove("loading");
+      btn.disabled = false;
+    }
+  }
+
+  $("sparkleStyle").addEventListener("click", () => generateWithAI("style"));
+  $("sparkleLyrics").addEventListener("click", () => generateWithAI("lyrics"));
 
   // ─── Draggable divider ───
   const divider = $("divider");
