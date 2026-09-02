@@ -9,6 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>" />
 <title>AI Music · GMI Cloud</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
 <style>
   :root {
     --bg: #111111;
@@ -24,6 +25,11 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Lucide icon sizing */
+  [data-lucide] { width: 1em; height: 1em; vertical-align: -0.125em; }
+  .icon-sm { width: 14px; height: 14px; }
+  .icon-lg { width: 32px; height: 32px; }
 
   html, body {
     background: var(--bg);
@@ -698,13 +704,13 @@
 
 <!-- Top bar -->
 <div class="topbar">
-  <div class="logo">♪ AI Music</div>
+  <div class="logo"><i data-lucide="music" class="icon-sm"></i> AI Music</div>
   <div class="mobile-tabs" id="mobileTabs">
     <button class="mobile-tab active" id="mobileCreateBtn">Create</button>
     <button class="mobile-tab" id="mobilePlaylistBtn">Playlist</button>
   </div>
   <div class="topbar-right">
-    <button class="topbar-btn" id="settingsBtn" title="Settings">⚙</button>
+    <button class="topbar-btn" id="settingsBtn" title="Settings"><i data-lucide="settings"></i></button>
   </div>
 </div>
 
@@ -752,7 +758,7 @@
 
     <div class="playlist" id="playlist" aria-live="polite" aria-label="Playlist">
       <div class="empty-state" id="emptyState">
-        <div class="empty-icon">♪</div>
+        <div class="empty-icon"><i data-lucide="music" class="icon-lg"></i></div>
         <div class="empty-text">No songs yet<br>Generate your first track</div>
       </div>
     </div>
@@ -763,7 +769,7 @@
 <div class="player-bar">
 
   <div class="player-track">
-    <div class="player-art" id="playerArt">♪</div>
+    <div class="player-art" id="playerArt"><i data-lucide="music"></i></div>
     <div class="player-info">
       <div class="player-title" id="playerTitle">No track selected</div>
       <div class="player-meta" id="playerMeta">—</div>
@@ -772,11 +778,11 @@
 
   <div class="player-center">
     <div class="player-controls">
-      <button class="ctrl-btn" id="shuffleBtn" title="Shuffle" aria-label="Shuffle">🔀</button>
-      <button class="ctrl-btn" id="prevBtn" aria-label="Previous track">⏮</button>
-      <button class="ctrl-btn play" id="playBtn" aria-label="Play">▶</button>
-      <button class="ctrl-btn" id="nextBtn" aria-label="Next track">⏭</button>
-      <button class="ctrl-btn" id="repeatBtn" title="Repeat" aria-label="Repeat">🔁</button>
+      <button class="ctrl-btn" id="shuffleBtn" title="Shuffle" aria-label="Shuffle"><i data-lucide="shuffle"></i></button>
+      <button class="ctrl-btn" id="prevBtn" aria-label="Previous track"><i data-lucide="skip-back"></i></button>
+      <button class="ctrl-btn play" id="playBtn" aria-label="Play"><i data-lucide="play"></i></button>
+      <button class="ctrl-btn" id="nextBtn" aria-label="Next track"><i data-lucide="skip-forward"></i></button>
+      <button class="ctrl-btn" id="repeatBtn" title="Repeat" aria-label="Repeat"><i data-lucide="repeat"></i></button>
     </div>
     <div class="player-time">
       <span id="currentTime">0:00</span>
@@ -788,7 +794,7 @@
   </div>
 
   <div class="player-right">
-    <span class="vol-icon" id="volIcon" role="button" tabindex="0" aria-label="Toggle mute">🔊</span>
+    <span class="vol-icon" id="volIcon" role="button" tabindex="0" aria-label="Toggle mute"><i data-lucide="volume-2"></i></span>
     <div class="vol-bar" id="volBar"><div class="vol-fill" id="volFill"></div></div>
   </div>
 </div>
@@ -798,7 +804,7 @@
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="settingsTitle">Settings</div>
-      <button class="modal-close" id="settingsClose" aria-label="Close settings">✕</button>
+      <button class="modal-close" id="settingsClose" aria-label="Close settings"><i data-lucide="x"></i></button>
     </div>
 
     <div class="settings-group">
@@ -910,6 +916,15 @@
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
+
+  // Icon helper — replaces element content with a Lucide icon
+  function setIcon(el, name) {
+    el.innerHTML = "";
+    const i = document.createElement("i");
+    i.setAttribute("data-lucide", name);
+    el.appendChild(i);
+    lucide.createIcons({ nodes: [i] });
+  }
 
   // ─── Proxy & endpoints ───
   const DEFAULT_PROXY = "https://gmi-music-proxy.minimax-bf7.workers.dev";
@@ -1258,7 +1273,8 @@
     title.textContent = history.length > 0 ? "Playlist · " + history.length + " tracks" : "Playlist";
 
     if (history.length === 0) {
-      playlist.innerHTML = '<div class="empty-state" id="emptyState"><div class="empty-icon">♪</div><div class="empty-text">No songs yet<br>Generate your first track</div></div>';
+      playlist.innerHTML = '<div class="empty-state" id="emptyState"><div class="empty-icon"><i data-lucide="music" class="icon-lg"></i></div><div class="empty-text">No songs yet<br>Generate your first track</div></div>';
+      lucide.createIcons({ nodes: playlist.querySelectorAll("[data-lucide]") });
       return;
     }
 
@@ -1296,7 +1312,7 @@
       dur.textContent = h.duration || "—";
       const dl = document.createElement("button");
       dl.className = "track-download";
-      dl.textContent = "↓";
+      dl.innerHTML = '<i data-lucide="download"></i>';
       dl.setAttribute("aria-label", "Download track");
       dl.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1304,7 +1320,7 @@
       });
       const del = document.createElement("button");
       del.className = "track-delete";
-      del.textContent = "✕";
+      del.innerHTML = '<i data-lucide="trash-2"></i>';
       del.setAttribute("aria-label", "Delete track");
       del.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1342,10 +1358,10 @@
   $("volFill").style.width = (volume * 100) + "%";
 
   function updateVolumeIcon(vol) {
-    if (vol === 0) $("volIcon").textContent = "🔇";
-    else if (vol < 0.3) $("volIcon").textContent = "🔈";
-    else if (vol < 0.7) $("volIcon").textContent = "🔉";
-    else $("volIcon").textContent = "🔊";
+    if (vol === 0) setIcon($("volIcon"), "volume-x");
+    else if (vol < 0.3) setIcon($("volIcon"), "volume");
+    else if (vol < 0.7) setIcon($("volIcon"), "volume-1");
+    else setIcon($("volIcon"), "volume-2");
   }
 
   updateVolumeIcon(volume);
@@ -1363,7 +1379,7 @@
     if (audio.volume > 0) {
       audio.volume = 0;
       $("volFill").style.width = "0%";
-      $("volIcon").textContent = "🔇";
+      setIcon($("volIcon"), "volume-x");
     } else {
       audio.volume = volume || 0.7;
       $("volFill").style.width = (audio.volume * 100) + "%";
@@ -1381,12 +1397,12 @@
     audio.src = entry.audioUrl;
     audio.play().then(() => {
       isPlaying = true;
-      $("playBtn").textContent = "⏸";
+      setIcon($("playBtn"), "pause");
       renderPlaylist();
     }).catch(() => {
       // Autoplay blocked — user can click play manually
       isPlaying = false;
-      $("playBtn").textContent = "▶";
+      setIcon($("playBtn"), "play");
     });
 
     $("playerTitle").textContent = entry.title || "Untitled";
@@ -1413,12 +1429,12 @@
     if (isPlaying) {
       audio.pause();
       isPlaying = false;
-      $("playBtn").textContent = "▶";
+      setIcon($("playBtn"), "play");
       renderPlaylist();
     } else {
       audio.play().then(() => {
         isPlaying = true;
-        $("playBtn").textContent = "⏸";
+        setIcon($("playBtn"), "pause");
         renderPlaylist();
       }).catch(() => {
         toast("Playback blocked — try again", "err");
@@ -1441,7 +1457,7 @@
   $("repeatBtn").addEventListener("click", () => {
     repeatMode = (repeatMode + 1) % 3;
     $("repeatBtn").classList.toggle("active", repeatMode > 0);
-    $("repeatBtn").textContent = repeatMode === 2 ? "🔂" : "🔁";
+    setIcon($("repeatBtn"), repeatMode === 2 ? "repeat-1" : "repeat");
     const repeatLabel = repeatMode === 0 ? "Repeat" : repeatMode === 1 ? "Repeat all" : "Repeat one";
     $("repeatBtn").setAttribute("aria-label", repeatLabel);
   });
@@ -1490,7 +1506,7 @@
 
   audio.addEventListener("ended", () => {
     isPlaying = false;
-    $("playBtn").textContent = "▶";
+    setIcon($("playBtn"), "play");
     renderPlaylist();
     // Auto-play next (respects shuffle & repeat)
     const nextIdx = getNextIndex();
@@ -1812,6 +1828,9 @@
       history.replaceState(null, "", window.location.pathname);
     } catch {}
   }
+
+  // Initialize all Lucide icons
+  lucide.createIcons();
 
 })();
 </script>
