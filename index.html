@@ -1240,9 +1240,14 @@
       if (!resp.ok) throw new Error("API error (" + resp.status + ")");
 
       const data = await resp.json();
-      console.log("LLM response:", data);
+      console.log("LLM response:", JSON.stringify(data, null, 2));
 
-      const generated = data.choices?.[0]?.message?.content?.trim();
+      // Try different response formats
+      const generated = data.choices?.[0]?.message?.content?.trim()
+        || data.reply?.text?.trim()
+        || data.result?.text?.trim()
+        || data.text?.trim()
+        || data.content?.trim();
 
       if (generated) {
         target.value = generated;
