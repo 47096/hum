@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Suno vs Our App · Feature Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #141414;
+    --border: #2a2a2a;
+    --fg: #e8e8e8;
+    --muted: #888888;
+    --accent: #a78bfa;
+    --accent-dim: rgba(167,139,250,0.15);
+    --green: #4ade80;
+    --green-dim: rgba(74,222,128,0.15);
+    --yellow: #fbbf24;
+    --yellow-dim: rgba(251,191,36,0.15);
+    --red: #f87171;
+    --red-dim: rgba(248,113,113,0.15);
+    --font: 'Inter', -apple-system, sans-serif;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f5f5f5;
+      --panel: #ffffff;
+      --border: #e5e5e5;
+      --fg: #1a1a1a;
+      --muted: #666666;
+      --accent: #7c3aed;
+      --accent-dim: rgba(124,58,237,0.08);
+      --green: #16a34a;
+      --green-dim: rgba(22,163,74,0.08);
+      --yellow: #d97706;
+      --yellow-dim: rgba(217,119,6,0.08);
+      --red: #dc2626;
+      --red-dim: rgba(220,38,38,0.08);
+    }
+  }
+
+  [data-theme="light"] {
+    --bg: #f5f5f5;
+    --panel: #ffffff;
+    --border: #e5e5e5;
+    --fg: #1a1a1a;
+    --muted: #666666;
+    --accent: #7c3aed;
+    --accent-dim: rgba(124,58,237,0.08);
+    --green: #16a34a;
+    --green-dim: rgba(22,163,74,0.08);
+    --yellow: #d97706;
+    --yellow-dim: rgba(217,119,6,0.08);
+    --red: #dc2626;
+    --red-dim: rgba(220,38,38,0.08);
+  }
+
+  [data-theme="dark"] {
+    --bg: #0a0a0a;
+    --panel: #141414;
+    --border: #2a2a2a;
+    --fg: #e8e8e8;
+    --muted: #888888;
+    --accent: #a78bfa;
+    --accent-dim: rgba(167,139,250,0.15);
+    --green: #4ade80;
+    --green-dim: rgba(74,222,128,0.15);
+    --yellow: #fbbf24;
+    --yellow-dim: rgba(251,191,36,0.15);
+    --red: #f87171;
+    --red-dim: rgba(248,113,113,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.6 var(--font);
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 24px 80px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  .page-header p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .table-wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  thead th {
+    background: var(--panel);
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  thead th:first-child {
+    width: 200px;
+  }
+
+  thead th:not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
+
+  tbody td {
+    padding: 14px 20px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  tbody td:not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody td:first-child {
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 2px 2px;
+  }
+
+  .tag-green { background: var(--green-dim); color: var(--green); }
+  .tag-yellow { background: var(--yellow-dim); color: var(--yellow); }
+  .tag-red { background: var(--red-dim); color: var(--red); }
+  .tag-accent { background: var(--accent-dim); color: var(--accent); }
+
+  .section-row td {
+    background: var(--bg);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    padding: 10px 20px;
+  }
+
+  .note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .legend {
+    max-width: 1000px;
+    margin: 24px auto 0;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .summary {
+    max-width: 1000px;
+    margin: 40px auto 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .summary h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+
+  .summary-card {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .summary-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .summary-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .summary-card li {
+    font-size: 12px;
+    color: var(--muted);
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .summary-card li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Suno vs Our App</h1>
+  <p>Feature-by-feature comparison to identify what to adopt, adapt, or skip.</p>
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Suno</th>
+      <th>Our App (Option 1)</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- Modes -->
+    <tr class="section-row"><td colspan="3">Modes</td></tr>
+    <tr>
+      <td>Simple mode</td>
+      <td><span class="tag tag-green">Yes</span> One prompt → full song</td>
+      <td><span class="tag tag-red">No</span> Separate fields only</td>
+    </tr>
+    <tr>
+      <td>Custom mode</td>
+      <td><span class="tag tag-green">Yes</span> Style + lyrics fields</td>
+      <td><span class="tag tag-green">Yes</span> Same approach</td>
+    </tr>
+
+    <!-- AI Assistance -->
+    <tr class="section-row"><td colspan="3">AI Assistance</td></tr>
+    <tr>
+      <td>AI generates lyrics</td>
+      <td><span class="tag tag-green">Yes</span> From idea/description</td>
+      <td><span class="tag tag-accent">Planned</span> Sparkle button</td>
+    </tr>
+    <tr>
+      <td>AI generates style</td>
+      <td><span class="tag tag-yellow">Partial</span> Interprets your prompt</td>
+      <td><span class="tag tag-accent">Planned</span> Sparkle button</td>
+    </tr>
+    <tr>
+      <td>AI entry point</td>
+      <td>Single "Create" button does everything</td>
+      <td>Per-field sparkle icons (granular)</td>
+    </tr>
+    <tr>
+      <td>Regenerate individual fields</td>
+      <td><span class="tag tag-red">No</span> Must regenerate whole song</td>
+      <td><span class="tag tag-green">Yes</span> Each field independent</td>
+    </tr>
+
+    <!-- Lyrics -->
+    <tr class="section-row"><td colspan="3">Lyrics</td></tr>
+    <tr>
+      <td>Structure tags</td>
+      <td><span class="tag tag-green">Yes</span> [Verse] [Chorus] [Bridge]</td>
+      <td><span class="tag tag-green">Yes</span> Same tags supported</td>
+    </tr>
+    <tr>
+      <td>Lyrics templates</td>
+      <td><span class="tag tag-red">No</span></td>
+      <td><span class="tag tag-green">Yes</span> Pre-built templates</td>
+    </tr>
+    <tr>
+      <td>Character limit</td>
+      <td>~3000 chars</td>
+      <td>3500 chars</td>
+    </tr>
+
+    <!-- Style -->
+    <tr class="section-row"><td colspan="3">Style</td></tr>
+    <tr>
+      <td>Style field</td>
+      <td>Free text, genre tags</td>
+      <td>Free text + genre/subgenre chips</td>
+    </tr>
+    <tr>
+      <td>Genre presets</td>
+      <td><span class="tag tag-yellow">Limited</span> Dropdown tags</td>
+      <td><span class="tag tag-green">Yes</span> Clickable chips</td>
+    </tr>
+    <tr>
+      <td>BPM / Key control</td>
+      <td><span class="tag tag-green">Yes</span></td>
+      <td><span class="tag tag-green">Yes</span></td>
+    </tr>
+
+    <!-- Output -->
+    <tr class="section-row"><td colspan="3">Output</td></tr>
+    <tr>
+      <td>Versions per generation</td>
+      <td>2 versions</td>
+      <td>1 version (or multiple with remix)</td>
+    </tr>
+    <tr>
+      <td>Instrumental toggle</td>
+      <td><span class="tag tag-green">Yes</span></td>
+      <td><span class="tag tag-green">Yes</span></td>
+    </tr>
+    <tr>
+      <td>Song duration</td>
+      <td>~2-4 min</td>
+      <td>Depends on API</td>
+    </tr>
+
+    <!-- UX -->
+    <tr class="section-row"><td colspan="3">UX</td></tr>
+    <tr>
+      <td>Lyrics panel</td>
+      <td><span class="tag tag-green">Yes</span> Shows while playing</td>
+      <td><span class="tag tag-green">Yes</span> Slide-in panel</td>
+    </tr>
+    <tr>
+      <td>Playlist / history</td>
+      <td><span class="tag tag-green">Yes</span></td>
+      <td><span class="tag tag-green">Yes</span></td>
+    </tr>
+    <tr>
+      <td>Album art</td>
+      <td><span class="tag tag-green">Yes</span> AI-generated</td>
+      <td><span class="tag tag-red">No</span> Music icon only</td>
+    </tr>
+
+  </tbody>
+</table>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Available</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> Partial</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Not available</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Planned</div>
+</div>
+
+<div class="summary">
+  <h2>What to adopt from Suno</h2>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <h3><span class="tag tag-green">Adopt</span> Worth copying</h3>
+      <ul>
+        <li>Per-field AI generation (our sparkle approach is better than Suno's single action)</li>
+        <li>Structure tags as first-class citizens</li>
+        <li>Style + lyrics as separate fields</li>
+        <li>Multiple versions per generation</li>
+      </ul>
+    </div>
+    <div class="summary-card">
+      <h3><span class="tag tag-yellow">Adapt</span> Modify to fit</h3>
+      <ul>
+        <li>Simple mode → could add a "quick generate" that fills both fields from one prompt</li>
+        <li>Genre tags → we already have chips, could add more</li>
+        <li>Album art → could add AI-generated art later</li>
+      </ul>
+    </div>
+    <div class="summary-card">
+      <h3><span class="tag tag-accent">Our edge</span> What we do better</h3>
+      <ul>
+        <li>Lyrics templates (Suno doesn't have these)</li>
+        <li>Granular AI control per field</li>
+        <li>Genre/subgenre chip system</li>
+        <li>Draggable lyrics panel</li>
+      </ul>
+    </div>
+    <div class="summary-card">
+      <h3><span class="tag tag-red">Skip</span> Not needed</h3>
+      <ul>
+        <li>Suno's "weirdness" slider (too niche)</li>
+        <li>Voice cloning (complex, legal issues)</li>
+        <li>Social features (out of scope)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
