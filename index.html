@@ -1633,15 +1633,23 @@
       art.innerHTML = '<i data-lucide="music"></i>';
       const playOverlay = document.createElement("div");
       playOverlay.className = "track-art-play";
-      playOverlay.innerHTML = '<i data-lucide="play"></i>';
+      playOverlay.innerHTML = '<i data-lucide="' + (i === currentTrackIndex && isPlaying ? 'pause' : 'play') + '"></i>';
       art.appendChild(playOverlay);
       art.addEventListener("click", (e) => {
         e.stopPropagation();
-        playTrack(i);
+        if (i === currentTrackIndex) {
+          togglePlay();
+        } else {
+          playTrack(i);
+        }
       });
 
       const info = document.createElement("div");
       info.className = "track-info";
+      info.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showLyrics(h);
+      });
       const name = document.createElement("div");
       name.className = "track-name";
       name.textContent = h.title || "Untitled";
