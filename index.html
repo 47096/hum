@@ -1239,6 +1239,8 @@
       if (!resp.ok) throw new Error("API error (" + resp.status + ")");
 
       const data = await resp.json();
+      console.log("LLM response:", data);
+
       const generated = data.choices?.[0]?.message?.content?.trim();
 
       if (generated) {
@@ -1246,6 +1248,7 @@
         if (field === "lyrics") updateLyricsCount();
         toast("Generated!", "ok");
       } else {
+        console.log("No content in response:", data);
         throw new Error("No content returned");
       }
     } catch (err) {
