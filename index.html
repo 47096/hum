@@ -1138,7 +1138,9 @@
     return v;
   }
 
-  const GMI_ENDPOINT = normalizeProxyUrl(localStorage.getItem("gmi_proxy_url") || "");
+  function getEndpoint() {
+    return normalizeProxyUrl(localStorage.getItem("gmi_proxy_url") || "");
+  }
   const POLL_INTERVAL = 4000;
   const POLL_TIMEOUT = 180000;
   const INSTRUMENTAL_LYRICS = "[instrumental]\n\n[inst]\n\n[outro]";
@@ -1197,12 +1199,12 @@
     const target = field === "style" ? $("prompt") : $("lyrics");
     const currentValue = target.value.trim();
 
-    if (!GMI_ENDPOINT) {
+    if (!getEndpoint()) {
       toast("Set proxy URL in settings first", "err");
       return;
     }
 
-    console.log("GMI_ENDPOINT:", GMI_ENDPOINT);
+    console.log("getEndpoint():", getEndpoint());
     btn.classList.add("loading");
     btn.disabled = true;
 
@@ -1220,14 +1222,15 @@
         return;
       }
 
-      const resp = await fetch(GMI_ENDPOINT + "/llm", {
+      const resp = await fetch(getEndpoint() + "/llm", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + key
+          "Authorization": "Bearer " + key,
+          "X-Provider": activeProvider
         },
         body: JSON.stringify({
-          model: "minimax-m3",
+          model: "MiniMaxAI/MiniMax-M3",
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt }
@@ -2054,7 +2057,7 @@
     const key = $("apiKey").value.trim();
     const headers = { "Authorization": "Bearer " + key, "Content-Type": "application/json", "X-Provider": activeProvider };
     const signal = abortController?.signal;
-    const resp = await fetch(GMI_ENDPOINT, { method: "POST", headers, body: JSON.stringify(payload), signal });
+    const resp = await fetch(getEndpoint(), { method: "POST", headers, body: JSON.stringify(payload), signal });
     if (!resp.ok) {
       if (resp.status === 524 && retries > 0) {
         await new Promise(r => setTimeout(r, 3000));
@@ -2070,7 +2073,7 @@
 
   async function pollRequest(requestId) {
     const key = $("apiKey").value.trim();
-    const url = GMI_ENDPOINT + "/" + requestId;
+    const url = getEndpoint() + "/" + requestId;
     const signal = abortController?.signal;
     const t0 = Date.now();
     while (Date.now() - t0 < POLL_TIMEOUT) {
@@ -2110,18 +2113,19 @@
     }
 
     if (isGenerating) return;
-    isGenerating = true;
 
     const key = $("apiKey").value.trim();
     if (!key) { openSettings(); toast("Set your API key first", "err"); return; }
 
-    if (!GMI_ENDPOINT) { openSettings(); toast("Set your proxy URL first", "err"); return; }
+    if (!getEndpoint()) { openSettings(); toast("Set your proxy URL first", "err"); return; }
 
     const prompt = $("prompt").value.trim();
     const lyrics = instrumentalOn ? "" : $("lyrics").value.trim();
     if (!instrumentalOn && !lyrics) { toast("Add lyrics or enable Instrumental", "err"); return; }
     if (!instrumentalOn && lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length.toLocaleString() + " / 3,500", "err"); return; }
     if (instrumentalOn && !prompt) { toast("Instrumental needs a style prompt", "err"); return; }
+
+    isGenerating = true;
 
     abortController = new AbortController();
     generateBtn.textContent = "Cancel";
