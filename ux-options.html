@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Music · UX Options for LLM Integration</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #141414;
+    --panel-alt: #1a1a1a;
+    --border: #2a2a2a;
+    --fg: #e8e8e8;
+    --muted: #888888;
+    --accent: #a78bfa;
+    --accent-dim: rgba(167,139,250,0.15);
+    --sparkle: #fbbf24;
+    --green: #4ade80;
+    --font: 'Inter', -apple-system, sans-serif;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f5f5f5;
+      --panel: #ffffff;
+      --panel-alt: #fafafa;
+      --border: #e5e5e5;
+      --fg: #1a1a1a;
+      --muted: #666666;
+      --accent: #7c3aed;
+      --accent-dim: rgba(124,58,237,0.08);
+      --sparkle: #d97706;
+      --green: #16a34a;
+    }
+  }
+
+  [data-theme="light"] {
+    --bg: #f5f5f5;
+    --panel: #ffffff;
+    --panel-alt: #fafafa;
+    --border: #e5e5e5;
+    --fg: #1a1a1a;
+    --muted: #666666;
+    --accent: #7c3aed;
+    --accent-dim: rgba(124,58,237,0.08);
+    --sparkle: #d97706;
+    --green: #16a34a;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0a0a0a;
+    --panel: #141414;
+    --panel-alt: #1a1a1a;
+    --border: #2a2a2a;
+    --fg: #e8e8e8;
+    --muted: #888888;
+    --accent: #a78bfa;
+    --accent-dim: rgba(167,139,250,0.15);
+    --sparkle: #fbbf24;
+    --green: #4ade80;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.6 var(--font);
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 24px 80px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    text-wrap: balance;
+  }
+
+  .page-header p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .options-grid { grid-template-columns: 1fr; max-width: 420px; }
+  }
+
+  .option-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .option-number {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .option-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .option-desc {
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mockup {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mockup-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mockup-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
+
+  .mockup-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--fg);
+    font-family: var(--font);
+    border-radius: 6px;
+    resize: none;
+    min-height: 80px;
+  }
+
+  .mockup-input::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .mockup-input-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .mockup-input-row .mockup-input {
+    flex: 1;
+  }
+
+  .sparkle-btn {
+    background: var(--accent-dim);
+    border: 1px solid transparent;
+    color: var(--accent);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 16px;
+    transition: all 0.15s;
+    align-self: flex-end;
+  }
+
+  .sparkle-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .sparkle-btn-row {
+    display: flex;
+    gap: 8px;
+    align-self: flex-end;
+  }
+
+  .ai-generate-btn {
+    background: linear-gradient(135deg, var(--accent), #818cf8);
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.15s;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ai-generate-btn:hover { opacity: 0.9; }
+
+  .inline-wrap {
+    position: relative;
+  }
+
+  .inline-expand {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: var(--accent-dim);
+    border: none;
+    color: var(--accent);
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s;
+  }
+
+  .inline-expand:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .mockup-textarea-large {
+    min-height: 140px;
+    padding-bottom: 40px;
+  }
+
+  .pros-cons {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pros-cons h4 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
+
+  .pros-cons ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pros-cons li {
+    font-size: 12px;
+    color: var(--muted);
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .pros-cons li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .pros li::before { background: var(--green); }
+  .cons li::before { background: #f87171; }
+
+  .recommendation {
+    max-width: 1200px;
+    margin: 48px auto 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .recommendation-icon {
+    width: 40px; height: 40px;
+    background: var(--accent-dim);
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .recommendation h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .recommendation p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>AI Lyrics & Style Generation</h1>
+  <p>Three UX approaches for integrating MiniMax-M3 LLM to auto-generate lyrics and style prompts from a brief idea.</p>
+</div>
+
+<div class="options-grid">
+
+  <!-- Option 1 -->
+  <div class="option-card">
+    <div class="option-label">
+      <div class="option-number">1</div>
+      <div class="option-title">Sparkle per field</div>
+      <span class="tag">Recommended</span>
+    </div>
+    <div class="option-desc">Small AI icon next to each input. Click to generate content for that specific field independently.</div>
+    <div class="mockup">
+      <div class="mockup-section">
+        <div class="mockup-label">Style prompt</div>
+        <div class="mockup-input-row">
+          <textarea class="mockup-input" placeholder="Upbeat dance pop, bright major key..." rows="2"></textarea>
+          <button class="sparkle-btn" title="Generate style with AI">&#10024;</button>
+        </div>
+      </div>
+      <div class="mockup-section">
+        <div class="mockup-label">Lyrics</div>
+        <div class="mockup-input-row">
+          <textarea class="mockup-input" placeholder="[verse]&#10;Write your lyrics here..." rows="5"></textarea>
+          <button class="sparkle-btn" title="Generate lyrics with AI">&#10024;</button>
+        </div>
+      </div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>Pros</h4>
+        <ul>
+          <li>Granular control per field</li>
+          <li>Can regenerate just one part</li>
+          <li>Familiar pattern (Notion, Docs)</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>Cons</h4>
+        <ul>
+          <li>Two separate actions</li>
+          <li>User needs to know what each field does</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option 2 -->
+  <div class="option-card">
+    <div class="option-label">
+      <div class="option-number">2</div>
+      <div class="option-title">Single AI button</div>
+    </div>
+    <div class="option-desc">One button above the form. Opens a modal to describe the song idea, then fills both fields at once.</div>
+    <div class="mockup">
+      <div class="mockup-section">
+        <button class="ai-generate-btn">&#10024; Generate lyrics & style from idea</button>
+      </div>
+      <div class="mockup-section">
+        <div class="mockup-label">Style prompt</div>
+        <textarea class="mockup-input" placeholder="Upbeat dance pop, bright major key..." rows="2"></textarea>
+      </div>
+      <div class="mockup-section">
+        <div class="mockup-label">Lyrics</div>
+        <textarea class="mockup-input" placeholder="[verse]&#10;Write your lyrics here..." rows="5"></textarea>
+      </div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>Pros</h4>
+        <ul>
+          <li>Simple, one action</li>
+          <li>Clear entry point</li>
+          <li>Good for beginners</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>Cons</h4>
+        <ul>
+          <li>Less control over individual fields</li>
+          <li>Modal adds friction</li>
+          <li>Can't regenerate just one part</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option 3 -->
+  <div class="option-card">
+    <div class="option-label">
+      <div class="option-number">3</div>
+      <div class="option-title">Inline expand</div>
+    </div>
+    <div class="option-desc">Type a brief idea directly in the lyrics box. Click "Expand with AI" to generate full lyrics and style.</div>
+    <div class="mockup">
+      <div class="mockup-section">
+        <div class="mockup-label">Style prompt</div>
+        <textarea class="mockup-input" placeholder="Auto-filled by AI..." rows="2"></textarea>
+      </div>
+      <div class="mockup-section">
+        <div class="mockup-label">Lyrics</div>
+        <div class="inline-wrap">
+          <textarea class="mockup-input mockup-textarea-large" placeholder="Type a brief idea...&#10;&#10;e.g. 'sad breakup song, piano ballad, female vocalist'"></textarea>
+          <button class="inline-expand">&#10024; Expand with AI</button>
+        </div>
+      </div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros">
+        <h4>Pros</h4>
+        <ul>
+          <li>Natural flow</li>
+          <li>Keeps context in one place</li>
+          <li>Minimal UI changes</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h4>Cons</h4>
+        <ul>
+          <li>Confuses input purpose</li>
+          <li>User might not discover the feature</li>
+          <li>Overwrites what they typed</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="recommendation">
+  <div class="recommendation-icon">&#10024;</div>
+  <div>
+    <h3>Recommendation: Option 1 — Sparkle per field</h3>
+    <p>This matches the pattern users already know from Notion, Google Docs, and other AI-powered tools. Each field stays independent — users can generate just the style, just the lyrics, or both. The sparkle icon is becoming a universal "AI assist" symbol. It's discoverable, non-destructive, and gives full control without adding modal friction.</p>
+  </div>
+</div>
+
+</body>
+</html>
