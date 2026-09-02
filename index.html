@@ -221,10 +221,17 @@
 
   .toggle-label { font-size: 11px; color: var(--muted); }
 
+  .lyrics-wrap {
+    position: relative;
+  }
+
   .char-count {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
     font-family: var(--font-body);
-    font-size: 8px; color: var(--muted);
-    margin-left: auto;
+    font-size: 11px; color: var(--muted);
+    pointer-events: none;
   }
 
   .generate-btn {
@@ -873,11 +880,13 @@
       <div class="template-row" id="templateChips"></div>
 
       <label>Lyrics</label>
-      <textarea id="lyrics" placeholder="[verse]&#10;Write your lyrics here...&#10;&#10;[chorus]&#10;The catchy hook goes here&#10;&#10;[verse]&#10;Second verse...&#10;&#10;[chorus]&#10;Repeat the hook&#10;&#10;[outro]&#10;Wrap it up"></textarea>
+      <div class="lyrics-wrap">
+        <textarea id="lyrics" placeholder="[verse]&#10;Write your lyrics here...&#10;&#10;[chorus]&#10;The catchy hook goes here&#10;&#10;[verse]&#10;Second verse...&#10;&#10;[chorus]&#10;Repeat the hook&#10;&#10;[outro]&#10;Wrap it up"></textarea>
+        <div class="char-count" id="lyricsCount">0 / 3500</div>
+      </div>
     </div>
 
     <div class="action-bar">
-      <div class="char-count" id="lyricsCount">0 / 3500</div>
       <button class="generate-btn" id="generateBtn">Generate</button>
     </div>
     <div class="gen-progress" id="genProgress">
