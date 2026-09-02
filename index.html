@@ -1652,7 +1652,7 @@
   document.addEventListener("click", (e) => {
     if (lyricsPanel.classList.contains("open") &&
         !lyricsPanel.contains(e.target) &&
-        !e.target.closest(".track-item") &&
+        !e.target.closest(".playlist-item") &&
         !e.target.closest(".playlist")) {
       hideLyrics();
     }
