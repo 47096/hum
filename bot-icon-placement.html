@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bot Icon Placement Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --bg: #111111;
+    --panel: #1a1a1a;
+    --border: #2a2a2a;
+    --fg: #e8e8e8;
+    --muted: #888888;
+    --accent: #a78bfa;
+    --accent-dim: rgba(167,139,250,0.15);
+    --font: 'Inter', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.6 var(--font);
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 24px;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 14px;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 700px) {
+    .options-grid { grid-template-columns: 1fr; max-width: 500px; }
+  }
+
+  .option-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .option-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .option-number {
+    width: 28px;
+    height: 28px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .option-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .option-desc {
+    padding: 12px 20px;
+    font-size: 12px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mockup {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .label-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .form-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--fg);
+    font-family: var(--font);
+    border-radius: 6px;
+    resize: none;
+  }
+
+  .form-input::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .sparkle-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .sparkle-btn:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .sparkle-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .ai-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+  }
+
+  .ai-bar-icon {
+    color: var(--accent);
+    display: grid;
+    place-items: center;
+  }
+
+  .ai-bar-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .ai-bar-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .ai-bar-btn {
+    margin-left: auto;
+    background: var(--accent);
+    border: none;
+    color: var(--bg);
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .textarea-wrap {
+    position: relative;
+  }
+
+  .textarea-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: var(--accent-dim);
+    border: 1px solid transparent;
+    color: var(--accent);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .textarea-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .textarea-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .inline-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .inline-btn {
+    background: var(--accent-dim);
+    border: 1px solid transparent;
+    color: var(--accent);
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .inline-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .inline-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .recommendation {
+    max-width: 1000px;
+    margin: 40px auto 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .recommendation-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--accent-dim);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .recommendation-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .recommendation h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .recommendation p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<h1>Bot Icon Placement Options</h1>
+<p class="subtitle">Where should the AI generate button appear in the form?</p>
+
+<div class="options-grid">
+
+  <!-- Option 1 -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">1</div>
+      <div class="option-title">Next to label</div>
+    </div>
+    <div class="option-desc">Bot icon sits inline with the field label. Compact, always visible.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style prompt</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <input class="form-input" value="Upbeat pop, bright major key" readonly>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Lyrics</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <textarea class="form-input" rows="4" readonly>[verse]
+Write your lyrics here...
+
+[chorus]
+The catchy hook goes here</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option 2 -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">2</div>
+      <div class="option-title">AI bar above fields</div>
+    </div>
+    <div class="option-desc">A dedicated AI bar above the form. One click generates both fields.</div>
+    <div class="mockup">
+      <div class="ai-bar">
+        <div class="ai-bar-icon"><i data-lucide="bot"></i></div>
+        <div class="ai-bar-text">Generate lyrics & style with AI</div>
+        <button class="ai-bar-btn">Generate</button>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Style prompt</div>
+        <input class="form-input" value="Upbeat pop, bright major key" readonly>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Lyrics</div>
+        <textarea class="form-input" rows="4" readonly>[verse]
+Write your lyrics here...
+
+[chorus]
+The catchy hook goes here</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option 3 -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">3</div>
+      <div class="option-title">Inside textarea</div>
+    </div>
+    <div class="option-desc">Bot icon floats inside the textarea bottom-right. Minimal, contextual.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="form-label">Style prompt</div>
+        <input class="form-input" value="Upbeat pop, bright major key" readonly>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Lyrics</div>
+        <div class="textarea-wrap">
+          <textarea class="form-input" rows="6" readonly style="padding-bottom:36px">[verse]
+Write your lyrics here...
+
+[chorus]
+The catchy hook goes here</textarea>
+          <button class="textarea-btn"><i data-lucide="bot"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option 4 -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">4</div>
+      <div class="option-title">Inline text button</div>
+    </div>
+    <div class="option-desc">A text button with icon next to each field. More descriptive, easier to discover.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style prompt</div>
+          <button class="inline-btn"><i data-lucide="bot"></i> AI Generate</button>
+        </div>
+        <input class="form-input" value="Upbeat pop, bright major key" readonly>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Lyrics</div>
+          <button class="inline-btn"><i data-lucide="bot"></i> AI Generate</button>
+        </div>
+        <textarea class="form-input" rows="4" readonly>[verse]
+Write your lyrics here...
+
+[chorus]
+The catchy hook goes here</textarea>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="recommendation">
+  <div class="recommendation-icon"><i data-lucide="bot"></i></div>
+  <div>
+    <h3>Recommendation: Option 1 — Next to label</h3>
+    <p>Compact, always visible, and doesn't take up extra space. Users will discover it through the tooltip ("Generate style with AI"). This is the pattern used by Notion and Google Docs for their AI features.</p>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+
+</body>
+</html>
