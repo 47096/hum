@@ -1101,9 +1101,7 @@
 
     <div class="settings-group">
       <div class="settings-label">AI Lyrics & Style</div>
-      <label for="llmProxyUrl">LLM Proxy URL</label>
-      <input type="text" id="llmProxyUrl" placeholder="https://your-llm-proxy.com" />
-      <div class="help-text">Proxy for MiniMax-M3 or other LLM. Used for sparkle button AI generation.</div>
+      <div class="help-text">Uses the same proxy URL above. Sparkle buttons call the LLM to generate lyrics and style prompts.</div>
     </div>
 
     <div class="settings-actions">
@@ -1191,31 +1189,15 @@
     toast("Proxy URL saved", "ok");
   });
 
-  // ─── LLM Proxy URL ───
-  $("llmProxyUrl").value = localStorage.getItem("llm_proxy_url") || "";
-  $("llmProxyUrl").addEventListener("change", () => {
-    const raw = $("llmProxyUrl").value.trim();
-    if (raw && !/^https?:\/\/.+/.test(raw)) {
-      toast("Invalid URL — must start with http:// or https://", "err");
-      $("llmProxyUrl").value = localStorage.getItem("llm_proxy_url") || "";
-      return;
-    }
-    const v = normalizeProxyUrl(raw);
-    $("llmProxyUrl").value = v;
-    localStorage.setItem("llm_proxy_url", v);
-    toast("LLM proxy URL saved", "ok");
-  });
-
   // ─── Sparkle AI generation ───
-  const LLM_ENDPOINT = normalizeProxyUrl(localStorage.getItem("llm_proxy_url") || "");
 
   async function generateWithAI(field, prompt) {
     const btn = field === "style" ? $("sparkleStyle") : $("sparkleLyrics");
     const target = field === "style" ? $("prompt") : $("lyrics");
     const currentValue = target.value.trim();
 
-    if (!LLM_ENDPOINT) {
-      toast("Set LLM proxy URL in settings first", "err");
+    if (!GMI_ENDPOINT) {
+      toast("Set proxy URL in settings first", "err");
       return;
     }
 
@@ -1229,7 +1211,7 @@
 
       const userPrompt = currentValue || (field === "style" ? "upbeat pop song" : "song about missing someone");
 
-      const resp = await fetch(LLM_ENDPOINT, {
+      const resp = await fetch(GMI_ENDPOINT + "/llm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
