@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Button Below Input Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --bg: #111111;
+    --panel: #1a1a1a;
+    --border: #2a2a2a;
+    --fg: #e8e8e8;
+    --muted: #888888;
+    --accent: #a78bfa;
+    --accent-dim: rgba(167,139,250,0.15);
+    --font: 'Inter', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.6 var(--font);
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 24px;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 48px;
+    font-size: 14px;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 800px) {
+    .options-grid { grid-template-columns: 1fr; max-width: 400px; }
+  }
+
+  .option-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .option-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .option-number {
+    width: 28px;
+    height: 28px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .option-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: auto;
+  }
+
+  .tag-green { background: rgba(74,222,128,0.15); color: #4ade80; }
+
+  .option-desc {
+    padding: 12px 20px;
+    font-size: 12px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    line-height: 1.6;
+  }
+
+  .mockup {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--bg);
+    margin: 12px;
+    border-radius: 8px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .form-input {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--fg);
+    font-family: var(--font);
+    border-radius: 6px 6px 0 0;
+  }
+
+  .form-input::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .form-textarea {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--fg);
+    font-family: var(--font);
+    border-radius: 6px 6px 0 0;
+    resize: none;
+    min-height: 80px;
+  }
+
+  .form-textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .ai-btn {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-top: none;
+    color: var(--accent);
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font);
+    border-radius: 0 0 6px 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .ai-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .ai-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .ai-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-top: none;
+    color: var(--muted);
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font);
+    border-radius: 0 0 6px 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .ai-btn-ghost:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .ai-btn-ghost svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .ai-btn-filled {
+    background: linear-gradient(135deg, var(--accent), #818cf8);
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font);
+    border-radius: 0 0 6px 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    transition: opacity 0.15s;
+  }
+
+  .ai-btn-filled:hover {
+    opacity: 0.9;
+  }
+
+  .ai-btn-filled svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .generate-btn {
+    background: var(--fg);
+    color: var(--bg);
+    border: none;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font);
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .toggle-label {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .toggle {
+    width: 32px;
+    height: 18px;
+    background: var(--border);
+    border-radius: 9px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .toggle-knob {
+    width: 14px;
+    height: 14px;
+    background: var(--fg);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: left 0.15s;
+  }
+
+  .label-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .recommendation {
+    max-width: 1100px;
+    margin: 40px auto 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .recommendation-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--accent-dim);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .recommendation-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .recommendation h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .recommendation p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<h1>Button Below Input Options</h1>
+<p class="subtitle">How should the AI generate button appear below each input field?</p>
+
+<div class="options-grid">
+
+  <!-- Option 1: Accent button -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">1</div>
+      <div class="option-title">Accent button</div>
+      <span class="tag tag-green">Recommended</span>
+    </div>
+    <div class="option-desc">Purple accent button attached to the input. Clear, prominent, easy to spot.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style prompt</div>
+          <div class="toggle-row">
+            <span class="toggle-label">Instrumental</span>
+            <span class="toggle"><span class="toggle-knob"></span></span>
+          </div>
+        </div>
+        <input class="form-input" placeholder="Upbeat dance pop, bright major key..." readonly>
+        <button class="ai-btn"><i data-lucide="bot"></i> Generate with AI</button>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Lyrics</div>
+        <textarea class="form-textarea" placeholder="[verse]&#10;Write your lyrics here..." readonly></textarea>
+        <button class="ai-btn"><i data-lucide="bot"></i> Generate with AI</button>
+      </div>
+      <button class="generate-btn">Generate</button>
+    </div>
+  </div>
+
+  <!-- Option 2: Ghost button -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">2</div>
+      <div class="option-title">Ghost button</div>
+    </div>
+    <div class="option-desc">Subtle ghost button. Less prominent, doesn't compete with the main Generate button.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style prompt</div>
+          <div class="toggle-row">
+            <span class="toggle-label">Instrumental</span>
+            <span class="toggle"><span class="toggle-knob"></span></span>
+          </div>
+        </div>
+        <input class="form-input" placeholder="Upbeat dance pop, bright major key..." readonly>
+        <button class="ai-btn-ghost"><i data-lucide="bot"></i> Generate with AI</button>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Lyrics</div>
+        <textarea class="form-textarea" placeholder="[verse]&#10;Write your lyrics here..." readonly></textarea>
+        <button class="ai-btn-ghost"><i data-lucide="bot"></i> Generate with AI</button>
+      </div>
+      <button class="generate-btn">Generate</button>
+    </div>
+  </div>
+
+  <!-- Option 3: Filled gradient button -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">3</div>
+      <div class="option-title">Filled gradient</div>
+    </div>
+    <div class="option-desc">Bold gradient button. Most prominent, clearly signals AI functionality.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style prompt</div>
+          <div class="toggle-row">
+            <span class="toggle-label">Instrumental</span>
+            <span class="toggle"><span class="toggle-knob"></span></span>
+          </div>
+        </div>
+        <input class="form-input" placeholder="Upbeat dance pop, bright major key..." readonly>
+        <button class="ai-btn-filled"><i data-lucide="bot"></i> Generate with AI</button>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Lyrics</div>
+        <textarea class="form-textarea" placeholder="[verse]&#10;Write your lyrics here..." readonly></textarea>
+        <button class="ai-btn-filled"><i data-lucide="bot"></i> Generate with AI</button>
+      </div>
+      <button class="generate-btn">Generate</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="recommendation">
+  <div class="recommendation-icon"><i data-lucide="bot"></i></div>
+  <div>
+    <h3>Recommendation: Option 1 — Accent button</h3>
+    <p>Purple accent button attached to the bottom of each input. Clear, prominent, and doesn't compete with the main Generate button. The bot icon makes it instantly recognizable as an AI feature. Users see it right after looking at the input field.</p>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+
+</body>
+</html>
