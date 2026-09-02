@@ -1214,6 +1214,7 @@
       const userPrompt = currentValue || (field === "style" ? "upbeat pop song" : "song about missing someone");
 
       const key = $("apiKey").value.trim();
+      console.log("API key length:", key.length);
       if (!key) {
         toast("Set your API key first", "err");
         return;
