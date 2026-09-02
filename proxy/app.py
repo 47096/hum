@@ -48,7 +48,7 @@ def llm_proxy():
 
         url = get_llm_url()
         api_headers = {
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": api_key,
             "Content-Type": "application/json",
         }
 
