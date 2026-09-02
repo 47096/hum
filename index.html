@@ -1322,7 +1322,6 @@
       $("lyrics").value = t.lyrics;
       $("prompt").value = t.prompt;
       updateLyricsCount();
-      toast("Loaded: " + name, "ok");
     });
     chip.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); chip.click(); } });
     templateChipsEl.appendChild(chip);
