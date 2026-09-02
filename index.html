@@ -499,14 +499,20 @@
   }
 
   .time-bar {
-    width: 200px; height: 3px;
+    flex: 1;
+    height: 6px;
     background: var(--border);
     cursor: pointer;
-    transition: height .15s;
     position: relative;
+    border-radius: 3px;
   }
 
-  .time-bar:hover { height: 6px; }
+  .time-bar::before {
+    content: "";
+    position: absolute;
+    top: -6px; bottom: -6px;
+    left: 0; right: 0;
+  }
 
   .time-fill {
     height: 100%;
@@ -682,7 +688,6 @@
     .mobile-tabs { display: flex; }
     .player-track { width: auto; flex: 1; }
     .player-right { display: none; }
-    .time-bar { width: 120px; }
     .settings-row { grid-template-columns: 1fr; }
   }
 
