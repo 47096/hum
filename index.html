@@ -1640,7 +1640,7 @@
         if (i === currentTrackIndex) {
           togglePlay();
         } else {
-          playTrack(i);
+          playTrack(i, false);
         }
       });
 
@@ -1744,7 +1744,7 @@
     }
   });
 
-  function playTrack(index) {
+  function playTrack(index, showLyricsPanel = true) {
     const history = getHistory();
     if (index < 0 || index >= history.length) return;
 
@@ -1765,8 +1765,10 @@
     $("playerTitle").textContent = entry.title || "Untitled";
     $("playerMeta").textContent = (entry.prompt || "").split(",").slice(0, 2).join(",");
 
-    // Show lyrics in panel
-    showLyrics(entry);
+    // Show lyrics in panel only if requested
+    if (showLyricsPanel) {
+      showLyrics(entry);
+    }
 
     // MediaSession API — lock screen / headphone controls
     if ("mediaSession" in navigator) {
