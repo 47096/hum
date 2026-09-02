@@ -25,7 +25,7 @@ def get_api_url(provider, path=""):
     return f"https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests{path}"
 
 def get_llm_url():
-    return "https://api.minimax.chat/v1/text/chatcompletion_v2"
+    return "https://api.gmi-serving.com/v1/chat/completions"
 
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -48,7 +48,7 @@ def llm_proxy():
 
         url = get_llm_url()
         api_headers = {
-            "Authorization": api_key,
+            "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         }
 
