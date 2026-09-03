@@ -1883,7 +1883,7 @@ Keep style prompts under 200 characters. Keep lyrics under 3500 characters.`;
       bpm: $("bpm").value,
       songKey: $("songKey").value,
       songMode: $("songMode").value,
-      instrumental: instrumentalOn,
+      instrumental: $("instrumentalToggle").checked,
       provider: activeProvider
     };
   }
@@ -1896,8 +1896,8 @@ Keep style prompts under 200 characters. Keep lyrics under 3500 characters.`;
     if (settings.bpm) $("bpm").value = settings.bpm;
     if (settings.songKey) $("songKey").value = settings.songKey;
     if (settings.songMode) $("songMode").value = settings.songMode;
-    if (settings.instrumental && !instrumentalOn) toggleInstrumental();
-    if (!settings.instrumental && instrumentalOn) toggleInstrumental();
+    if (settings.instrumental) $("instrumentalToggle").checked = true;
+    if (!settings.instrumental) $("instrumentalToggle").checked = false;
     if (settings.provider && settings.provider !== activeProvider) switchProvider(settings.provider);
   }
 
