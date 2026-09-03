@@ -2385,6 +2385,7 @@ Keep style prompts under 200 characters. Keep lyrics under 3500 characters.`;
     const bpm = $("bpm").value ? parseInt($("bpm").value) : undefined;
     const key = $("songKey").value || undefined;
     const mode = $("songMode").value || undefined;
+    const instrumentalOn = $("instrumentalToggle").checked;
 
     if (activeProvider === "minimax") {
       // Using INSTRUMENTAL_LYRICS constant
