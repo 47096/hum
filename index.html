@@ -197,6 +197,15 @@
     font-family: var(--font-body);
   }
 
+  .message-content pre.clickable {
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .message-content pre.clickable:hover {
+    border-color: var(--accent);
+  }
+
   .inline-edit {
     background: var(--bg);
     border: 1px solid var(--accent);
@@ -1626,13 +1635,13 @@ Rules:
         // Add AI response to chat
         let responseHTML = "";
         if (style) {
-          responseHTML += '<div class="label">Style <span class="quick-prompt" style="font-size:10px; padding:2px 6px;" onclick="toggleEdit(\'style\')">Edit</span></div>';
-          responseHTML += '<pre id="styleDisplay">' + escapeHtml(style) + '</pre>';
+          responseHTML += '<div class="label">Style <span style="font-size:10px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+          responseHTML += '<pre class="clickable" id="styleDisplay" onclick="toggleEdit(\'style\')">' + escapeHtml(style) + '</pre>';
           responseHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + escapeHtml(style) + '</textarea>';
         }
         if (lyrics) {
-          responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span class="quick-prompt" style="font-size:10px; padding:2px 6px;" onclick="toggleEdit(\'lyrics\')">Edit</span></div>';
-          responseHTML += '<pre id="lyricsDisplay">' + escapeHtml(lyrics) + '</pre>';
+          responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:10px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+          responseHTML += '<pre class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + escapeHtml(lyrics) + '</pre>';
           responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
         }
 
@@ -1661,23 +1670,36 @@ Rules:
       display.style.display = "none";
       edit.style.display = "block";
       edit.focus();
-      // Update button text
-      const btn = display.previousElementSibling?.querySelector('.quick-prompt');
-      if (btn) btn.textContent = "Save";
+      // Save on blur (clicking outside)
+      edit.onblur = function() {
+        saveEdit(field);
+      };
+      // Save on Escape
+      edit.onkeydown = function(e) {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          saveEdit(field);
+        }
+      };
     } else {
-      // Save and hide edit mode
-      const newValue = edit.value;
-      display.textContent = newValue;
-      display.style.display = "block";
-      edit.style.display = "none";
-      // Update the global variables
-      if (field === "style") currentStyle = newValue;
-      if (field === "lyrics") currentLyrics = newValue;
-      // Update button text
-      const btn = display.previousElementSibling?.querySelector('.quick-prompt');
-      if (btn) btn.textContent = "Edit";
-      toast(field.charAt(0).toUpperCase() + field.slice(1) + " updated", "ok");
+      saveEdit(field);
     }
+  };
+
+  function saveEdit(field) {
+    const display = document.getElementById(field + "Display");
+    const edit = document.getElementById(field + "Edit");
+    if (!display || !edit) return;
+
+    const newValue = edit.value;
+    display.textContent = newValue;
+    display.style.display = "block";
+    edit.style.display = "none";
+    // Update the global variables
+    if (field === "style") currentStyle = newValue;
+    if (field === "lyrics") currentLyrics = newValue;
+    toast(field.charAt(0).toUpperCase() + field.slice(1) + " updated", "ok");
+  }
   };
 
   // Event listeners for chat
