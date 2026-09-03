@@ -1568,12 +1568,11 @@
     const loadingDiv = document.createElement("div");
     loadingDiv.className = "message ai";
     loadingDiv.innerHTML = `
-      <div class="message-avatar ai"><i data-lucide="bot" class="icon-sm"></i></div>
+      <div class="message-avatar ai">A</div>
       <div class="message-content">Thinking...</div>
     `;
     chatMessages.appendChild(loadingDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    if (typeof lucide !== "undefined") lucide.createIcons({ nodes: loadingDiv.querySelectorAll("[data-lucide]") });
 
     try {
       const systemPrompt = `You are a songwriting assistant. Help users create songs by generating style prompts and lyrics.
