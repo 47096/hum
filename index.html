@@ -1633,7 +1633,7 @@ Keep style prompts under 200 characters. Keep lyrics under 3500 characters.`;
   });
 
   // ─── Lyrics editor modal ───
-  function openLyricsEditor() {
+  window.openLyricsEditor = function() {
     // Create modal if it doesn't exist
     let modal = $("lyricsEditorModal");
     if (!modal) {
@@ -1858,7 +1858,7 @@ Keep style prompts under 200 characters. Keep lyrics under 3500 characters.`;
   // ─── Toast ───
   const toastEl = $("toast");
   let toastTimer;
-  const toast = (msg, kind) => {
+  window.toast = (msg, kind) => {
     toastEl.textContent = msg;
     toastEl.className = "toast show" + (kind ? " " + kind : "");
     clearTimeout(toastTimer);
