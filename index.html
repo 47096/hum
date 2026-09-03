@@ -1522,8 +1522,7 @@
       }
       return {
         style: currentStyle,
-        lyrics: currentLyrics,
-        message: json.message || ""
+        lyrics: currentLyrics
       };
     } catch {
       // Fallback: try to extract from free text
@@ -1533,7 +1532,7 @@
       if (styleMatch) currentStyle = styleMatch[1].trim();
       if (lyricsMatch) currentLyrics = lyricsMatch[1].trim();
 
-      return { style: currentStyle, lyrics: currentLyrics, message: "" };
+      return { style: currentStyle, lyrics: currentLyrics };
     }
   }
 
@@ -1575,15 +1574,15 @@
 IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
 
 The JSON must be in this exact format:
-{"style":"your style prompt here","lyrics":"[verse]\\nYour lyrics here\\n\\n[chorus]\\nChorus here","message":"Your conversational response"}
+{"style":"your style prompt here","lyrics":"[verse]\\nYour lyrics here\\n\\n[chorus]\\nChorus here"}
 
 Rules:
 - "style": genre, mood, instruments, tempo, key (under 200 chars)
 - "lyrics": full song with [verse], [chorus], [bridge], [outro] tags (under 3500 chars). Escape newlines as \\n
-- "message": friendly explanation of what you created or changed
 - When user asks for changes, update style/lyrics accordingly
 - If user asks a question (not song creation), set style and lyrics to empty strings
-- NEVER include markdown code blocks or any text outside the JSON object`;
+- NEVER include markdown code blocks or any text outside the JSON object
+- Do NOT repeat the user's prompt or add explanations`;
 
       const messages = [
         { role: "system", content: systemPrompt },
@@ -1619,18 +1618,15 @@ Rules:
         chatMessages.removeChild(loadingDiv);
 
         // Parse AI response
-        const { style, lyrics, message } = parseAIResponse(aiResponse);
+        const { style, lyrics } = parseAIResponse(aiResponse);
 
         // Helper to escape HTML
         const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
         // Add AI response to chat
         let responseHTML = "";
-        if (message) {
-          responseHTML += '<div>' + escapeHtml(message) + '</div>';
-        }
         if (style) {
-          responseHTML += '<div class="label" style="margin-top: 8px;">Style <span class="quick-prompt" style="font-size:10px; padding:2px 6px;" onclick="toggleEdit(\'style\')">Edit</span></div>';
+          responseHTML += '<div class="label">Style <span class="quick-prompt" style="font-size:10px; padding:2px 6px;" onclick="toggleEdit(\'style\')">Edit</span></div>';
           responseHTML += '<pre id="styleDisplay">' + escapeHtml(style) + '</pre>';
           responseHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + escapeHtml(style) + '</textarea>';
         }
