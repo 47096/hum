@@ -127,6 +127,176 @@
   .template-chip:hover { border-color: var(--fg); color: var(--fg); }
   .template-chip.active { border-color: var(--fg); color: var(--fg); }
 
+  /* Chat interface */
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .message {
+    display: flex;
+    gap: 8px;
+    max-width: 90%;
+  }
+
+  .message.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  .message-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .message-avatar.ai {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .message-avatar.user {
+    background: rgba(74,222,128,0.15);
+    color: #4ade80;
+  }
+
+  .message-content {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .message.user .message-content {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+  }
+
+  .message-content pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    font-family: var(--font-body);
+  }
+
+  .message-content .label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .quick-prompts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .quick-prompt {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--muted);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .quick-prompt:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .chat-input {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+  }
+
+  .chat-input input {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--fg);
+    font-family: var(--font-body);
+    border-radius: 6px;
+  }
+
+  .chat-input input::placeholder {
+    color: var(--muted);
+  }
+
+  .chat-input button {
+    background: var(--accent);
+    border: none;
+    color: var(--bg);
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .chat-input button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .generate-section {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .checkbox-label input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+  }
+
   input[type="text"], input[type="password"], textarea {
     width: 100%;
     background: var(--bg);
@@ -903,41 +1073,37 @@
 
 <!-- Main: split -->
 <div class="main">
-  <!-- Left: Create form -->
+  <!-- Left: Chat interface -->
   <div class="left">
-    <div class="form-area">
-      <label>Style templates</label>
-      <div class="template-row" id="styleTemplates"></div>
-
-      <div class="label-row">
-        <label>Style prompt</label>
-        <div class="toggle-row">
-          <button class="sparkle-btn" id="sparkleStyle" title="Generate style with AI">&#10024;</button>
-          <span class="toggle-label">Instrumental</span>
-          <span class="toggle" id="instrumentalToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <div class="message ai">
+          <div class="message-avatar ai"><i data-lucide="bot" class="icon-sm"></i></div>
+          <div class="message-content">
+            Hi! I'm your songwriting assistant. Describe the song you want and I'll help you create it.
+            <div class="quick-prompts">
+              <span class="quick-prompt" data-prompt="I want a sad breakup song with piano">Sad breakup</span>
+              <span class="quick-prompt" data-prompt="Create an energetic pop song about summer">Summer pop</span>
+              <span class="quick-prompt" data-prompt="Make a chill lo-fi song for studying">Study lo-fi</span>
+              <span class="quick-prompt" data-prompt="Write a romantic ballad for a wedding">Wedding ballad</span>
+            </div>
+          </div>
         </div>
       </div>
-      <textarea id="prompt" placeholder="Upbeat dance pop, bright major key, punchy electronic drums"></textarea>
-
-      <label>Lyrics templates</label>
-      <div class="template-row" id="templateChips"></div>
-
-      <div class="label-row">
-        <label>Lyrics</label>
-        <button class="sparkle-btn" id="sparkleLyrics" title="Generate lyrics with AI">&#10024;</button>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Describe your song or ask for changes...">
+        <button id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
       </div>
-      <div class="lyrics-wrap">
-        <textarea id="lyrics" placeholder="[verse]&#10;Write your lyrics here...&#10;&#10;[chorus]&#10;The catchy hook goes here&#10;&#10;[verse]&#10;Second verse...&#10;&#10;[chorus]&#10;Repeat the hook&#10;&#10;[outro]&#10;Wrap it up"></textarea>
-        <div class="char-count" id="lyricsCount">0 / 3500</div>
+      <div class="generate-section">
+        <label class="checkbox-label">
+          <input type="checkbox" id="instrumentalToggle"> Instrumental
+        </label>
+        <button class="generate-btn" id="generateBtn">Generate Song</button>
       </div>
-    </div>
-
-    <div class="action-bar">
-      <button class="generate-btn" id="generateBtn">Generate</button>
-    </div>
-    <div class="gen-progress" id="genProgress">
-      <div class="gen-progress-bar" id="genProgressBar"></div>
-      <div class="gen-progress-text" id="genProgressText">0s elapsed</div>
+      <div class="gen-progress" id="genProgress">
+        <div class="gen-progress-bar" id="genProgressBar"></div>
+        <div class="gen-progress-text" id="genProgressText">0s elapsed</div>
+      </div>
     </div>
   </div>
 
@@ -1264,7 +1430,6 @@
 
       if (generated) {
         target.value = generated;
-        if (field === "lyrics") updateLyricsCount();
         toast("Generated!", "ok");
       } else {
         console.log("No content in response:", data);
@@ -1278,8 +1443,171 @@
     }
   }
 
-  $("sparkleStyle").addEventListener("click", () => generateWithAI("style"));
-  $("sparkleLyrics").addEventListener("click", () => generateWithAI("lyrics"));
+  // ─── Chat interface ───
+  const chatMessages = $("chatMessages");
+  const chatInput = $("chatInput");
+  const chatSend = $("chatSend");
+  let chatHistory = [];
+  let currentStyle = "";
+  let currentLyrics = "";
+
+  function addMessage(role, content) {
+    const messageDiv = document.createElement("div");
+    messageDiv.className = "message " + role;
+
+    const avatarDiv = document.createElement("div");
+    avatarDiv.className = "message-avatar " + role;
+    if (role === "ai") {
+      avatarDiv.innerHTML = '<i data-lucide="bot" class="icon-sm"></i>';
+    } else {
+      avatarDiv.textContent = "U";
+    }
+
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "message-content";
+    contentDiv.innerHTML = content;
+
+    messageDiv.appendChild(avatarDiv);
+    messageDiv.appendChild(contentDiv);
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Initialize Lucide icons for new messages
+    if (typeof lucide !== "undefined") lucide.createIcons({ nodes: messageDiv.querySelectorAll("[data-lucide]") });
+  }
+
+  function parseAIResponse(text) {
+    // Extract style and lyrics from AI response
+    const styleMatch = text.match(/Style:\s*([\s\S]*?)(?=\n\n|$)/i);
+    const lyricsMatch = text.match(/Lyrics:\s*([\s\S]*?)(?=\n\n|$)/i);
+
+    if (styleMatch) currentStyle = styleMatch[1].trim();
+    if (lyricsMatch) currentLyrics = lyricsMatch[1].trim();
+
+    return { style: currentStyle, lyrics: currentLyrics };
+  }
+
+  async function sendChatMessage() {
+    const userMessage = chatInput.value.trim();
+    if (!userMessage) return;
+
+    // Add user message to chat
+    addMessage("user", userMessage);
+    chatInput.value = "";
+
+    // Check for API key and endpoint
+    const key = $("apiKey").value.trim();
+    if (!key) {
+      addMessage("ai", "Please set your API key in Settings first.");
+      return;
+    }
+    if (!getEndpoint()) {
+      addMessage("ai", "Please set your proxy URL in Settings first.");
+      return;
+    }
+
+    // Add to chat history
+    chatHistory.push({ role: "user", content: userMessage });
+
+    // Show loading state
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "message ai";
+    loadingDiv.innerHTML = `
+      <div class="message-avatar ai"><i data-lucide="bot" class="icon-sm"></i></div>
+      <div class="message-content">Thinking...</div>
+    `;
+    chatMessages.appendChild(loadingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (typeof lucide !== "undefined") lucide.createIcons({ nodes: loadingDiv.querySelectorAll("[data-lucide]") });
+
+    try {
+      const systemPrompt = `You are a songwriting assistant. Help users create songs by generating:
+1. A style prompt (genre, mood, instruments, tempo, key)
+2. Lyrics with structure tags ([verse], [chorus], [bridge], [outro])
+
+When user describes a song, respond with:
+Style: [generated style prompt]
+Lyrics: [generated lyrics]
+
+When user asks for changes, update the relevant part and respond with the full updated version.
+
+Keep style prompts under 200 characters. Keep lyrics under 3500 characters.`;
+
+      const messages = [
+        { role: "system", content: systemPrompt },
+        ...chatHistory
+      ];
+
+      const resp = await fetch(getEndpoint() + "/llm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key,
+          "X-Provider": activeProvider
+        },
+        body: JSON.stringify({
+          model: "MiniMaxAI/MiniMax-M3",
+          messages: messages,
+          max_tokens: 1000,
+          temperature: 0.8
+        })
+      });
+
+      if (!resp.ok) throw new Error("API error (" + resp.status + ")");
+
+      const data = await resp.json();
+      const aiResponse = data.choices?.[0]?.message?.content?.trim()
+        || data.reply?.text?.trim()
+        || data.result?.text?.trim()
+        || data.text?.trim()
+        || data.content?.trim();
+
+      if (aiResponse) {
+        // Remove loading message
+        chatMessages.removeChild(loadingDiv);
+
+        // Parse AI response
+        const { style, lyrics } = parseAIResponse(aiResponse);
+
+        // Add AI response to chat
+        let responseHTML = aiResponse;
+        if (style || lyrics) {
+          responseHTML += '<div style="margin-top: 8px; display: flex; gap: 4px;">';
+          if (style) responseHTML += '<span class="quick-prompt" onclick="toast(\'Style ready for generation\', \'ok\')">Style ready</span>';
+          if (lyrics) responseHTML += '<span class="quick-prompt" onclick="toast(\'Lyrics ready for generation\', \'ok\')">Lyrics ready</span>';
+          responseHTML += '</div>';
+        }
+
+        addMessage("ai", responseHTML);
+
+        // Add to chat history
+        chatHistory.push({ role: "assistant", content: aiResponse });
+      } else {
+        throw new Error("No response from AI");
+      }
+    } catch (err) {
+      // Remove loading message
+      chatMessages.removeChild(loadingDiv);
+      addMessage("ai", "Sorry, I encountered an error: " + err.message);
+    }
+  }
+
+  // Event listeners for chat
+  chatSend.addEventListener("click", sendChatMessage);
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendChatMessage();
+    }
+  });
+
+  // Quick prompts
+  document.querySelectorAll(".quick-prompt[data-prompt]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      chatInput.value = btn.dataset.prompt;
+      sendChatMessage();
+    });
+  });
 
   // ─── Draggable divider ───
   const divider = $("divider");
@@ -1372,16 +1700,6 @@
   loadSettings();
   settingsFields.forEach(id => { $(id).addEventListener("change", saveSettings); });
 
-  // ─── Lyrics counter ───
-  const lyricsEl = $("lyrics");
-  function updateLyricsCount() {
-    const len = lyricsEl.value.length;
-    $("lyricsCount").textContent = len.toLocaleString() + " / 3500";
-    $("lyricsCount").style.color = len > 3500 ? "var(--err)" : "var(--muted)";
-  }
-  lyricsEl.addEventListener("input", updateLyricsCount);
-  updateLyricsCount();
-
   // ─── Style templates ───
   const styleTemplates = {
     "Pop Anthem": "Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads, catchy melodic hook, 120 BPM, feel-good summer anthem energy, radio-ready production",
@@ -1428,64 +1746,6 @@
     "Dream Pop": { prompt: "Dream pop, ethereal synths, reverb-drenched guitars, soft vocals, atmospheric and floating, 90 BPM, F major, nostalgic and wistful, shoegaze influence", lyrics: `[verse]\nFloating through the clouds above\nEverything is made of love\nColors blending, soft and bright\nDancing in the pale moonlight\n\n[chorus]\nDream away, don't let go\nLet the gentle breezes blow\nEvery star is shining bright\nIn this dream we hold tonight\n\n[verse]\nWhispers echoing in space\nTime is standing still in place\nHearts are beating, soft and slow\nIn this world we've come to know\n\n[chorus]\nDream away, don't let go\nLet the gentle breezes blow\nEvery star is shining bright\nIn this dream we hold tonight\n\n[outro]\nDream on, dream on, dream on` },
     "Urban Night": { prompt: "Dark R&B, atmospheric pads, trap-influenced beats, moody and introspective, 85 BPM, D minor, city lights, late-night driving, Frank Ocean vibes", lyrics: `[verse]\nCity streets are wet with rain\nNeon signs are glowing again\nWindows down, I'm driving slow\nWatching all the people go\n\n[chorus]\nUrban night, don't let me down\nShow me all around this town\nEvery corner has a story\nEvery shadow hides a glory\n\n[verse]\nSkyscrapers are touching stars\nPeople driving in their cars\nEveryone is searching for\nSomething more than what's in store\n\n[chorus]\nUrban night, don't let me down\nShow me all around this town\nEvery corner has a story\nEvery shadow hides a glory\n\n[outro]\nThe city sleeps, but I'm awake` },
   };
-
-  // ─── Render style template chips ───
-  const styleTemplatesEl = $("styleTemplates");
-  Object.keys(styleTemplates).forEach(name => {
-    const chip = document.createElement("span");
-    chip.className = "template-chip";
-    chip.textContent = name;
-    chip.setAttribute("role", "button");
-    chip.setAttribute("tabindex", "0");
-    chip.addEventListener("click", () => {
-      $("prompt").value = styleTemplates[name];
-    });
-    chip.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); chip.click(); } });
-    styleTemplatesEl.appendChild(chip);
-  });
-
-  // ─── Render template chips ───
-  const templateChipsEl = $("templateChips");
-  Object.keys(lyricsTemplates).forEach(name => {
-    const chip = document.createElement("span");
-    chip.className = "template-chip";
-    chip.textContent = name;
-    chip.setAttribute("role", "button");
-    chip.setAttribute("tabindex", "0");
-    chip.addEventListener("click", () => {
-      const t = lyricsTemplates[name];
-      $("lyrics").value = t.lyrics;
-      $("prompt").value = t.prompt;
-      updateLyricsCount();
-    });
-    chip.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); chip.click(); } });
-    templateChipsEl.appendChild(chip);
-  });
-
-  // ─── Instrumental toggle ───
-  let instrumentalOn = false;
-  const instrumentalToggle = $("instrumentalToggle");
-
-  function toggleInstrumental() {
-    // Confirm before clearing lyrics
-    if (!instrumentalOn && lyricsEl.value.trim().length > 0) {
-      if (!confirm("Switch to instrumental? Your lyrics will be cleared.")) return;
-    }
-    instrumentalOn = !instrumentalOn;
-    instrumentalToggle.classList.toggle("on", instrumentalOn);
-    instrumentalToggle.setAttribute("aria-checked", String(instrumentalOn));
-    lyricsEl.disabled = instrumentalOn;
-    lyricsEl.style.opacity = instrumentalOn ? "0.4" : "1";
-    if (instrumentalOn) {
-      lyricsEl.value = "";
-      updateLyricsCount();
-    }
-  }
-
-  instrumentalToggle.addEventListener("click", toggleInstrumental);
-  instrumentalToggle.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleInstrumental(); }
-  });
 
   // ─── Remix toggle ───
   let remixOn = false;
@@ -2137,11 +2397,12 @@
 
     if (!getEndpoint()) { openSettings(); toast("Set your proxy URL first", "err"); return; }
 
-    const prompt = $("prompt").value.trim();
-    const lyrics = instrumentalOn ? "" : $("lyrics").value.trim();
-    if (!instrumentalOn && !lyrics) { toast("Add lyrics or enable Instrumental", "err"); return; }
+    const instrumentalOn = $("instrumentalToggle").checked;
+    const prompt = currentStyle || "";
+    const lyrics = instrumentalOn ? "" : currentLyrics || "";
+    if (!instrumentalOn && !lyrics) { toast("Chat with AI to generate lyrics first", "err"); return; }
     if (!instrumentalOn && lyrics.length > 3500) { toast("Lyrics too long: " + lyrics.length.toLocaleString() + " / 3,500", "err"); return; }
-    if (instrumentalOn && !prompt) { toast("Instrumental needs a style prompt", "err"); return; }
+    if (instrumentalOn && !prompt) { toast("Chat with AI to generate a style prompt first", "err"); return; }
 
     isGenerating = true;
 
@@ -2239,7 +2500,7 @@
 
   // ─── Share / Copy / Paste ───
   $("shareBtn").addEventListener("click", async () => {
-    const data = { p: $("prompt").value, l: $("lyrics").value };
+    const data = { p: currentStyle, l: currentLyrics };
     if (!data.p && !data.l) { toast("Nothing to share", "err"); return; }
     const hash = btoa(encodeURIComponent(JSON.stringify(data)));
     const url = window.location.origin + window.location.pathname + "#" + hash;
@@ -2248,7 +2509,7 @@
   });
 
   $("copySettingsBtn").addEventListener("click", async () => {
-    const data = { style: $("prompt").value, lyrics: $("lyrics").value, sampleRate: $("sampleRate").value, bitrate: $("bitrate").value, format: $("format").value };
+    const data = { style: currentStyle, lyrics: currentLyrics, sampleRate: $("sampleRate").value, bitrate: $("bitrate").value, format: $("format").value };
     try { await navigator.clipboard.writeText(JSON.stringify(data)); toast("Settings copied", "ok"); }
     catch { toast("Failed to copy", "err"); }
   });
@@ -2257,8 +2518,8 @@
     try {
       const text = await navigator.clipboard.readText();
       const data = JSON.parse(text);
-      if (data.style !== undefined) $("prompt").value = data.style;
-      if (data.lyrics !== undefined) { $("lyrics").value = data.lyrics; updateLyricsCount(); }
+      if (data.style !== undefined) currentStyle = data.style;
+      if (data.lyrics !== undefined) currentLyrics = data.lyrics;
       if (data.sampleRate) $("sampleRate").value = data.sampleRate;
       if (data.bitrate) $("bitrate").value = data.bitrate;
       if (data.format) $("format").value = data.format;
@@ -2270,8 +2531,8 @@
   if (window.location.hash.length > 1) {
     try {
       const data = JSON.parse(decodeURIComponent(atob(window.location.hash.slice(1))));
-      if (data.p) $("prompt").value = data.p;
-      if (data.l) { $("lyrics").value = data.l; updateLyricsCount(); }
+      if (data.p) currentStyle = data.p;
+      if (data.l) currentLyrics = data.l;
       toast("Loaded shared settings", "ok");
       history.replaceState(null, "", window.location.pathname);
     } catch {}
