@@ -1519,7 +1519,12 @@
       // Try to parse as JSON
       const json = JSON.parse(text);
       if (json.style) currentStyle = json.style;
-      if (json.lyrics) currentLyrics = json.lyrics.replace(/\\n/g, "\n");
+      if (json.lyrics) {
+        // Handle both escaped newlines (\n) and actual newlines
+        currentLyrics = json.lyrics
+          .replace(/\\n/g, "\n")  // Convert \n to actual newlines
+          .replace(/\n\n+/g, "\n\n");  // Normalize multiple newlines
+      }
       return {
         style: currentStyle,
         lyrics: currentLyrics,
