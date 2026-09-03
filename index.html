@@ -110,40 +110,22 @@
 
   .label-row label { margin-bottom: 0; }
 
-  .genre-grid {
+  .template-row {
     display: flex; flex-wrap: wrap; gap: 4px;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
-  .genre-chip {
-    background: transparent;
-    border: 1px solid var(--border);
-    padding: 6px 12px;
-    font-family: var(--font-body);
-    font-size: 8px; color: var(--muted);
-    cursor: pointer;
-    transition: all .12s;
-  }
-
-  .genre-chip:hover { border-color: var(--fg); color: var(--fg); }
-  .genre-chip.active { background: var(--fg); border-color: var(--fg); color: var(--bg); }
-
-  .subgenre-row {
-    display: flex; flex-wrap: wrap; gap: 4px;
-    margin-bottom: 16px;
-  }
-
-  .sub-chip {
+  .template-chip {
     background: transparent;
     border: 1px solid var(--border);
     padding: 4px 10px;
-    font-size: 11px; color: var(--muted);
+    font-size: 10px; color: var(--muted);
     cursor: pointer;
     transition: all .12s;
   }
 
-  .sub-chip:hover { border-color: var(--fg); color: var(--fg); }
-  .sub-chip.active { border-color: var(--fg); color: var(--fg); }
+  .template-chip:hover { border-color: var(--fg); color: var(--fg); }
+  .template-chip.active { border-color: var(--fg); color: var(--fg); }
 
   input[type="text"], input[type="password"], textarea {
     width: 100%;
@@ -924,11 +906,8 @@
   <!-- Left: Create form -->
   <div class="left">
     <div class="form-area">
-      <label>Genre</label>
-      <div class="genre-grid" id="styleTabs"></div>
-
-      <label>Subgenre</label>
-      <div class="subgenre-row" id="subgenreDisplay"></div>
+      <label>Style templates</label>
+      <div class="template-row" id="styleTemplates"></div>
 
       <div class="label-row">
         <label>Style prompt</label>
@@ -1042,8 +1021,8 @@
       <div class="settings-label">API</div>
       <label>Provider</label>
       <div class="provider-row">
-        <span class="genre-chip provider-tab active" data-provider="gmi" role="button" tabindex="0">GMI Cloud</span>
-        <span class="genre-chip provider-tab" data-provider="minimax" role="button" tabindex="0">MiniMax</span>
+        <span class="template-chip provider-tab active" data-provider="gmi" role="button" tabindex="0">GMI Cloud</span>
+        <span class="template-chip provider-tab" data-provider="minimax" role="button" tabindex="0">MiniMax</span>
       </div>
       <label id="apiKeyLabel">GMI Cloud API key</label>
       <input type="password" id="apiKey" placeholder="Paste your key here" autocomplete="off" />
@@ -1403,18 +1382,18 @@
   lyricsEl.addEventListener("input", updateLyricsCount);
   updateLyricsCount();
 
-  // ─── Genre data ───
-  const samplePrompts = {
-    "Pop": ["Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads, catchy melodic hook, 120 BPM, feel-good summer anthem energy","Electropop, glossy production, sidechain compression, vocoder harmonies, pulsing bassline, futuristic neon atmosphere, radio-ready polish","Indie pop, jangly reverb guitar, soft brushed drums, warm lo-fi texture, dreamy and wistful, slightly off-kilter charm, cassette aesthetic","Synthpop, 80s analog warmth, arpeggiated Juno synths, gated reverb snare, nostalgic and cinematic, John Hughes movie soundtrack feel","Cantopop ballad, 深情款款, 鋼琴弦樂編曲, 懷舊經典氣息, 張學友式深情演繹, 夜色浪漫氛圍","Mandopop ballad, 華語抒情鋼琴, 深情弦樂編曲, 周杰倫式旋律美感, 深夜思念情緒, 電台經典情歌"],
-    "R&B": ["Smooth R&B slow jam, silky Rhodes piano, deep sub-bass, finger-snapped rhythm, candlelit intimacy, late-night bedroom vibes, breathy vocals","Neo-soul, live bass groove, warm Fender Rhodes, D'Angelo-inspired looseness, organic and earthy, Sunday afternoon warmth","Contemporary R&B, polished pop production, trap-influenced hi-hats, layered vocal harmonies, confident and sleek, chart-ready sound","Alternative R&B, dark atmospheric pads, sparse beats, reverb-drenched vocals, moody and introspective, Frank Ocean-esque vulnerability","Classic soul, punchy brass section, handclaps, walking bassline, gospel choir backing, joyful and uplifting, vintage Motown warmth"],
-    "Hip-hop": ["Boom bap, dusty vinyl samples, chopped soul loops, punchy kick-snare pattern, 90s golden era, lyrical and head-nodding, DJ Premier style","Trap, booming 808 sub-bass, rapid hi-hat rolls, dark piano melody, hard-hitting and aggressive, festival-ready energy","Lo-fi hip-hop, crackling vinyl texture, mellow jazz piano samples, lazy drum pattern, rainy-day study vibes, warm and comforting","UK drill, sliding 808 bass, ominous piano chords, skippy hi-hat pattern, dark and tense, street-level intensity","Conscious rap, soulful sample, boom bap drums, storytelling energy, thoughtful and deliberate, Common or Kendrick-inspired depth"],
-    "Rock": ["Classic rock, crunchy Marshall amp tone, driving power chords, pounding drums, arena-sized energy, 70s swagger, Led Zeppelin spirit","Indie rock, angular guitar riffs, tight rhythm section, raw and DIY, slightly off-kilter, Pavement-esque charm, basement-show energy","Punk rock, breakneck tempo, buzzing power chords, snotty vocals, three-chord fury, Ramones-style simplicity, anti-establishment fire","Alternative rock, 90s grunge influence, heavy chorus guitar, dynamic quiet-loud-quiet, angsty and cathartic, flannel-shirt atmosphere","Soft rock, warm acoustic strumming, gentle piano, easygoing groove, sunset-cruise mellow, Eagles-inspired smoothness"],
-    "Electronic": ["House, four-on-the-floor kick, deep bassline, soulful vocal chops, building energy, warehouse rave atmosphere, sunrise-set euphoria","Techno, industrial pulse, repetitive hypnotic groove, dark and mechanical, Berlin club aesthetic, relentless forward motion","Trance, euphoric synth leads, sweeping build-ups, uplifting breakdowns, hands-in-the-air moments, 138 BPM peak-time energy","Dubstep, earth-shaking sub-bass, wobble synths, half-time drums, aggressive drops, Skrillex-style chaos, speaker-rattling power","Ambient, lush evolving pads, no percussion, ethereal textures, Brian Eno-inspired spaciousness, meditative and calming, floating sensation"],
-    "Jazz": ["Smooth jazz, warm tenor saxophone melody, brushed snare, walking upright bass, candlelit lounge atmosphere, effortless sophistication","Bebop, lightning-fast sax runs, complex chord changes, driving ride cymbal, Charlie Parker-inspired virtuosity, smoky late-night club","Swing, big band brass section, walking bass, driving rhythm, 1940s dancehall energy, Benny Goodman-era joy, toe-tapping infectiousness","Jazz fusion, electric guitar shredding, funky bass grooves, complex time signatures, Herbie Hancock-inspired, genre-bending energy","Vocal jazz, intimate piano accompaniment, soft brushed drums, smoky late-night bar, Billie Holiday-inspired phrasing, bittersweet elegance"],
-    "Country": ["Classic country, twangy Telecaster, pedal steel weeping, storytelling lyrics, honky-tonk bar atmosphere, Johnny Cash-inspired authenticity","Country pop, polished Nashville production, catchy chorus, crossover appeal, radio-friendly sheen, Taylor Swift-era energy","Outlaw country, rough-edged vocals, whiskey-soaked baritone, rebellious spirit, Waylon Jennings swagger, dusty-road freedom","Bluegrass, lightning-fast banjo rolls, fiddle breakdowns, mandolin chops, front-porch picking energy, Appalachian mountain spirit","Country rock, crunchy electric guitar, driving drums, southern-rock grit, Lynyrd Skynyrd-inspired, open-highway freedom"],
-    "Latin": ["Reggaeton, dembow beat, booming bass, urban party energy, Bad Bunny-inspired swagger, club-ready heat, infectious perreo rhythm","Salsa, punchy brass section, conga percussion, piano montuno, dance-floor fire, Fania All-Stars energy, tropical and vibrant","Bachata, romantic guitar melody, bongo rhythm, Dominican warmth, intimate and passionate, Romeo Santos-inspired tenderness","Latin pop, catchy bilingual hooks, polished production, crossover appeal, Shakira-inspired energy, mainstream and infectious","Cumbia, accordion melody, Colombian rhythm, tropical percussion, festive and joyful, street-party energy, accordion-driven charm"],
-    "K-pop": ["K-pop dance track, bright synth hooks, powerful choreography energy, polished production, BTS-inspired precision, stadium-ready anthem","K-pop ballad, emotional piano, soaring strings, heartfelt vocals, dramatic build-up, IU-inspired tenderness, tear-jerking beauty","K-pop hip-hop, hard-hitting rap verses, trap beats, confident swagger, Stray Kids-inspired intensity, fierce and commanding","Cute concept, bubblegum synths, aegyo sweetness, playful rhythm, TWICE-inspired charm, bright and innocent, feel-good energy","K-pop R&B, smooth grooves, falsetto vocals, sophisticated production, Dean-inspired coolness, late-night Seoul atmosphere"],
-    "Metal": ["Heavy metal, thunderous double-kick drums, screaming guitar solos, powerful riffs, Iron Maiden-inspired gallop, epic and triumphant","Death metal, guttural growls, blast beats, downtuned guitars, dark and brutal, Cannibal Corpse-inspired intensity, relentless aggression","Power metal, soaring clean vocals, symphonic keyboards, fantasy themes, DragonForce-inspired speed, epic quest energy","Progressive metal, complex time signatures, extended compositions, Tool-inspired depth, technical virtuosity, cerebral and evolving","Metalcore, breakdowns with crushing heaviness, screaming verses, melodic choruses, Architects-inspired dynamics, emotional catharsis"],
+  // ─── Style templates ───
+  const styleTemplates = {
+    "Pop Anthem": "Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads, catchy melodic hook, 120 BPM, feel-good summer anthem energy, radio-ready production",
+    "Chill Lo-fi": "Lo-fi hip-hop, crackling vinyl texture, mellow jazz piano samples, lazy drum pattern, rainy-day study vibes, warm and comforting, 80 BPM, F major, instrumental focus",
+    "Rock Energy": "Classic rock, crunchy Marshall amp tone, driving power chords, pounding drums, arena-sized energy, 70s swagger, 130 BPM, E major, guitar solo",
+    "R&B Smooth": "Smooth R&B slow jam, silky Rhodes piano, deep sub-bass, finger-snapped rhythm, candlelit intimacy, late-night bedroom vibes, 85 BPM, D minor",
+    "Electronic Drop": "Euphoric trance, soaring synth leads, sweeping build-ups, uplifting breakdowns, hands-in-the-air moments, 138 BPM, A minor, peak-time energy",
+    "Acoustic Ballad": "Emotional acoustic ballad, fingerpicked steel-string guitar, soft brushed drums, gentle and intimate, 75 BPM, G major, heartfelt male vocals",
+    "Hip-Hop Bounce": "Boom bap, dusty vinyl samples, chopped soul loops, punchy kick-snare pattern, 90s golden era, lyrical and head-nodding, 90 BPM, D minor",
+    "Jazz Lounge": "Smooth jazz, warm tenor saxophone melody, brushed snare, walking upright bass, candlelit lounge atmosphere, 100 BPM, Bb major, effortless sophistication",
+    "Cinematic Epic": "Epic orchestral, sweeping strings, dramatic brass section, pounding timpani, cinematic build-up, 110 BPM, D minor, movie soundtrack energy, heroic and triumphant",
+    "K-Pop Dance": "K-pop dance track, bright synth hooks, powerful choreography energy, polished production, 125 BPM, A major, stadium-ready anthem, confident and fierce",
   };
 
   // ─── Lyrics templates ───
@@ -1426,50 +1405,20 @@
     "Party starter": { prompt: "Dance pop, four-on-the-floor kick, funky bassline, bright synth hooks, crowd energy, festival-ready, 125 BPM, G major, feel-good and infectious", lyrics: `[intro]\nTurn it up, here we go\n\n[verse]\nFriday night, the lights go down\nBass is shaking through the ground\nGrab your friends, hit the floor\nThis is what the night is for\n\n[chorus]\nMove your body, lose your mind\nLeave the stress and rules behind\nEvery beat is running through\nTonight we dance, me and you\n\n[verse]\nThe DJ's spinning, crowd's alive\nEvery single soul will thrive\nHands up high, feel the sound\nThis is where we're heaven-bound\n\n[chorus]\nMove your body, lose your mind\nLeave the stress and rules behind\nEvery beat is running through\nTonight we dance, me and you\n\n[outro]\nOne more song before we go` },
   };
 
-  // ─── Render genre chips ───
-  const tabsEl = $("styleTabs");
-  let activeTab = null;
-
-  function renderChips(category) {
-    const prompts = samplePrompts[category];
-    if (!prompts) return;
-    const subgenreEl = $("subgenreDisplay");
-    subgenreEl.innerHTML = "";
-    prompts.forEach((p, i) => {
-      const c = document.createElement("span");
-      c.className = "sub-chip" + (i === 0 ? " active" : "");
-      c.textContent = p.split(",")[0];
-      c.title = p;
-      c.setAttribute("role", "button");
-      c.setAttribute("tabindex", "0");
-      c.addEventListener("click", () => {
-        subgenreEl.querySelectorAll(".sub-chip").forEach(el => el.classList.remove("active"));
-        c.classList.add("active");
-        $("prompt").value = p;
-      });
-      c.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); c.click(); } });
-      subgenreEl.appendChild(c);
+  // ─── Render style template chips ───
+  const styleTemplatesEl = $("styleTemplates");
+  Object.keys(styleTemplates).forEach(name => {
+    const chip = document.createElement("span");
+    chip.className = "template-chip";
+    chip.textContent = name;
+    chip.setAttribute("role", "button");
+    chip.setAttribute("tabindex", "0");
+    chip.addEventListener("click", () => {
+      $("prompt").value = styleTemplates[name];
     });
-    $("prompt").value = prompts[0];
-  }
-
-  Object.keys(samplePrompts).forEach((label, i) => {
-    const btn = document.createElement("span");
-    btn.className = "genre-chip" + (i === 0 ? " active" : "");
-    btn.textContent = label;
-    btn.setAttribute("role", "button");
-    btn.setAttribute("tabindex", "0");
-    btn.addEventListener("click", () => {
-      tabsEl.querySelectorAll(".genre-chip").forEach(el => el.classList.remove("active"));
-      btn.classList.add("active");
-      activeTab = label;
-      renderChips(label);
-    });
-    btn.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); btn.click(); } });
-    tabsEl.appendChild(btn);
-    if (i === 0) activeTab = label;
+    chip.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); chip.click(); } });
+    styleTemplatesEl.appendChild(chip);
   });
-  renderChips(Object.keys(samplePrompts)[0]);
 
   // ─── Render template chips ───
   const templateChipsEl = $("templateChips");
@@ -2050,11 +1999,10 @@
   });
 
   function pickRandomStyles(n) {
-    const categories = Object.keys(samplePrompts);
-    const shuffled = categories.sort(() => Math.random() - 0.5).slice(0, n);
-    return shuffled.map(cat => {
-      const prompts = samplePrompts[cat];
-      return { category: cat, prompt: prompts[Math.floor(Math.random() * prompts.length)] };
+    const templates = Object.keys(styleTemplates);
+    const shuffled = templates.sort(() => Math.random() - 0.5).slice(0, n);
+    return shuffled.map(name => {
+      return { category: name, prompt: styleTemplates[name] };
     });
   }
 
