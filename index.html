@@ -1496,7 +1496,7 @@
     const avatarDiv = document.createElement("div");
     avatarDiv.className = "message-avatar " + role;
     if (role === "ai") {
-      avatarDiv.innerHTML = '<i data-lucide="bot" class="icon-sm"></i>';
+      avatarDiv.textContent = "A";
     } else {
       avatarDiv.textContent = "U";
     }
