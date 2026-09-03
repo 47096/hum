@@ -202,6 +202,20 @@
     font-family: var(--font-body);
   }
 
+  .inline-edit {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-family: var(--font-body);
+    color: var(--fg);
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+  }
+
   .message-content .label {
     font-size: 10px;
     font-weight: 600;
@@ -1616,18 +1630,14 @@ Rules:
           responseHTML += '<div>' + message + '</div>';
         }
         if (style) {
-          responseHTML += '<div class="label" style="margin-top: 8px;">Style</div>';
-          responseHTML += '<pre>' + style + '</pre>';
+          responseHTML += '<div class="label" style="margin-top: 8px;">Style <span class="quick-prompt" style="font-size:10px; padding:2px 6px;" onclick="toggleEdit(\'style\')">Edit</span></div>';
+          responseHTML += '<pre id="styleDisplay">' + style + '</pre>';
+          responseHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + style + '</textarea>';
         }
         if (lyrics) {
-          responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics</div>';
-          responseHTML += '<pre>' + lyrics + '</pre>';
-        }
-        if (style || lyrics) {
-          responseHTML += '<div style="margin-top: 8px; display: flex; gap: 4px;">';
-          if (style) responseHTML += '<span class="quick-prompt" onclick="toast(\'Style ready for generation\', \'ok\')">Style ready</span>';
-          if (lyrics) responseHTML += '<span class="quick-prompt" onclick="openLyricsEditor()">Edit lyrics</span>';
-          responseHTML += '</div>';
+          responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span class="quick-prompt" style="font-size:10px; padding:2px 6px;" onclick="toggleEdit(\'lyrics\')">Edit</span></div>';
+          responseHTML += '<pre id="lyricsDisplay">' + lyrics + '</pre>';
+          responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + lyrics + '</textarea>';
         }
 
         addMessage("ai", responseHTML || aiResponse);
@@ -1643,6 +1653,36 @@ Rules:
       addMessage("ai", "Sorry, I encountered an error: " + err.message);
     }
   }
+
+  // Toggle inline edit for style/lyrics
+  window.toggleEdit = function(field) {
+    const display = document.getElementById(field + "Display");
+    const edit = document.getElementById(field + "Edit");
+    if (!display || !edit) return;
+
+    if (edit.style.display === "none") {
+      // Show edit mode
+      display.style.display = "none";
+      edit.style.display = "block";
+      edit.focus();
+      // Update button text
+      const btn = display.previousElementSibling?.querySelector('.quick-prompt');
+      if (btn) btn.textContent = "Save";
+    } else {
+      // Save and hide edit mode
+      const newValue = edit.value;
+      display.textContent = newValue;
+      display.style.display = "block";
+      edit.style.display = "none";
+      // Update the global variables
+      if (field === "style") currentStyle = newValue;
+      if (field === "lyrics") currentLyrics = newValue;
+      // Update button text
+      const btn = display.previousElementSibling?.querySelector('.quick-prompt');
+      if (btn) btn.textContent = "Edit";
+      toast(field.charAt(0).toUpperCase() + field.slice(1) + " updated", "ok");
+    }
+  };
 
   // Event listeners for chat
   chatSend.addEventListener("click", sendChatMessage);
