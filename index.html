@@ -924,6 +924,29 @@
 
   .modal-close:hover { color: var(--err); }
 
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .generate-btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .generate-btn.secondary:hover {
+    border-color: var(--fg);
+    color: var(--fg);
+  }
+
   .settings-group { margin-bottom: 20px; }
   .provider-row { display: flex; gap: 6px; margin-bottom: 12px; }
   .remix-toggle-row { margin-bottom: 10px; }
@@ -1574,7 +1597,7 @@ Keep style prompts under 200 characters. Keep lyrics under 3500 characters.`;
         if (style || lyrics) {
           responseHTML += '<div style="margin-top: 8px; display: flex; gap: 4px;">';
           if (style) responseHTML += '<span class="quick-prompt" onclick="toast(\'Style ready for generation\', \'ok\')">Style ready</span>';
-          if (lyrics) responseHTML += '<span class="quick-prompt" onclick="toast(\'Lyrics ready for generation\', \'ok\')">Lyrics ready</span>';
+          if (lyrics) responseHTML += '<span class="quick-prompt" onclick="openLyricsEditor()">Edit lyrics</span>';
           responseHTML += '</div>';
         }
 
@@ -1608,6 +1631,74 @@ Keep style prompts under 200 characters. Keep lyrics under 3500 characters.`;
       sendChatMessage();
     });
   });
+
+  // ─── Lyrics editor modal ───
+  function openLyricsEditor() {
+    // Create modal if it doesn't exist
+    let modal = $("lyricsEditorModal");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "lyricsEditorModal";
+      modal.className = "modal-overlay";
+      modal.innerHTML = `
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title">Edit Lyrics</div>
+            <button class="modal-close" id="lyricsEditorClose" aria-label="Close"><i data-lucide="x"></i></button>
+          </div>
+          <div class="modal-body">
+            <textarea id="lyricsEditorText" placeholder="[verse]&#10;Write your lyrics here..." style="min-height: 300px;"></textarea>
+            <div class="char-count" id="lyricsEditorCount">0 / 3500</div>
+          </div>
+          <div class="modal-footer">
+            <button class="generate-btn secondary" id="lyricsEditorCancel">Cancel</button>
+            <button class="generate-btn" id="lyricsEditorSave">Save Lyrics</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      // Initialize Lucide icons
+      if (typeof lucide !== "undefined") lucide.createIcons({ nodes: modal.querySelectorAll("[data-lucide]") });
+
+      // Event listeners
+      $("lyricsEditorClose").addEventListener("click", () => modal.classList.remove("show"));
+      $("lyricsEditorCancel").addEventListener("click", () => modal.classList.remove("show"));
+      $("lyricsEditorSave").addEventListener("click", () => {
+        currentLyrics = $("lyricsEditorText").value;
+        modal.classList.remove("show");
+        toast("Lyrics updated", "ok");
+      });
+
+      // Character count
+      $("lyricsEditorText").addEventListener("input", () => {
+        const len = $("lyricsEditorText").value.length;
+        $("lyricsEditorCount").textContent = len.toLocaleString() + " / 3500";
+        $("lyricsEditorCount").style.color = len > 3500 ? "var(--err)" : "var(--muted)";
+      });
+
+      // Close on click outside
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.classList.remove("show");
+      });
+
+      // Close on Escape
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("show")) {
+          modal.classList.remove("show");
+        }
+      });
+    }
+
+    // Set current lyrics
+    $("lyricsEditorText").value = currentLyrics;
+    const len = currentLyrics.length;
+    $("lyricsEditorCount").textContent = len.toLocaleString() + " / 3500";
+    $("lyricsEditorCount").style.color = len > 3500 ? "var(--err)" : "var(--muted)";
+
+    // Show modal
+    modal.classList.add("show");
+  }
 
   // ─── Draggable divider ───
   const divider = $("divider");
