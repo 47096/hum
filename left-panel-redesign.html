@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Left Panel Redesign Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --bg: #111111;
+    --panel: #1a1a1a;
+    --border: #2a2a2a;
+    --fg: #e8e8e8;
+    --muted: #888888;
+    --accent: #a78bfa;
+    --accent-dim: rgba(167,139,250,0.15);
+    --font: 'Inter', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.6 var(--font);
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 24px 80px;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 48px;
+    font-size: 14px;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 800px) {
+    .options-grid { grid-template-columns: 1fr; max-width: 500px; }
+  }
+
+  .option-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .option-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .option-number {
+    width: 28px;
+    height: 28px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .option-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: auto;
+  }
+
+  .tag-green { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .tag-yellow { background: rgba(251,191,36,0.15); color: #fbbf24; }
+
+  .option-desc {
+    padding: 12px 20px;
+    font-size: 12px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    line-height: 1.6;
+  }
+
+  .mockup {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--bg);
+    margin: 12px;
+    border-radius: 8px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .label-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .form-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .form-input {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--fg);
+    font-family: var(--font);
+    border-radius: 6px;
+  }
+
+  .form-input::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .form-textarea {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--fg);
+    font-family: var(--font);
+    border-radius: 6px;
+    resize: none;
+    min-height: 80px;
+  }
+
+  .form-textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .chip {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--muted);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .chip.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .sparkle-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .sparkle-btn:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .sparkle-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .toggle-label {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .toggle {
+    width: 32px;
+    height: 18px;
+    background: var(--border);
+    border-radius: 9px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .toggle-knob {
+    width: 14px;
+    height: 14px;
+    background: var(--fg);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: left 0.15s;
+  }
+
+  .toggle.active .toggle-knob {
+    left: 16px;
+  }
+
+  .generate-btn {
+    background: var(--fg);
+    color: var(--bg);
+    border: none;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--font);
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .generate-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .generate-row .generate-btn {
+    flex: 1;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .checkbox-label input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+  }
+
+  .more-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--font);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .more-btn:hover {
+    border-color: var(--fg);
+    color: var(--fg);
+  }
+
+  .dropdown {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--fg);
+    font-family: var(--font);
+    border-radius: 6px;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 6px 0;
+  }
+
+  .advanced-toggle svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.15s;
+  }
+
+  .advanced-toggle.open svg {
+    transform: rotate(90deg);
+  }
+
+  .advanced-section {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    margin-top: 10px;
+  }
+
+  .advanced-section.show {
+    display: flex;
+  }
+
+  .textarea-wrap {
+    position: relative;
+  }
+
+  .textarea-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: var(--accent-dim);
+    border: 1px solid transparent;
+    color: var(--accent);
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .textarea-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .textarea-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .recommendation {
+    max-width: 1100px;
+    margin: 48px auto 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .recommendation h2 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .recommendation-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 700px) {
+    .recommendation-grid { grid-template-columns: 1fr; }
+  }
+
+  .recommendation-card {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .recommendation-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+
+  .recommendation-card p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<h1>Left Panel Redesign Options</h1>
+<p class="subtitle">How to simplify the create panel and reduce visual clutter</p>
+
+<div class="options-grid">
+
+  <!-- Option 1: Move Instrumental toggle -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">1</div>
+      <div class="option-title">Instrumental next to Generate</div>
+      <span class="tag tag-green">Clean</span>
+    </div>
+    <div class="option-desc">Move Instrumental toggle to a checkbox next to the Generate button. Removes it from the style prompt area.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style templates</div>
+        </div>
+        <div class="chip-row">
+          <span class="chip active">Pop Anthem</span>
+          <span class="chip">Trap Banger</span>
+          <span class="chip">Chill Lo-fi</span>
+          <span class="chip">Indie Folk</span>
+          <span class="chip">R&B Smooth</span>
+          <button class="more-btn">+15 more</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style prompt</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <input class="form-input" placeholder="Upbeat dance pop, bright major key..." readonly>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Lyrics</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <textarea class="form-textarea" placeholder="[verse]&#10;Write your lyrics here..." readonly></textarea>
+      </div>
+      <div class="generate-row">
+        <label class="checkbox-label">
+          <input type="checkbox"> Instrumental
+        </label>
+        <button class="generate-btn">Generate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option 2: Consolidate templates -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">2</div>
+      <div class="option-title">Show top 5 + More button</div>
+      <span class="tag tag-green">Recommended</span>
+    </div>
+    <div class="option-desc">Show only top 5 templates by default. "More" button reveals the rest. Reduces visual clutter significantly.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style templates</div>
+        </div>
+        <div class="chip-row">
+          <span class="chip active">Pop Anthem</span>
+          <span class="chip">Trap Banger</span>
+          <span class="chip">Chill Lo-fi</span>
+          <span class="chip">Indie Folk</span>
+          <span class="chip">R&B Smooth</span>
+          <button class="more-btn">+15 more</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style prompt</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+          <div class="toggle-row">
+            <span class="toggle-label">Instrumental</span>
+            <span class="toggle"><span class="toggle-knob"></span></span>
+          </div>
+        </div>
+        <input class="form-input" placeholder="Upbeat dance pop, bright major key..." readonly>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Lyrics templates</div>
+        </div>
+        <div class="chip-row">
+          <span class="chip">Love Song</span>
+          <span class="chip">Motivation</span>
+          <span class="chip">Party Anthem</span>
+          <span class="chip">Sad Ballad</span>
+          <span class="chip">Road Trip</span>
+          <button class="more-btn">+15 more</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Lyrics</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <textarea class="form-textarea" placeholder="[verse]&#10;Write your lyrics here..." readonly></textarea>
+      </div>
+      <button class="generate-btn">Generate</button>
+    </div>
+  </div>
+
+  <!-- Option 3: Sparkle inside textarea -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">3</div>
+      <div class="option-title">Sparkle inside textarea</div>
+    </div>
+    <div class="option-desc">Move sparkle buttons inside the textarea as floating buttons. More contextual, saves horizontal space.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style templates</div>
+        </div>
+        <div class="chip-row">
+          <span class="chip active">Pop Anthem</span>
+          <span class="chip">Trap Banger</span>
+          <span class="chip">Chill Lo-fi</span>
+          <span class="chip">Indie Folk</span>
+          <span class="chip">R&B Smooth</span>
+          <button class="more-btn">+15 more</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Style prompt</div>
+        <div class="textarea-wrap">
+          <input class="form-input" placeholder="Upbeat dance pop, bright major key..." readonly style="padding-right: 36px;">
+          <button class="textarea-btn"><i data-lucide="bot"></i></button>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Lyrics templates</div>
+        </div>
+        <div class="chip-row">
+          <span class="chip">Love Song</span>
+          <span class="chip">Motivation</span>
+          <span class="chip">Party Anthem</span>
+          <span class="chip">Sad Ballad</span>
+          <span class="chip">Road Trip</span>
+          <button class="more-btn">+15 more</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Lyrics</div>
+        <div class="textarea-wrap">
+          <textarea class="form-textarea" placeholder="[verse]&#10;Write your lyrics here..." readonly style="padding-bottom: 36px;"></textarea>
+          <button class="textarea-btn"><i data-lucide="bot"></i></button>
+        </div>
+      </div>
+      <div class="generate-row">
+        <div class="toggle-row">
+          <span class="toggle-label">Instrumental</span>
+          <span class="toggle"><span class="toggle-knob"></span></span>
+        </div>
+        <button class="generate-btn">Generate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option 4: Dropdowns instead of chips -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">4</div>
+      <div class="option-title">Dropdowns instead of chips</div>
+    </div>
+    <div class="option-desc">Replace chip rows with dropdown selects. Most compact option, but less discoverable.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="form-label">Style template</div>
+        <select class="dropdown">
+          <option>Pop Anthem — Upbeat dance pop, 120 BPM</option>
+          <option>Trap Banger — Hard-hitting trap, 140 BPM</option>
+          <option>Chill Lo-fi — Lo-fi hip-hop, 80 BPM</option>
+          <option>Indie Folk — Warm acoustic, 95 BPM</option>
+          <option>R&B Smooth — Silky Rhodes, 85 BPM</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style prompt</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <input class="form-input" placeholder="Upbeat dance pop, bright major key..." readonly>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Lyrics template</div>
+        <select class="dropdown">
+          <option>Love Song — Romantic pop ballad</option>
+          <option>Motivation — Inspirational pop-rock</option>
+          <option>Party Anthem — EDM festival anthem</option>
+          <option>Sad Ballad — Emotional piano ballad</option>
+          <option>Road Trip — Indie rock adventure</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Lyrics</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <textarea class="form-textarea" placeholder="[verse]&#10;Write your lyrics here..." readonly></textarea>
+      </div>
+      <div class="generate-row">
+        <div class="toggle-row">
+          <span class="toggle-label">Instrumental</span>
+          <span class="toggle"><span class="toggle-knob"></span></span>
+        </div>
+        <button class="generate-btn">Generate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option 5: Progressive disclosure -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">5</div>
+      <div class="option-title">Progressive disclosure</div>
+      <span class="tag tag-yellow">Advanced</span>
+    </div>
+    <div class="option-desc">Show basic options by default. "Advanced" toggle reveals style templates, lyrics templates, and instrumental. Clean default state.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Style prompt</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <input class="form-input" placeholder="Describe your song style..." readonly>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Lyrics</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <textarea class="form-textarea" placeholder="[verse]&#10;Write your lyrics here..." readonly></textarea>
+      </div>
+      <div class="advanced-toggle">
+        <i data-lucide="chevron-right"></i>
+        <span>Advanced options</span>
+      </div>
+      <div class="advanced-section">
+        <div class="form-group">
+          <div class="form-label">Style templates</div>
+          <div class="chip-row">
+            <span class="chip">Pop Anthem</span>
+            <span class="chip">Trap Banger</span>
+            <span class="chip">Chill Lo-fi</span>
+            <button class="more-btn">+17 more</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Lyrics templates</div>
+          <div class="chip-row">
+            <span class="chip">Love Song</span>
+            <span class="chip">Motivation</span>
+            <span class="chip">Party Anthem</span>
+            <button class="more-btn">+17 more</button>
+          </div>
+        </div>
+        <label class="checkbox-label">
+          <input type="checkbox"> Instrumental (no lyrics)
+        </label>
+      </div>
+      <button class="generate-btn">Generate</button>
+    </div>
+  </div>
+
+  <!-- Option 6: Simplified flow -->
+  <div class="option-card">
+    <div class="option-header">
+      <div class="option-number">6</div>
+      <div class="option-title">Simplified flow</div>
+      <span class="tag tag-green">Clean</span>
+    </div>
+    <div class="option-desc">Remove templates entirely. Just style prompt + lyrics + generate. Users describe what they want in their own words.</div>
+    <div class="mockup">
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Describe your song</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <input class="form-input" placeholder="e.g. Sad breakup ballad, piano, female vocals..." readonly>
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <div class="form-label">Lyrics</div>
+          <button class="sparkle-btn"><i data-lucide="bot"></i></button>
+        </div>
+        <textarea class="form-textarea" placeholder="[verse]&#10;Write your lyrics here...&#10;&#10;Or leave empty for AI to generate" readonly></textarea>
+      </div>
+      <div class="generate-row">
+        <label class="checkbox-label">
+          <input type="checkbox"> Instrumental
+        </label>
+        <button class="generate-btn">Generate</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="recommendation">
+  <h2>My Recommendation</h2>
+  <div class="recommendation-grid">
+    <div class="recommendation-card">
+      <h3>Option 2: Top 5 + More button</h3>
+      <p>Show top 5 style templates and top 5 lyrics templates by default. "More" button reveals the rest. Keeps discoverability while reducing clutter. Best balance of simplicity and power.</p>
+    </div>
+    <div class="recommendation-card">
+      <h3>Why not Option 4 (Dropdowns)?</h3>
+      <p>Dropdowns are compact but less discoverable. Users can't see all options at a glance. Chips are more visual and easier to scan quickly.</p>
+    </div>
+    <div class="recommendation-card">
+      <h3>Why not Option 5 (Progressive)?</h3>
+      <p>Progressive disclosure hides too much. Templates are useful for inspiration — hiding them behind a toggle reduces their value.</p>
+    </div>
+    <div class="recommendation-card">
+      <h3>Why not Option 6 (Simplified)?</h3>
+      <p>Too minimal. Templates help users who don't know what to write. Removing them removes a key feature.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+
+</body>
+</html>
