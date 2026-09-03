@@ -1629,20 +1629,23 @@ Rules:
         // Parse AI response
         const { style, lyrics, message } = parseAIResponse(aiResponse);
 
+        // Helper to escape HTML
+        const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
         // Add AI response to chat
         let responseHTML = "";
         if (message) {
-          responseHTML += '<div>' + message + '</div>';
+          responseHTML += '<div>' + escapeHtml(message) + '</div>';
         }
         if (style) {
           responseHTML += '<div class="label" style="margin-top: 8px;">Style <span class="quick-prompt" style="font-size:10px; padding:2px 6px;" onclick="toggleEdit(\'style\')">Edit</span></div>';
-          responseHTML += '<pre id="styleDisplay">' + style + '</pre>';
-          responseHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + style + '</textarea>';
+          responseHTML += '<pre id="styleDisplay">' + escapeHtml(style) + '</pre>';
+          responseHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + escapeHtml(style) + '</textarea>';
         }
         if (lyrics) {
           responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span class="quick-prompt" style="font-size:10px; padding:2px 6px;" onclick="toggleEdit(\'lyrics\')">Edit</span></div>';
-          responseHTML += '<pre id="lyricsDisplay">' + lyrics + '</pre>';
-          responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + lyrics + '</textarea>';
+          responseHTML += '<pre id="lyricsDisplay">' + escapeHtml(lyrics) + '</pre>';
+          responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
         }
 
         addMessage("ai", responseHTML || aiResponse);
