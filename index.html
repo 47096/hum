@@ -1508,6 +1508,7 @@
   const chatInput = $("chatInput");
   const chatSend = $("chatSend");
   let chatHistory = [];
+  const MAX_CHAT_HISTORY = 20; // cap at 20 messages (10 exchanges) to prevent context overflow
   let currentStyle = "";
   let currentLyrics = "";
 
@@ -1585,6 +1586,7 @@
 
     // Add to chat history
     chatHistory.push({ role: "user", content: userMessage });
+    if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
 
     // Show loading state
     const loadingDiv = document.createElement("div");
@@ -1671,6 +1673,7 @@ Rules:
 
         // Add to chat history
         chatHistory.push({ role: "assistant", content: aiResponse });
+        if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
       } else {
         throw new Error("No response from AI");
       }
