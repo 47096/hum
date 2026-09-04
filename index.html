@@ -1783,8 +1783,8 @@ Rules:
 - "title": a short creative name for the song (2-5 words, under 40 chars). Based on the mood/genre/lyrics.
 - "style": genre, mood, instruments, tempo, key (under 200 chars)
 - "lyrics": full song with [verse], [chorus], [bridge], [outro] tags (under 3500 chars). Escape newlines as \\n
-- When user asks for changes, update title/style/lyrics accordingly
-- If user asks a question (not song creation), set title, style, and lyrics to empty strings
+- When user asks for changes (e.g., "make it upbeat", "change the genre"), ALWAYS return ALL THREE fields (title, style, lyrics) with the updated values. Never return empty strings for unchanged fields.
+- If user asks a question (not song creation), set style and lyrics to empty strings, but keep title if you have one
 - NEVER include markdown code blocks or any text outside the JSON object
 - Do NOT repeat the user's prompt or add explanations`;
 
