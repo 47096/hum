@@ -904,15 +904,17 @@
 
   /* Settings modal */
   .modal-overlay {
-    display: none;
+    display: flex;
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.7);
     z-index: 100;
     opacity: 0;
+    pointer-events: none;
     transition: opacity .2s;
+    justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto;
   }
 
-  .modal-overlay.show { display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; overflow-y: auto; opacity: 1; }
+  .modal-overlay.show { opacity: 1; pointer-events: auto; }
 
   .modal {
     background: var(--panel);
