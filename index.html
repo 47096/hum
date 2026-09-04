@@ -1512,6 +1512,7 @@
   const chatSend = $("chatSend");
   let chatHistory = [];
   const MAX_CHAT_HISTORY = 20; // cap at 20 messages (10 exchanges) to prevent context overflow
+  let currentTitle = "";
   let currentStyle = "";
   let currentLyrics = "";
 
@@ -1564,6 +1565,7 @@
     try {
       // Try to parse as JSON
       const json = JSON.parse(text);
+      if (json.title) currentTitle = json.title;
       if (json.style) currentStyle = json.style;
       if (json.lyrics) {
         // Handle both escaped newlines (\n) and actual newlines
@@ -1572,18 +1574,21 @@
           .replace(/\n\n+/g, "\n\n");  // Normalize multiple newlines
       }
       return {
+        title: currentTitle,
         style: currentStyle,
         lyrics: currentLyrics
       };
     } catch {
       // Fallback: try to extract from free text
+      const titleMatch = text.match(/Title:\s*([\s\S]*?)(?=\n\n|$)/i);
       const styleMatch = text.match(/Style:\s*([\s\S]*?)(?=\n\n|$)/i);
       const lyricsMatch = text.match(/Lyrics:\s*([\s\S]*?)(?=\n\n|$)/i);
 
+      if (titleMatch) currentTitle = titleMatch[1].trim();
       if (styleMatch) currentStyle = styleMatch[1].trim();
       if (lyricsMatch) currentLyrics = lyricsMatch[1].trim();
 
-      return { style: currentStyle, lyrics: currentLyrics };
+      return { title: currentTitle, style: currentStyle, lyrics: currentLyrics };
     }
   }
 
@@ -1627,13 +1632,14 @@
 IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
 
 The JSON must be in this exact format:
-{"style":"your style prompt here","lyrics":""}
+{"title":"Short Track Name","style":"your style prompt here","lyrics":""}
 
 Rules:
+- "title": a short creative name for the track (2-5 words, under 40 chars). Based on the mood/genre.
 - "style": genre, mood, instruments, tempo, key (under 200 chars). Be descriptive and detailed.
 - "lyrics": always empty string for instrumental mode
-- When user asks for changes, update style accordingly
-- If user asks a question (not music creation), set style to empty string
+- When user asks for changes, update title/style accordingly
+- If user asks a question (not music creation), set title, style, and lyrics to empty strings
 - NEVER include markdown code blocks or any text outside the JSON object
 - Do NOT repeat the user's prompt or add explanations`
         : `You are a songwriting assistant. Help users create songs by generating style prompts and lyrics.
@@ -1641,13 +1647,14 @@ Rules:
 IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
 
 The JSON must be in this exact format:
-{"style":"your style prompt here","lyrics":"[verse]\\nYour lyrics here\\n\\n[chorus]\\nChorus here"}
+{"title":"Short Song Name","style":"your style prompt here","lyrics":"[verse]\\nYour lyrics here\\n\\n[chorus]\\nChorus here"}
 
 Rules:
+- "title": a short creative name for the song (2-5 words, under 40 chars). Based on the mood/genre/lyrics.
 - "style": genre, mood, instruments, tempo, key (under 200 chars)
 - "lyrics": full song with [verse], [chorus], [bridge], [outro] tags (under 3500 chars). Escape newlines as \\n
-- When user asks for changes, update style/lyrics accordingly
-- If user asks a question (not song creation), set style and lyrics to empty strings
+- When user asks for changes, update title/style/lyrics accordingly
+- If user asks a question (not song creation), set title, style, and lyrics to empty strings
 - NEVER include markdown code blocks or any text outside the JSON object
 - Do NOT repeat the user's prompt or add explanations`;
 
@@ -1691,10 +1698,15 @@ Rules:
         chatMessages.removeChild(loadingDiv);
 
         // Parse AI response
-        const { style, lyrics } = parseAIResponse(aiResponse);
+        const { title, style, lyrics } = parseAIResponse(aiResponse);
 
         // Add AI response to chat
         let responseHTML = "";
+        if (title) {
+          responseHTML += '<div class="label">Title <span style="font-size:10px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+          responseHTML += '<pre class="clickable" id="titleDisplay" onclick="toggleEdit(\'title\')">' + escapeHtml(title) + '</pre>';
+          responseHTML += '<textarea id="titleEdit" class="inline-edit" style="display:none;">' + escapeHtml(title) + '</textarea>';
+        }
         if (style) {
           responseHTML += '<div class="label">Style <span style="font-size:10px; color:var(--muted); font-weight:400;">click to edit</span></div>';
           responseHTML += '<pre class="clickable" id="styleDisplay" onclick="toggleEdit(\'style\')">' + escapeHtml(style) + '</pre>';
@@ -1770,6 +1782,7 @@ Rules:
     display.style.display = "block";
     edit.style.display = "none";
     // Update the global variables
+    if (field === "title") currentTitle = newValue;
     if (field === "style") currentStyle = newValue;
     if (field === "lyrics") currentLyrics = newValue;
     toast(field.charAt(0).toUpperCase() + field.slice(1) + " updated", "ok");
@@ -2712,10 +2725,11 @@ Rules:
           const audioUrl = extractAudioUrl(f);
           if (!audioUrl) return;
           const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
+          const trackTitle = currentTitle || titleLine || "Untitled";
           const dur = activeProvider === "minimax" ? (f.extra_info?.music_duration || 0) : ((f.outcome?.duration_ms || 0) / 1000);
           saveToHistory({
             id: crypto.randomUUID() + "-" + i,
-            title: (titleLine || "Untitled").slice(0, 60) + " (" + styles[i].category + ")",
+            title: trackTitle.slice(0, 60) + " (" + styles[i].category + ")",
             lyrics, prompt: styles[i].prompt,
             audioUrl, duration: formatDuration(dur),
             date: new Date().toLocaleString(),
@@ -2745,10 +2759,11 @@ Rules:
         if (!audioUrl) throw new Error("No audio returned");
 
         const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
+        const trackTitle = currentTitle || titleLine || "Untitled";
         const dur = activeProvider === "minimax" ? (final.extra_info?.music_duration || 0) : ((final.outcome?.duration_ms || 0) / 1000);
         saveToHistory({
           id: crypto.randomUUID(),
-          title: (titleLine || "Untitled").slice(0, 60),
+          title: trackTitle.slice(0, 60),
           lyrics, prompt,
           audioUrl, duration: formatDuration(dur),
           date: new Date().toLocaleString(),
