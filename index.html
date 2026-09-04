@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>" />
-<title>AI Music · GMI Cloud</title>
+<title>Hum</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1165,7 +1165,7 @@
 
 <!-- Top bar -->
 <div class="topbar">
-  <div class="logo"><i data-lucide="music" class="icon-sm"></i> AI Music</div>
+  <div class="logo"><i data-lucide="music" class="icon-sm"></i> Hum</div>
   <div class="mobile-tabs" id="mobileTabs">
     <button class="mobile-tab active" id="mobileCreateBtn">Create</button>
     <button class="mobile-tab" id="mobilePlaylistBtn">Playlist</button>
@@ -2340,7 +2340,7 @@ Rules:
     if ("mediaSession" in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: entry.title || "Untitled",
-        artist: "AI Music",
+        artist: "Hum",
         album: (entry.prompt || "").split(",")[0] || "Generated"
       });
       navigator.mediaSession.setActionHandler("play", () => togglePlay());
