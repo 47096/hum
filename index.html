@@ -2638,22 +2638,25 @@ Rules:
         const count = parseInt(remixCount.value);
         const styles = pickRandomStyles(count);
         const payloads = styles.map(s => buildPayload(lyrics, s.prompt));
-        const submitResults = await Promise.all(payloads.map(p => submitRequest(p)));
+        const submitResults = await Promise.allSettled(payloads.map(p => submitRequest(p)));
 
         let finals;
         if (activeProvider === "minimax") {
           finals = submitResults;
         } else {
-          const requestIds = submitResults.map(r => {
-            if (!r.request_id) throw new Error("Unexpected response from server");
-            return r.request_id;
-          });
-          finals = await Promise.all(requestIds.map(id => pollRequest(id)));
+          const requestIds = submitResults
+            .filter(r => r.status === "fulfilled")
+            .map(r => r.value.request_id);
+          const pollResults = await Promise.allSettled(requestIds.map(id => pollRequest(id)));
+          finals = pollResults;
         }
 
-        finals.forEach((f, i) => {
+        let successCount = 0;
+        finals.forEach((result, i) => {
+          if (result.status !== "fulfilled") return;
+          const f = result.value;
           const audioUrl = extractAudioUrl(f);
-          if (!audioUrl) throw new Error("No audio returned for version " + (i + 1));
+          if (!audioUrl) return;
           const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
           const dur = activeProvider === "minimax" ? (f.extra_info?.music_duration || 0) : ((f.outcome?.duration_ms || 0) / 1000);
           saveToHistory({
@@ -2664,9 +2667,11 @@ Rules:
             date: new Date().toLocaleString(),
             settings: getCurrentSettings()
           });
+          successCount++;
         });
 
-        toast(count + " remixes ready", "ok");
+        if (successCount === 0) throw new Error("All remixes failed");
+        toast(successCount + " of " + count + " remixes ready", successCount < count ? "err" : "ok");
         playTrack(0);
 
       } else {
