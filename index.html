@@ -1365,19 +1365,19 @@
   }
 
   function getEndpoint() {
-    return normalizeProxyUrl(localStorage.getItem("gmi_proxy_url") || "");
+    return normalizeProxyUrl(sessionStorage.getItem("gmi_proxy_url") || "");
   }
   const POLL_INTERVAL = 4000;
   const POLL_TIMEOUT = 180000;
   const INSTRUMENTAL_LYRICS = "[instrumental]\n\n[inst]\n\n[outro]";
 
   // ─── Provider ───
-  let activeProvider = localStorage.getItem("gmi_provider") || "gmi";
+  let activeProvider = sessionStorage.getItem("gmi_provider") || "gmi";
   const providerTabs = document.querySelectorAll(".provider-tab");
 
   function switchProvider(provider) {
     activeProvider = provider;
-    localStorage.setItem("gmi_provider", provider);
+    sessionStorage.setItem("gmi_provider", provider);
     providerTabs.forEach(t => {
       const isActive = t.dataset.provider === provider;
       t.classList.toggle("active", isActive);
@@ -1386,7 +1386,7 @@
     $("apiKeyHelp").textContent = provider === "gmi"
       ? "Get one at console.gmicloud.ai → API Keys. Free until Sep 6, 2026."
       : "Get one at platform.minimax.io → API Keys. Paid users only.";
-    $("apiKey").value = localStorage.getItem(provider === "gmi" ? "gmi_api_key" : "minimax_api_key") || "";
+    $("apiKey").value = sessionStorage.getItem(provider === "gmi" ? "gmi_api_key" : "minimax_api_key") || "";
   }
 
   providerTabs.forEach(t => {
@@ -1398,22 +1398,22 @@
   // ─── API key ───
   $("apiKey").addEventListener("change", () => {
     const storageKey = activeProvider === "gmi" ? "gmi_api_key" : "minimax_api_key";
-    localStorage.setItem(storageKey, $("apiKey").value);
+    sessionStorage.setItem(storageKey, $("apiKey").value);
     toast("Key saved", "ok");
   });
 
   // ─── Proxy URL ───
-  $("proxyUrl").value = localStorage.getItem("gmi_proxy_url") || "";
+  $("proxyUrl").value = sessionStorage.getItem("gmi_proxy_url") || "";
   $("proxyUrl").addEventListener("change", () => {
     const raw = $("proxyUrl").value.trim();
     if (raw && !/^https?:\/\/.+/.test(raw)) {
       toast("Invalid URL — must start with http:// or https://", "err");
-      $("proxyUrl").value = localStorage.getItem("gmi_proxy_url") || "";
+      $("proxyUrl").value = sessionStorage.getItem("gmi_proxy_url") || "";
       return;
     }
     const v = normalizeProxyUrl(raw);
     $("proxyUrl").value = v;
-    localStorage.setItem("gmi_proxy_url", v);
+    sessionStorage.setItem("gmi_proxy_url", v);
     toast("Proxy URL saved", "ok");
   });
 
