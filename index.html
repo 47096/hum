@@ -1506,6 +1506,15 @@
     }
   }
 
+  // ─── Chat interface ───
+  const chatMessages = $("chatMessages");
+  const chatInput = $("chatInput");
+  const chatSend = $("chatSend");
+  let chatHistory = [];
+  const MAX_CHAT_HISTORY = 20; // cap at 20 messages (10 exchanges) to prevent context overflow
+  let currentStyle = "";
+  let currentLyrics = "";
+
   // ─── Mode tabs (Song vs Instrumental) ───
   let mode = sessionStorage.getItem("gmi_mode") || "song";
   const modeTabs = document.querySelectorAll(".mode-tab");
@@ -1525,15 +1534,6 @@
     t.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); switchMode(t.dataset.mode); } });
   });
   switchMode(mode);
-
-  // ─── Chat interface ───
-  const chatMessages = $("chatMessages");
-  const chatInput = $("chatInput");
-  const chatSend = $("chatSend");
-  let chatHistory = [];
-  const MAX_CHAT_HISTORY = 20; // cap at 20 messages (10 exchanges) to prevent context overflow
-  let currentStyle = "";
-  let currentLyrics = "";
 
   function addMessage(role, content) {
     const messageDiv = document.createElement("div");
