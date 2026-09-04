@@ -192,18 +192,33 @@
     line-height: 1.5;
   }
 
-  /* AI messages — centered text */
+  /* AI messages — left-aligned with avatar (ChatGPT style) */
   .msg.ai-msg {
-    text-align: center;
-    padding: 10px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .ai-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(167,139,250,0.2);
+    color: #c4b5fd;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 2px;
   }
 
   .ai-text {
     font-size: 14px;
     line-height: 1.6;
     color: var(--fg);
-    max-width: 90%;
-    margin: 0 auto;
+    flex: 1;
+    min-width: 0;
   }
 
   .ai-text .label {
@@ -1171,6 +1186,7 @@
     <div class="chat-container">
       <div class="chat-messages" id="chatMessages">
         <div class="msg ai-msg">
+          <div class="ai-avatar">A</div>
           <div class="ai-text">
             Hi! I'm your songwriting assistant. Describe the song you want and I'll help you create it.
             <div class="quick-prompts">
@@ -1582,6 +1598,11 @@
       bubble.textContent = content;
       messageDiv.appendChild(bubble);
     } else {
+      const avatar = document.createElement("div");
+      avatar.className = "ai-avatar";
+      avatar.textContent = "A";
+      messageDiv.appendChild(avatar);
+
       const textDiv = document.createElement("div");
       textDiv.className = "ai-text";
       textDiv.innerHTML = content;
@@ -1652,7 +1673,7 @@
     // Show loading state
     const loadingDiv = document.createElement("div");
     loadingDiv.className = "msg ai-msg";
-    loadingDiv.innerHTML = '<div class="ai-text">Thinking...</div>';
+    loadingDiv.innerHTML = '<div class="ai-avatar">A</div><div class="ai-text">Thinking...</div>';
     chatMessages.appendChild(loadingDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
