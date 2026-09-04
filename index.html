@@ -131,27 +131,33 @@
   .template-chip:hover { border-color: var(--fg); color: var(--fg); }
   .template-chip.active { border-color: var(--fg); color: var(--fg); }
 
-  /* Mode tabs */
-  .mode-tabs {
+  /* Mode bar */
+  .mode-bar {
     display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: var(--bg);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
 
-  .mode-tab {
+  .mode-btn {
     flex: 1;
-    padding: 10px;
+    padding: 8px;
     text-align: center;
     font-size: 13px;
-    font-weight: 500;
-    color: var(--muted);
+    border-radius: 6px;
     cursor: pointer;
+    color: var(--muted);
     transition: all .15s;
-    border-bottom: 2px solid transparent;
   }
 
-  .mode-tab:hover { color: var(--fg); }
-  .mode-tab.active { color: var(--fg); border-bottom-color: var(--fg); }
+  .mode-btn:hover { color: var(--fg); }
+  .mode-btn.active {
+    background: var(--panel);
+    color: var(--fg);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
 
   /* Chat interface */
   .chat-container {
@@ -167,109 +173,104 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 20px;
   }
 
-  .message {
+  /* User messages — right-aligned rounded bubble */
+  .msg.user-msg {
     display: flex;
-    gap: 8px;
-    max-width: 90%;
+    justify-content: flex-end;
   }
 
-  .message.user {
-    align-self: flex-end;
-    flex-direction: row-reverse;
-  }
-
-  .message-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .message-avatar.ai {
-    background: rgba(167,139,250,0.2);
-    color: #c4b5fd;
-  }
-
-  .message-avatar.user {
-    background: rgba(74,222,128,0.15);
-    color: #4ade80;
-  }
-
-  .message-content {
-    background: var(--accent-dim);
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 13px;
+  .user-bubble {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 12px 16px;
+    max-width: 80%;
+    font-size: 14px;
     line-height: 1.5;
   }
 
-  .message-content pre {
+  /* AI messages — centered text */
+  .msg.ai-msg {
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .ai-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--fg);
+    max-width: 90%;
+    margin: 0 auto;
+  }
+
+  .ai-text .label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
+  .ai-text .value {
+    margin-bottom: 14px;
+  }
+
+  .ai-text pre {
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 8px;
-    margin-top: 8px;
-    font-size: 12px;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 4px;
+    font-size: 13px;
     overflow-x: auto;
     white-space: pre-wrap;
     font-family: var(--font-body);
+    text-align: left;
+    display: inline-block;
+    max-width: 100%;
   }
 
-  .message-content pre.clickable {
+  .ai-text pre.clickable {
     cursor: pointer;
     transition: border-color 0.15s;
   }
 
-  .message-content pre.clickable:hover {
+  .ai-text pre.clickable:hover {
     border-color: var(--accent);
   }
 
   .inline-edit {
     background: var(--bg);
     border: 1px solid var(--accent);
-    border-radius: 4px;
-    padding: 8px;
-    margin-top: 8px;
-    font-size: 12px;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 4px;
+    font-size: 13px;
     font-family: var(--font-body);
     color: var(--fg);
     width: 100%;
     min-height: 40px;
     resize: none;
     overflow: hidden;
-  }
-
-  .message-content .label {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-    margin-bottom: 4px;
+    text-align: left;
   }
 
   .quick-prompts {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 8px;
+    gap: 6px;
+    margin-top: 12px;
+    justify-content: center;
   }
 
   .quick-prompt {
     background: var(--bg);
     border: 1px solid var(--border);
-    padding: 4px 10px;
-    font-size: 11px;
+    padding: 6px 14px;
+    font-size: 12px;
     color: var(--muted);
-    border-radius: 4px;
+    border-radius: 20px;
     cursor: pointer;
     transition: all 0.15s;
   }
@@ -279,67 +280,102 @@
     color: var(--accent);
   }
 
-  .chat-input {
+  /* Bottom input area */
+  .chat-bottom {
     padding: 12px 16px;
     border-top: 1px solid var(--border);
+  }
+
+  .input-container {
     display: flex;
     gap: 8px;
+    align-items: center;
   }
 
-  .chat-input input {
+  .input-container .chat-input {
     flex: 1;
-    background: var(--panel);
     border: 1px solid var(--border);
-    padding: 10px 12px;
-    font-size: 13px;
+    border-radius: 24px;
+    padding: 12px 18px;
+    font-size: 14px;
+    background: var(--bg);
     color: var(--fg);
     font-family: var(--font-body);
-    border-radius: 6px;
+    outline: none;
+    min-height: 44px;
   }
 
-  .chat-input input::placeholder {
+  .input-container .chat-input::placeholder {
     color: var(--muted);
   }
 
-  .chat-input button {
-    background: var(--accent);
-    border: none;
-    color: var(--bg);
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
+  .input-container .chat-input:focus {
+    border-color: var(--accent);
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 6px;
     flex-shrink: 0;
   }
 
-  .chat-input button svg {
+  .send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .send-btn svg {
     width: 18px;
     height: 18px;
   }
 
-  .generate-section {
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-  }
-
-  .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--muted);
+  .generate-btn {
+    height: 44px;
+    padding: 0 20px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
+    flex-shrink: 0;
   }
 
-  .checkbox-label input {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--accent);
+  .generate-btn:hover { background: #cccccc; }
+  .generate-btn:active { background: #aaaaaa; transform: scale(0.97); }
+  .generate-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .generate-btn.generating {
+    background: var(--muted);
+    cursor: not-allowed;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .generate-btn.generating::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .generate-btn.generating:hover {
+    background: var(--muted);
   }
 
   input[type="text"], input[type="password"], textarea {
@@ -1128,15 +1164,14 @@
 <div class="main">
   <!-- Left: Chat interface -->
   <div class="left">
-    <div class="mode-tabs">
-      <div class="mode-tab active" data-mode="song">Song</div>
-      <div class="mode-tab" data-mode="instrumental">Instrumental</div>
+    <div class="mode-bar">
+      <div class="mode-btn active" data-mode="song">Song</div>
+      <div class="mode-btn" data-mode="instrumental">Instrumental</div>
     </div>
     <div class="chat-container">
       <div class="chat-messages" id="chatMessages">
-        <div class="message ai">
-          <div class="message-avatar ai">A</div>
-          <div class="message-content">
+        <div class="msg ai-msg">
+          <div class="ai-text">
             Hi! I'm your songwriting assistant. Describe the song you want and I'll help you create it.
             <div class="quick-prompts">
               <span class="quick-prompt" data-prompt="Create an aggressive trap song for working out at the gym. Booming 808 bass, rapid hi-hats, dark piano melody, hard-hitting and intense, motivational energy, 140 BPM, D minor. Lyrics about pushing limits, no excuses, getting up at 5am, heavy weights, and never giving up. Include an intro, 2 verses, 2 choruses, and an outro.">Workout motivation</span>
@@ -1148,12 +1183,14 @@
           </div>
         </div>
       </div>
-      <div class="chat-input">
-        <input type="text" id="chatInput" placeholder="Describe your song or ask for changes...">
-        <button id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
-      </div>
-      <div class="generate-section">
-        <button class="generate-btn" id="generateBtn">Generate</button>
+      <div class="chat-bottom">
+        <div class="input-container">
+          <input class="chat-input" type="text" id="chatInput" placeholder="Describe your song...">
+          <div class="btn-group">
+            <button class="send-btn" id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
+            <button class="generate-btn" id="generateBtn">Generate</button>
+          </div>
+        </div>
       </div>
       <div class="gen-progress" id="genProgress">
         <div class="gen-progress-bar" id="genProgressBar"></div>
@@ -1516,20 +1553,20 @@
   let currentStyle = "";
   let currentLyrics = "";
 
-  // ─── Mode tabs (Song vs Instrumental) ───
+  // ─── Mode bar (Song vs Instrumental) ───
   let mode = sessionStorage.getItem("gmi_mode") || "song";
-  const modeTabs = document.querySelectorAll(".mode-tab");
+  const modeBtns = document.querySelectorAll(".mode-btn");
 
   function switchMode(newMode) {
     mode = newMode;
     sessionStorage.setItem("gmi_mode", mode);
-    modeTabs.forEach(t => t.classList.toggle("active", t.dataset.mode === mode));
+    modeBtns.forEach(t => t.classList.toggle("active", t.dataset.mode === mode));
     chatInput.placeholder = mode === "song"
-      ? "Describe your song or ask for changes..."
+      ? "Describe your song..."
       : "Describe the music you want...";
   }
 
-  modeTabs.forEach(t => {
+  modeBtns.forEach(t => {
     t.addEventListener("click", () => switchMode(t.dataset.mode));
     t.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); switchMode(t.dataset.mode); } });
   });
@@ -1537,23 +1574,20 @@
 
   function addMessage(role, content) {
     const messageDiv = document.createElement("div");
-    messageDiv.className = "message " + role;
+    messageDiv.className = "msg " + (role === "user" ? "user-msg" : "ai-msg");
 
-    const avatarDiv = document.createElement("div");
-    avatarDiv.className = "message-avatar " + role;
-    if (role === "ai") {
-      avatarDiv.textContent = "A";
+    if (role === "user") {
+      const bubble = document.createElement("div");
+      bubble.className = "user-bubble";
+      bubble.textContent = content;
+      messageDiv.appendChild(bubble);
     } else {
-      avatarDiv.textContent = "U";
+      const textDiv = document.createElement("div");
+      textDiv.className = "ai-text";
+      textDiv.innerHTML = content;
+      messageDiv.appendChild(textDiv);
     }
 
-    const contentDiv = document.createElement("div");
-    contentDiv.className = "message-content";
-    // Escape user messages; AI messages contain intentional HTML (pre, textarea)
-    contentDiv.innerHTML = role === "user" ? escapeHtml(content) : content;
-
-    messageDiv.appendChild(avatarDiv);
-    messageDiv.appendChild(contentDiv);
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -1617,11 +1651,8 @@
 
     // Show loading state
     const loadingDiv = document.createElement("div");
-    loadingDiv.className = "message ai";
-    loadingDiv.innerHTML = `
-      <div class="message-avatar ai">A</div>
-      <div class="message-content">Thinking...</div>
-    `;
+    loadingDiv.className = "msg ai-msg";
+    loadingDiv.innerHTML = '<div class="ai-text">Thinking...</div>';
     chatMessages.appendChild(loadingDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
