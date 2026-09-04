@@ -323,7 +323,7 @@
     padding: 12px 16px;
     border-top: 1px solid var(--border);
     display: flex;
-    gap: 8px;
+    justify-content: flex-end;
     align-items: center;
   }
 
@@ -1153,7 +1153,7 @@
         <button id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
       </div>
       <div class="generate-section">
-        <button class="generate-btn" id="generateBtn">Generate Song</button>
+        <button class="generate-btn" id="generateBtn">Generate</button>
       </div>
       <div class="gen-progress" id="genProgress">
         <div class="gen-progress-bar" id="genProgressBar"></div>
@@ -1526,7 +1526,6 @@
     chatInput.placeholder = mode === "song"
       ? "Describe your song or ask for changes..."
       : "Describe the music you want...";
-    $("generateBtn").textContent = mode === "song" ? "Generate Song" : "Generate Music";
   }
 
   modeTabs.forEach(t => {
