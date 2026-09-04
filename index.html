@@ -20,8 +20,8 @@
     --border: #e5e5e5;
     --fg: #111111;
     --muted: #6b6b6b;
-    --accent: #111111;
-    --accent-dim: rgba(0,0,0,0.04);
+    --accent: #7c3aed;
+    --accent-dim: rgba(124,58,237,0.06);
     --ok: #16a34a;
     --err: #dc2626;
     --font-body: 'Inter', sans-serif;
@@ -154,9 +154,9 @@
 
   .mode-btn:hover { color: var(--fg); }
   .mode-btn.active {
-    background: var(--panel);
-    color: var(--fg);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 1px 3px rgba(124,58,237,0.2);
   }
 
   /* Chat interface */
@@ -203,8 +203,8 @@
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: #e8e8e8;
-    color: #6b6b6b;
+    background: rgba(124,58,237,0.12);
+    color: #7c3aed;
     display: grid;
     place-items: center;
     font-size: 12px;
@@ -339,7 +339,7 @@
     height: 44px;
     border-radius: 50%;
     background: var(--accent);
-    color: var(--bg);
+    color: #ffffff;
     border: none;
     cursor: pointer;
     display: grid;
@@ -365,8 +365,8 @@
     flex-shrink: 0;
   }
 
-  .generate-btn:hover { background: #cccccc; }
-  .generate-btn:active { background: #aaaaaa; transform: scale(0.97); }
+  .generate-btn:hover { background: #6d28d9; }
+  .generate-btn:active { background: #5b21b6; transform: scale(0.97); }
   .generate-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .generate-btn.generating {
@@ -465,8 +465,8 @@
   }
 
   .generate-btn {
-    background: var(--fg);
-    color: var(--bg);
+    background: var(--accent);
+    color: #ffffff;
     border: none;
     padding: 14px 32px;
     font-family: var(--font-body);
@@ -509,8 +509,8 @@
     50% { opacity: 0.8; }
   }
 
-  .generate-btn:hover { background: #cccccc; }
-  .generate-btn:active { background: #aaaaaa; transform: scale(0.97); }
+  .generate-btn:hover { background: #6d28d9; }
+  .generate-btn:active { background: #5b21b6; transform: scale(0.97); }
   .generate-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .generate-btn.generating {
@@ -603,7 +603,7 @@
   }
 
   .playlist-item:hover { background: rgba(0,0,0,0.03); }
-  .playlist-item.active { background: rgba(0,0,0,0.06); }
+  .playlist-item.active { background: rgba(124,58,237,0.08); }
 
   .track-num {
     font-family: var(--font-body);
@@ -936,7 +936,7 @@
 
   .time-fill {
     height: 100%;
-    background: var(--fg);
+    background: var(--accent);
     transition: width 0.3s ease;
   }
 
@@ -957,7 +957,7 @@
 
   .vol-fill {
     width: 70%; height: 100%;
-    background: var(--fg);
+    background: var(--accent);
   }
 
   /* Settings modal */
