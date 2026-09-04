@@ -63,10 +63,11 @@
     background: transparent;
     border: 1px solid var(--border);
     color: var(--muted);
-    width: 28px; height: 28px;
+    width: 44px; height: 44px;
     display: grid; place-items: center;
     cursor: pointer; font-size: 14px;
     transition: all .15s;
+    border-radius: 8px;
   }
 
   .topbar-btn:hover { border-color: var(--fg); color: var(--fg); }
@@ -122,10 +123,11 @@
   .template-chip {
     background: transparent;
     border: 1px solid var(--border);
-    padding: 4px 10px;
-    font-size: 10px; color: var(--muted);
+    padding: 8px 14px;
+    font-size: 12px; color: var(--muted);
     cursor: pointer;
     transition: all .12s;
+    border-radius: 6px;
   }
 
   .template-chip:hover { border-color: var(--fg); color: var(--fg); }
@@ -424,32 +426,34 @@
   }
 
   .toggle-row {
-    display: flex; align-items: center; gap: 6px;
+    display: flex; align-items: center; gap: 8px;
+    min-height: 44px;
   }
 
   .toggle {
-    width: 32px; height: 18px;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    width: 44px; height: 24px;
+    background: var(--border);
+    border: none;
+    border-radius: 12px;
     position: relative; cursor: pointer;
     transition: all .15s;
   }
 
-  .toggle.on { background: var(--fg); border-color: var(--fg); }
+  .toggle.on { background: var(--accent); }
 
   .toggle-knob {
-    width: 10px; height: 10px;
-    background: var(--muted);
-    position: absolute; top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    background: #ffffff;
+    border-radius: 50%;
+    position: absolute; top: 3px; left: 3px;
     transition: all .15s;
   }
 
   .toggle.on .toggle-knob {
-    transform: translateX(14px);
-    background: var(--bg);
+    transform: translateX(20px);
   }
 
-  .toggle-label { font-size: 11px; color: var(--muted); }
+  .toggle-label { font-size: 12px; color: var(--muted); }
 
   .lyrics-wrap {
     position: relative;
@@ -582,10 +586,11 @@
     background: transparent;
     border: 1px solid var(--border);
     color: var(--muted);
-    padding: 3px 8px;
+    padding: 8px 14px;
     font-family: var(--font-body);
-    font-size: 10px;
+    font-size: 12px;
     cursor: pointer;
+    border-radius: 6px;
   }
 
   .playlist-clear:hover { border-color: var(--err); color: var(--err); }
@@ -665,24 +670,30 @@
 
   .track-download {
     background: transparent; border: none;
-    color: var(--muted); font-size: 12px;
+    color: var(--muted); font-size: 14px;
     cursor: pointer; opacity: 0;
     transition: opacity .15s;
     text-decoration: none;
+    width: 44px; height: 44px;
+    display: grid; place-items: center;
+    border-radius: 8px;
   }
 
   .playlist-item:hover .track-download { opacity: 1; }
-  .track-download:hover { color: var(--fg); }
+  .track-download:hover { color: var(--fg); background: rgba(0,0,0,0.04); }
 
   .track-delete {
     background: transparent; border: none;
-    color: var(--muted); font-size: 12px;
+    color: var(--muted); font-size: 14px;
     cursor: pointer; opacity: 0;
     transition: opacity .15s;
+    width: 44px; height: 44px;
+    display: grid; place-items: center;
+    border-radius: 8px;
   }
 
   .playlist-item:hover .track-delete { opacity: 1; }
-  .track-delete:hover { color: var(--err); }
+  .track-delete:hover { color: var(--err); background: rgba(220,38,38,0.06); }
 
   /* Always show download/delete on touch devices */
   @media (hover: none) {
