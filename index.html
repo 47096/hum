@@ -1448,6 +1448,9 @@
         return;
       }
 
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
       const resp = await fetch(getEndpoint() + "/llm", {
         method: "POST",
         headers: {
@@ -1463,8 +1466,11 @@
           ],
           max_tokens: 500,
           temperature: 0.8
-        })
+        }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeout);
 
       if (!resp.ok) throw new Error("API error (" + resp.status + ")");
 
@@ -1486,7 +1492,11 @@
         throw new Error("No content returned");
       }
     } catch (err) {
-      toast("Generation failed: " + err.message, "err");
+      if (err.name === "AbortError") {
+        toast("Request timed out — try again", "err");
+      } else {
+        toast("Generation failed: " + err.message, "err");
+      }
     } finally {
       btn.classList.remove("loading");
       btn.disabled = false;
@@ -1607,6 +1617,9 @@ Rules:
         ...chatHistory
       ];
 
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
       const resp = await fetch(getEndpoint() + "/llm", {
         method: "POST",
         headers: {
@@ -1619,8 +1632,11 @@ Rules:
           messages: messages,
           max_tokens: 1000,
           temperature: 0.8
-        })
+        }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeout);
 
       if (!resp.ok) throw new Error("API error (" + resp.status + ")");
 
@@ -1661,7 +1677,11 @@ Rules:
     } catch (err) {
       // Remove loading message
       chatMessages.removeChild(loadingDiv);
-      addMessage("ai", "Sorry, I encountered an error: " + escapeHtml(err.message));
+      if (err.name === "AbortError") {
+        addMessage("ai", "Request timed out — please try again.");
+      } else {
+        addMessage("ai", "Sorry, I encountered an error: " + escapeHtml(err.message));
+      }
     }
   }
 
