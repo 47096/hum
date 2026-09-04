@@ -131,6 +131,28 @@
   .template-chip:hover { border-color: var(--fg); color: var(--fg); }
   .template-chip.active { border-color: var(--fg); color: var(--fg); }
 
+  /* Mode tabs */
+  .mode-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .mode-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+    border-bottom: 2px solid transparent;
+  }
+
+  .mode-tab:hover { color: var(--fg); }
+  .mode-tab.active { color: var(--fg); border-bottom-color: var(--fg); }
+
   /* Chat interface */
   .chat-container {
     display: flex;
@@ -1106,6 +1128,10 @@
 <div class="main">
   <!-- Left: Chat interface -->
   <div class="left">
+    <div class="mode-tabs">
+      <div class="mode-tab active" data-mode="song">Song</div>
+      <div class="mode-tab" data-mode="instrumental">Instrumental</div>
+    </div>
     <div class="chat-container">
       <div class="chat-messages" id="chatMessages">
         <div class="message ai">
@@ -1127,9 +1153,6 @@
         <button id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
       </div>
       <div class="generate-section">
-        <label class="checkbox-label">
-          <input type="checkbox" id="instrumentalToggle"> Instrumental
-        </label>
         <button class="generate-btn" id="generateBtn">Generate Song</button>
       </div>
       <div class="gen-progress" id="genProgress">
@@ -1483,6 +1506,26 @@
     }
   }
 
+  // ─── Mode tabs (Song vs Instrumental) ───
+  let mode = sessionStorage.getItem("gmi_mode") || "song";
+  const modeTabs = document.querySelectorAll(".mode-tab");
+
+  function switchMode(newMode) {
+    mode = newMode;
+    sessionStorage.setItem("gmi_mode", mode);
+    modeTabs.forEach(t => t.classList.toggle("active", t.dataset.mode === mode));
+    chatInput.placeholder = mode === "song"
+      ? "Describe your song or ask for changes..."
+      : "Describe the music you want...";
+    $("generateBtn").textContent = mode === "song" ? "Generate Song" : "Generate Music";
+  }
+
+  modeTabs.forEach(t => {
+    t.addEventListener("click", () => switchMode(t.dataset.mode));
+    t.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); switchMode(t.dataset.mode); } });
+  });
+  switchMode(mode);
+
   // ─── Chat interface ───
   const chatMessages = $("chatMessages");
   const chatInput = $("chatInput");
@@ -1579,7 +1622,22 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     try {
-      const systemPrompt = `You are a songwriting assistant. Help users create songs by generating style prompts and lyrics.
+      const systemPrompt = mode === "instrumental"
+        ? `You are a music style prompt generator. Help users create instrumental music by generating detailed style prompts.
+
+IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
+
+The JSON must be in this exact format:
+{"style":"your style prompt here","lyrics":""}
+
+Rules:
+- "style": genre, mood, instruments, tempo, key (under 200 chars). Be descriptive and detailed.
+- "lyrics": always empty string for instrumental mode
+- When user asks for changes, update style accordingly
+- If user asks a question (not music creation), set style to empty string
+- NEVER include markdown code blocks or any text outside the JSON object
+- Do NOT repeat the user's prompt or add explanations`
+        : `You are a songwriting assistant. Help users create songs by generating style prompts and lyrics.
 
 IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
 
@@ -1986,7 +2044,7 @@ Rules:
       bpm: $("bpm").value,
       songKey: $("songKey").value,
       songMode: $("songMode").value,
-      instrumental: $("instrumentalToggle").checked,
+      instrumental: mode === "instrumental",
       provider: activeProvider
     };
   }
@@ -1999,8 +2057,8 @@ Rules:
     if (settings.bpm) $("bpm").value = settings.bpm;
     if (settings.songKey) $("songKey").value = settings.songKey;
     if (settings.songMode) $("songMode").value = settings.songMode;
-    if (settings.instrumental) $("instrumentalToggle").checked = true;
-    if (!settings.instrumental) $("instrumentalToggle").checked = false;
+    if (settings.instrumental) switchMode("instrumental");
+    else switchMode("song");
     if (settings.provider && settings.provider !== activeProvider) switchProvider(settings.provider);
   }
 
@@ -2504,8 +2562,8 @@ Rules:
   function buildPayload(lyrics, prompt) {
     const bpm = $("bpm").value ? parseInt($("bpm").value) : undefined;
     const key = $("songKey").value || undefined;
-    const mode = $("songMode").value || undefined;
-    const instrumentalOn = $("instrumentalToggle").checked;
+    const songMode = $("songMode").value || undefined;
+    const instrumentalOn = mode === "instrumental";
 
     if (activeProvider === "minimax") {
       // Using INSTRUMENTAL_LYRICS constant
@@ -2524,7 +2582,7 @@ Rules:
       if (!prompt) delete p.prompt;
       if (bpm) p.audio_setting.bpm = bpm;
       if (key) p.audio_setting.key = key;
-      if (mode) p.audio_setting.mode = mode;
+      if (songMode) p.audio_setting.mode = songMode;
       return p;
     }
 
@@ -2532,7 +2590,7 @@ Rules:
     const payload = { lyrics: instrumentalOn ? INSTRUMENTAL_LYRICS : lyrics, prompt, sample_rate: parseInt($("sampleRate").value), bitrate: parseInt($("bitrate").value), format: $("format").value };
     if (bpm) payload.bpm = bpm;
     if (key) payload.key = key;
-    if (mode) payload.mode = mode;
+    if (songMode) payload.mode = songMode;
     const p = { model: "minimax-music-3.0", payload };
     if (!prompt) delete p.payload.prompt;
     return p;
@@ -2609,7 +2667,7 @@ Rules:
 
     if (!getEndpoint()) { openSettings(); toast("Set your proxy URL first", "err"); return; }
 
-    const instrumentalOn = $("instrumentalToggle").checked;
+    const instrumentalOn = mode === "instrumental";
     const prompt = currentStyle || "";
     const lyrics = instrumentalOn ? "" : currentLyrics || "";
     if (!instrumentalOn && !lyrics) { toast("Chat with AI to generate lyrics first", "err"); return; }
