@@ -216,8 +216,9 @@
     font-family: var(--font-body);
     color: var(--fg);
     width: 100%;
-    min-height: 80px;
-    resize: vertical;
+    min-height: 40px;
+    resize: none;
+    overflow: hidden;
   }
 
   .message-content .label {
@@ -1669,7 +1670,15 @@ Rules:
       // Show edit mode
       display.style.display = "none";
       edit.style.display = "block";
+      // Auto-resize textarea to match content
+      edit.style.height = "auto";
+      edit.style.height = edit.scrollHeight + "px";
       edit.focus();
+      // Auto-resize on input
+      edit.oninput = function() {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+      };
       // Save on blur (clicking outside)
       edit.onblur = function() {
         saveEdit(field);
