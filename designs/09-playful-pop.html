@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Music · Playful Pop</title>
+<style>
+  :root {
+    --bg: #fff5f5;
+    --panel: #ffffff;
+    --border: #ffd5d5;
+    --fg: #333333;
+    --muted: #999999;
+    --accent: #ff6b6b;
+    --accent-2: #4ecdc4;
+    --accent-3: #ffe66d;
+    --font-body: 'Segoe UI', system-ui, sans-serif;
+    --font-display: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 15px/1.6 var(--font-body);
+    padding: 40px 20px;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.1);
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--fg);
+    padding: 14px 18px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    margin-bottom: 14px;
+    transition: all 0.3s;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+  }
+
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .chip {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 25px;
+    color: var(--fg);
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .chip:hover, .chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: scale(1.05);
+  }
+
+  .generate-btn {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    color: #fff;
+    border: none;
+    padding: 18px 36px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  }
+
+  .generate-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+
+  .dot.active {
+    background: var(--accent);
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    50% { transform: scale(1.2); }
+  }
+
+  .player {
+    background: var(--bg);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 18px;
+  }
+
+  audio {
+    width: 100%;
+    margin-bottom: 18px;
+    border-radius: 10px;
+  }
+
+  .meta {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    color: var(--fg);
+    padding: 12px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .action-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: scale(1.05);
+  }
+
+  .toggle {
+    width: 54px;
+    height: 28px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    transition: all 0.3s;
+  }
+
+  .toggle::after {
+    content: "";
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: var(--muted);
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.3s;
+  }
+
+  .toggle.active {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .toggle.active::after {
+    background: #fff;
+    left: 28px;
+  }
+
+  .history-item {
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .history-title {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .history-date {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 40px; }
+    .card { padding: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>AI Music</h1>
+    <div class="subtitle">Create your perfect song</div>
+  </header>
+
+  <div class="card">
+    <label>API Configuration</label>
+    <select>
+      <option>GMI Cloud</option>
+      <option>MiniMax</option>
+    </select>
+    <input type="password" placeholder="Paste your API key" />
+  </div>
+
+  <div class="card">
+    <label>Genre</label>
+    <div class="chips">
+      <span class="chip active">Pop</span>
+      <span class="chip">Rock</span>
+      <span class="chip">Hip-hop</span>
+      <span class="chip">Electronic</span>
+      <span class="chip">Jazz</span>
+      <span class="chip">R&B</span>
+    </div>
+    <label>Subgenres</label>
+    <div class="chips">
+      <span class="chip active">Dance Pop</span>
+      <span class="chip">Electropop</span>
+      <span class="chip">Indie Pop</span>
+      <span class="chip">Synthpop</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Style Prompt</label>
+    <input type="text" value="Upbeat dance pop, bright major key, punchy electronic drums" />
+
+    <label>Lyrics</label>
+    <textarea placeholder="[verse]\nYour lyrics here...\n\n[chorus]\nThe catchy hook goes here"></textarea>
+
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+      <div class="toggle active"></div>
+      <span style="font-size:15px;font-weight:600;">Instrumental (no lyrics)</span>
+    </div>
+
+    <label>Templates</label>
+    <div class="chips">
+      <span class="chip">Morning Coffee</span>
+      <span class="chip">Gym Pump-up</span>
+      <span class="chip">Study Focus</span>
+      <span class="chip">Sunset Drive</span>
+      <span class="chip">Party Starter</span>
+    </div>
+
+    <button class="generate-btn">Generate Song</button>
+
+    <div class="status">
+      <div class="dot active"></div>
+      <span>Composing... 45s</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Output</label>
+    <div class="player">
+      <audio controls></audio>
+      <div class="meta">
+        128.5s · 44100 Hz · 2 channels · 256 kbps · MP3
+      </div>
+      <div class="actions">
+        <button class="action-btn">Download MP3</button>
+        <button class="action-btn">Open in new tab</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Advanced Settings</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+      <select>
+        <option>44100 Hz</option>
+        <option>32000 Hz</option>
+        <option>24000 Hz</option>
+      </select>
+      <select>
+        <option>256 kbps</option>
+        <option>128 kbps</option>
+        <option>64 kbps</option>
+      </select>
+      <select>
+        <option>MP3</option>
+        <option>WAV</option>
+        <option>PCM</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px;">
+      <select>
+        <option>BPM: Auto</option>
+        <option>120 BPM</option>
+        <option>140 BPM</option>
+      </select>
+      <select>
+        <option>Key: Auto</option>
+        <option>C Major</option>
+        <option>A Minor</option>
+      </select>
+      <select>
+        <option>Mode: Auto</option>
+        <option>Major</option>
+        <option>Minor</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Song History</label>
+    <div class="history-item">
+      <div>
+        <div class="history-title">Summer Vibes</div>
+        <div class="history-date">2026-09-01 14:30</div>
+      </div>
+      <button class="action-btn">Play</button>
+    </div>
+    <div class="history-item">
+      <div>
+        <div class="history-title">Midnight Drive</div>
+        <div class="history-date">2026-09-01 12:15</div>
+      </div>
+      <button class="action-btn">Play</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

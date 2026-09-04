@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Music — French House Label Sleeve</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Permanent+Marker&family=JetBrains+Mono:wght@400;500;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== DESIGN TOKENS ========== */
+    :root {
+      --flash-white: #F2F2F0;
+      --room-grey: #B7B7B3;
+      --crushed-shadow: #2B2B2B;
+      --ink-black: #0A0A0A;
+      --marker-pink: #FF2D87;
+      --sticker-white: #FEFEFC;
+
+      --font-marker: 'Permanent Marker', cursive;
+      --font-scrawl: 'Caveat', cursive;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-compressed: 'Barlow Condensed', sans-serif;
+
+      --grain-opacity: 0.06;
+    }
+
+    /* ========== RESET ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-compressed);
+      background: var(--ink-black);
+      color: var(--flash-white);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      letter-spacing: 0.02em;
+    }
+
+    /* ========== FLASH GRAIN OVERLAY ========== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 200px 200px;
+    }
+
+    /* Secondary grain layer for flash feel */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 60%);
+    }
+
+    /* ========== UTILITY ========== */
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--room-grey);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label::before {
+      content: '//';
+      color: var(--marker-pink);
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--marker-pink), var(--crushed-shadow) 80%);
+      margin: 32px 0;
+      position: relative;
+    }
+    .divider::after {
+      content: '///';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--ink-black);
+      padding: 0 12px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--room-grey);
+      letter-spacing: 0.2em;
+    }
+
+    /* ========== STICKER ELEMENT ========== */
+    .sticker {
+      background: var(--sticker-white);
+      color: var(--ink-black);
+      font-family: var(--font-scrawl);
+      font-weight: 700;
+      padding: 4px 10px;
+      display: inline-block;
+      transform: rotate(-2deg);
+      box-shadow: 2px 3px 0 var(--crushed-shadow);
+      position: relative;
+      font-size: 13px;
+    }
+    .sticker::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-top: 8px solid var(--marker-pink);
+    }
+
+    /* ========== HEADER ========== */
+    header {
+      padding: 28px 20px 20px;
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      position: relative;
+    }
+    .logo {
+      font-family: var(--font-marker);
+      font-size: 34px;
+      color: var(--flash-white);
+      text-decoration: none;
+      line-height: 1;
+      position: relative;
+      letter-spacing: -0.02em;
+    }
+    .logo span {
+      color: var(--marker-pink);
+    }
+    /* Marker underline scribble */
+    .logo::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: -4px;
+      right: -4px;
+      height: 4px;
+      background: var(--marker-pink);
+      opacity: 0.5;
+      transform: skewX(-12deg) rotate(-0.5deg);
+      border-radius: 2px;
+    }
+
+    nav {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    nav a {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--room-grey);
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--marker-pink); }
+    nav a.active { color: var(--marker-pink); }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--marker-pink);
+      background: var(--crushed-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-marker);
+      font-size: 14px;
+      color: var(--marker-pink);
+      cursor: pointer;
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    main {
+      padding: 0 20px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-family: var(--font-marker);
+      font-size: 48px;
+      line-height: 1.05;
+      color: var(--flash-white);
+      margin-bottom: 6px;
+      position: relative;
+    }
+    .page-title .pink { color: var(--marker-pink); }
+    .page-title-sub {
+      font-family: var(--font-scrawl);
+      font-size: 22px;
+      color: var(--room-grey);
+      margin-bottom: 28px;
+      transform: rotate(-0.8deg);
+    }
+
+    /* ========== GENRE CHIPS ========== */
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .chip {
+      font-family: var(--font-compressed);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 8px 16px;
+      border: 1.5px solid var(--room-grey);
+      border-radius: 0;
+      background: transparent;
+      color: var(--room-grey);
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+    }
+    .chip:hover {
+      border-color: var(--flash-white);
+      color: var(--flash-white);
+    }
+    .chip.selected {
+      background: var(--marker-pink);
+      border-color: var(--marker-pink);
+      color: var(--sticker-white);
+    }
+    .chip.selected::before {
+      content: 'X';
+      position: absolute;
+      top: -6px;
+      right: -4px;
+      font-family: var(--font-marker);
+      font-size: 10px;
+      color: var(--ink-black);
+      transform: rotate(12deg);
+    }
+
+    .chip-row.subgenres {
+      margin-top: 10px;
+    }
+    .chip.sub {
+      font-size: 12px;
+      padding: 5px 12px;
+      border-width: 1px;
+      clip-path: none;
+      border-radius: 0;
+    }
+    .chip.sub.selected {
+      background: var(--crushed-shadow);
+      border-color: var(--marker-pink);
+      color: var(--marker-pink);
+    }
+
+    /* ========== PROMPT INPUT ========== */
+    .input-group {
+      position: relative;
+      margin-top: 24px;
+    }
+    .prompt-input {
+      width: 100%;
+      padding: 16px 18px;
+      background: var(--crushed-shadow);
+      border: 1.5px solid #444;
+      border-radius: 0;
+      color: var(--flash-white);
+      font-family: var(--font-compressed);
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .prompt-input::placeholder {
+      color: #666;
+      font-style: italic;
+    }
+    .prompt-input:focus {
+      border-color: var(--marker-pink);
+    }
+    .prompt-hint {
+      font-family: var(--font-scrawl);
+      font-size: 14px;
+      color: var(--room-grey);
+      margin-top: 6px;
+      transform: rotate(-0.5deg);
+    }
+
+    /* ========== LYRICS TEXTAREA ========== */
+    .lyrics-section {
+      margin-top: 24px;
+    }
+    .lyrics-label {
+      font-family: var(--font-marker);
+      font-size: 18px;
+      color: var(--flash-white);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lyrics-label .marker-line {
+      flex: 1;
+      height: 2px;
+      background: var(--crushed-shadow);
+    }
+    .lyrics-textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 16px;
+      background: var(--crushed-shadow);
+      border: 1.5px solid #444;
+      border-radius: 0;
+      color: var(--flash-white);
+      font-family: var(--font-scrawl);
+      font-size: 17px;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .lyrics-textarea::placeholder {
+      color: #555;
+    }
+    .lyrics-textarea:focus {
+      border-color: var(--marker-pink);
+    }
+
+    .template-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .template-chip {
+      font-family: var(--font-scrawl);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 5px 12px;
+      background: transparent;
+      border: 1px dashed var(--room-grey);
+      color: var(--room-grey);
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .template-chip:hover {
+      border-color: var(--marker-pink);
+      color: var(--marker-pink);
+      border-style: solid;
+    }
+    .template-chip::before {
+      content: '>';
+      margin-right: 4px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      vertical-align: middle;
+    }
+
+    /* ========== INSTRUMENTAL TOGGLE ========== */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 24px;
+      padding: 14px 16px;
+      background: var(--crushed-shadow);
+      border-left: 3px solid var(--marker-pink);
+    }
+    .toggle-label {
+      font-family: var(--font-compressed);
+      font-size: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--flash-white);
+    }
+    .toggle-sublabel {
+      font-family: var(--font-scrawl);
+      font-size: 13px;
+      color: var(--room-grey);
+      margin-left: auto;
+    }
+    .toggle-switch {
+      width: 44px;
+      height: 24px;
+      background: var(--ink-black);
+      border: 2px solid var(--room-grey);
+      border-radius: 0;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+      transform: rotate(-1deg);
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      background: var(--room-grey);
+      transition: all 0.2s;
+    }
+    .toggle-switch.on {
+      background: var(--marker-pink);
+      border-color: var(--marker-pink);
+    }
+    .toggle-switch.on::after {
+      left: 23px;
+      background: var(--sticker-white);
+    }
+    /* Scrawl mark on toggle */
+    .toggle-switch.on::before {
+      content: '~';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-marker);
+      font-size: 16px;
+      color: var(--marker-pink);
+    }
+
+    /* ========== PLAY BUTTON ========== */
+    .play-section {
+      margin-top: 32px;
+      text-align: center;
+    }
+    .play-btn {
+      width: 100%;
+      padding: 22px 40px;
+      background: var(--marker-pink);
+      border: none;
+      color: var(--sticker-white);
+      font-family: var(--font-marker);
+      font-size: 28px;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+      clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+    }
+    .play-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+      background-size: 128px 128px;
+      pointer-events: none;
+    }
+    .play-btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s, height 0.4s;
+    }
+    .play-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255, 45, 135, 0.35);
+    }
+    .play-btn:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+    .play-btn:active {
+      transform: translateY(0);
+    }
+    .play-subtext {
+      font-family: var(--font-scrawl);
+      font-size: 14px;
+      color: var(--room-grey);
+      margin-top: 8px;
+      transform: rotate(-1deg);
+    }
+
+    /* ========== ADVANCED SETTINGS ========== */
+    .settings-panel {
+      margin-top: 32px;
+    }
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 12px 16px;
+      background: var(--crushed-shadow);
+      border: 1px solid #3a3a3a;
+      transition: border-color 0.2s;
+      user-select: none;
+    }
+    .settings-header:hover {
+      border-color: var(--room-grey);
+    }
+    .settings-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .settings-title {
+      font-family: var(--font-compressed);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--flash-white);
+    }
+    .settings-badge {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      padding: 2px 6px;
+      background: var(--marker-pink);
+      color: var(--sticker-white);
+      letter-spacing: 0.05em;
+    }
+    .settings-chevron {
+      font-family: var(--font-marker);
+      font-size: 18px;
+      color: var(--room-grey);
+      transition: transform 0.3s;
+    }
+    .settings-panel.open .settings-chevron {
+      transform: rotate(90deg);
+    }
+    .settings-body {
+      display: none;
+      padding: 16px;
+      background: rgba(43, 43, 43, 0.5);
+      border: 1px solid #3a3a3a;
+      border-top: none;
+    }
+    .settings-panel.open .settings-body {
+      display: block;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-key {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--room-grey);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .setting-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .setting-value select,
+    .setting-value input {
+      background: var(--ink-black);
+      border: 1px solid #444;
+      color: var(--flash-white);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 0;
+      outline: none;
+      cursor: pointer;
+    }
+    .setting-value select:focus,
+    .setting-value input:focus {
+      border-color: var(--marker-pink);
+    }
+    .setting-value select {
+      -webkit-appearance: none;
+      appearance: none;
+      padding-right: 24px;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23B7B7B3' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+    .setting-value input[type="number"] {
+      width: 70px;
+      text-align: right;
+    }
+
+    /* ========== SONG HISTORY ========== */
+    .history-panel {
+      margin-top: 20px;
+    }
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 12px 16px;
+      background: var(--crushed-shadow);
+      border: 1px solid #3a3a3a;
+      transition: border-color 0.2s;
+      user-select: none;
+    }
+    .history-header:hover {
+      border-color: var(--room-grey);
+    }
+    .history-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .history-title {
+      font-family: var(--font-compressed);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--flash-white);
+    }
+    .history-count {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--room-grey);
+    }
+    .history-chevron {
+      font-family: var(--font-marker);
+      font-size: 18px;
+      color: var(--room-grey);
+      transition: transform 0.3s;
+    }
+    .history-panel.open .history-chevron {
+      transform: rotate(90deg);
+    }
+    .history-body {
+      display: none;
+      border: 1px solid #3a3a3a;
+      border-top: none;
+    }
+    .history-panel.open .history-body {
+      display: block;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #2a2a2a;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-item:hover {
+      background: rgba(255, 45, 135, 0.06);
+    }
+    .history-thumb {
+      width: 44px;
+      height: 44px;
+      background: var(--crushed-shadow);
+      border: 1px solid #444;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .history-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,45,135,0.15), transparent);
+    }
+    .history-thumb-icon {
+      font-family: var(--font-marker);
+      font-size: 18px;
+      color: var(--marker-pink);
+      z-index: 1;
+    }
+    .history-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .history-name {
+      font-family: var(--font-compressed);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--flash-white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--room-grey);
+      margin-top: 2px;
+      display: flex;
+      gap: 10px;
+    }
+    .history-meta .genre-tag {
+      color: var(--marker-pink);
+    }
+    .history-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .history-action-btn {
+      width: 30px;
+      height: 30px;
+      background: transparent;
+      border: 1px solid #444;
+      color: var(--room-grey);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .history-action-btn:hover {
+      border-color: var(--marker-pink);
+      color: var(--marker-pink);
+    }
+
+    /* ========== FOOTER ========== */
+    .app-footer {
+      max-width: 640px;
+      margin: 48px auto 0;
+      padding: 20px;
+      border-top: 1px solid #222;
+      text-align: center;
+    }
+    .footer-scrawl {
+      font-family: var(--font-scrawl);
+      font-size: 16px;
+      color: var(--room-grey);
+      transform: rotate(-1deg);
+      display: inline-block;
+    }
+    .footer-scrawl .pink { color: var(--marker-pink); }
+    .footer-mono {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: #555;
+      margin-top: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ========== STICKER DECORATION ========== */
+    .sticker-deco {
+      position: absolute;
+      font-family: var(--font-marker);
+      font-size: 11px;
+      padding: 3px 8px;
+      background: var(--sticker-white);
+      color: var(--ink-black);
+      transform: rotate(-6deg);
+      box-shadow: 1px 2px 0 var(--crushed-shadow);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .sticker-deco.pink {
+      background: var(--marker-pink);
+      color: var(--sticker-white);
+    }
+
+    /* ========== ANIMATIONS ========== */
+    @keyframes grain-shift {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-2%, -2%); }
+      30% { transform: translate(1%, 3%); }
+      50% { transform: translate(-3%, 1%); }
+      70% { transform: translate(3%, -1%); }
+      90% { transform: translate(1%, 2%); }
+    }
+    body::before {
+      animation: grain-shift 8s steps(6) infinite;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 480px) {
+      .page-title { font-size: 36px; }
+      .play-btn { font-size: 22px; padding: 18px 24px; }
+      header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      nav { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <header>
+    <a href="#" class="logo">AI <span>Music</span></a>
+    <nav>
+      <a href="#" class="active">Create</a>
+      <a href="#">Library</a>
+      <a href="#">Explore</a>
+      <div class="avatar">S</div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ========== PAGE TITLE ========== -->
+    <h1 class="page-title">Make <span class="pink">noise</span></h1>
+    <p class="page-title-sub">describe it. feel it. play it.</p>
+
+    <!-- ========== GENRE SELECTION ========== -->
+    <div class="section-label">Genre</div>
+    <div class="chip-row" id="genreChips">
+      <button class="chip" data-genre="pop">Pop</button>
+      <button class="chip" data-genre="rnb">R&B</button>
+      <button class="chip" data-genre="hiphop">Hip-hop</button>
+      <button class="chip" data-genre="rock">Rock</button>
+      <button class="chip selected" data-genre="electronic">Electronic</button>
+      <button class="chip" data-genre="jazz">Jazz</button>
+      <button class="chip" data-genre="country">Country</button>
+      <button class="chip" data-genre="latin">Latin</button>
+      <button class="chip" data-genre="kpop">K-pop</button>
+      <button class="chip" data-genre="metal">Metal</button>
+    </div>
+
+    <!-- ========== SUBGENRE CHIPS ========== -->
+    <div class="section-label" style="margin-top: 16px;">Subgenre</div>
+    <div class="chip-row subgenres" id="subgenreChips">
+      <button class="chip sub" data-sub="french-house">French House</button>
+      <button class="chip sub selected" data-sub="disco-house">Disco House</button>
+      <button class="chip sub" data-sub="nu-disco">Nu-Disco</button>
+      <button class="chip sub" data-sub="filter-house">Filter House</button>
+      <button class="chip sub" data-sub="electro-clash">Electro-Clash</button>
+      <button class="chip sub" data-sub="balearic">Balearic</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ========== PROMPT INPUT ========== -->
+    <div class="section-label">Describe your track</div>
+    <div class="input-group">
+      <input type="text" class="prompt-input" placeholder="e.g. Late night warehouse vibe, heavy bass, chopped vocal samples..." id="promptInput">
+      <p class="prompt-hint">* the more specific, the filthier the result</p>
+    </div>
+
+    <!-- ========== LYRICS ========== -->
+    <div class="lyrics-section">
+      <div class="lyrics-label">
+        Lyrics
+        <span class="marker-line"></span>
+      </div>
+      <textarea class="lyrics-textarea" placeholder="drop your bars here... or leave empty for instrumental" id="lyricsArea"></textarea>
+      <div class="template-chips">
+        <button class="template-chip" data-template="morning">Morning coffee</button>
+        <button class="template-chip" data-template="gym">Gym pump-up</button>
+        <button class="template-chip" data-template="study">Study focus</button>
+        <button class="template-chip" data-template="sunset">Sunset drive</button>
+        <button class="template-chip" data-template="party">Party starter</button>
+      </div>
+    </div>
+
+    <!-- ========== INSTRUMENTAL TOGGLE ========== -->
+    <div class="toggle-row">
+      <span class="toggle-label">Instrumental</span>
+      <div class="toggle-switch" id="instrumentalToggle"></div>
+      <span class="toggle-sublabel">no vocals, pure vibes</span>
+    </div>
+
+    <!-- ========== PLAY BUTTON ========== -->
+    <div class="play-section">
+      <button class="play-btn" id="playBtn">PLAY</button>
+      <p class="play-subtext">generates ~30s preview</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ========== ADVANCED SETTINGS ========== -->
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-header" onclick="togglePanel('settingsPanel')">
+        <div class="settings-header-left">
+          <span class="settings-title">Advanced settings</span>
+          <span class="settings-badge">PRO</span>
+        </div>
+        <span class="settings-chevron">></span>
+      </div>
+      <div class="settings-body">
+        <div class="setting-row">
+          <span class="setting-key">Sample rate</span>
+          <div class="setting-value">
+            <select>
+              <option>22050 Hz</option>
+              <option>44100 Hz</option>
+              <option selected>48000 Hz</option>
+              <option>96000 Hz</option>
+            </select>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-key">Bitrate</span>
+          <div class="setting-value">
+            <select>
+              <option>128 kbps</option>
+              <option>192 kbps</option>
+              <option selected>320 kbps</option>
+            </select>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-key">Format</span>
+          <div class="setting-value">
+            <select>
+              <option selected>WAV</option>
+              <option>MP3</option>
+              <option>FLAC</option>
+              <option>OGG</option>
+            </select>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-key">BPM</span>
+          <div class="setting-value">
+            <input type="number" value="124" min="60" max="200">
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-key">Key</span>
+          <div class="setting-value">
+            <select>
+              <option>C</option>
+              <option>D</option>
+              <option>E</option>
+              <option>F</option>
+              <option selected>G</option>
+              <option>A</option>
+              <option>B</option>
+            </select>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-key">Mode</span>
+          <div class="setting-value">
+            <select>
+              <option>Major</option>
+              <option selected>Minor</option>
+              <option>Dorian</option>
+              <option>Mixolydian</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SONG HISTORY ========== -->
+    <div class="history-panel" id="historyPanel">
+      <div class="history-header" onclick="togglePanel('historyPanel')">
+        <div class="history-header-left">
+          <span class="history-title">Recent tracks</span>
+          <span class="history-count">4 generated</span>
+        </div>
+        <span class="history-chevron">></span>
+      </div>
+      <div class="history-body">
+        <div class="history-item">
+          <div class="history-thumb"><span class="history-thumb-icon">~</span></div>
+          <div class="history-info">
+            <div class="history-name">Daft Analog - Midnight Loop v3</div>
+            <div class="history-meta">
+              <span class="genre-tag">French House</span>
+              <span>124 BPM</span>
+              <span>G Minor</span>
+              <span>2m ago</span>
+            </div>
+          </div>
+          <div class="history-actions">
+            <button class="history-action-btn" title="Play">&#9654;</button>
+            <button class="history-action-btn" title="Download">&#8681;</button>
+          </div>
+        </div>
+        <div class="history-item">
+          <div class="history-thumb"><span class="history-thumb-icon">~</span></div>
+          <div class="history-info">
+            <div class="history-name">Sample Juice - Filtered Sunrise</div>
+            <div class="history-meta">
+              <span class="genre-tag">Disco House</span>
+              <span>120 BPM</span>
+              <span>A Minor</span>
+              <span>18m ago</span>
+            </div>
+          </div>
+          <div class="history-actions">
+            <button class="history-action-btn" title="Play">&#9654;</button>
+            <button class="history-action-btn" title="Download">&#8681;</button>
+          </div>
+        </div>
+        <div class="history-item">
+          <div class="history-thumb"><span class="history-thumb-icon">~</span></div>
+          <div class="history-info">
+            <div class="history-name">Bass Culture - Warehouse Frequencies</div>
+            <div class="history-meta">
+              <span class="genre-tag">Electro-Clash</span>
+              <span>128 BPM</span>
+              <span>D Minor</span>
+              <span>1h ago</span>
+            </div>
+          </div>
+          <div class="history-actions">
+            <button class="history-action-btn" title="Play">&#9654;</button>
+            <button class="history-action-btn" title="Download">&#8681;</button>
+          </div>
+        </div>
+        <div class="history-item">
+          <div class="history-thumb"><span class="history-thumb-icon">~</span></div>
+          <div class="history-info">
+            <div class="history-name">Disco Magnet - Sticker on the Booth</div>
+            <div class="history-meta">
+              <span class="genre-tag">Nu-Disco</span>
+              <span>118 BPM</span>
+              <span>E Minor</span>
+              <span>3h ago</span>
+            </div>
+          </div>
+          <div class="history-actions">
+            <button class="history-action-btn" title="Play">&#9654;</button>
+            <button class="history-action-btn" title="Download">&#8681;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="app-footer">
+    <div class="footer-scrawl">made with <span class="pink">AI</span> + too much <span class="pink">coffee</span></div>
+    <div class="footer-mono">AI Music v0.1 // French House Label Sleeve Direction</div>
+  </footer>
+
+  <script>
+    // ========== GENRE CHIP TOGGLE ==========
+    document.getElementById('genreChips').addEventListener('click', (e) => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      // Single select
+      document.querySelectorAll('#genreChips .chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+    });
+
+    // ========== SUBGENRE CHIP TOGGLE ==========
+    document.getElementById('subgenreChips').addEventListener('click', (e) => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      chip.classList.toggle('selected');
+    });
+
+    // ========== INSTRUMENTAL TOGGLE ==========
+    document.getElementById('instrumentalToggle').addEventListener('click', function() {
+      this.classList.toggle('on');
+    });
+
+    // ========== TEMPLATE CHIPS ==========
+    const templates = {
+      morning: "Waking up slow, golden light through the blinds\nCoffee brewing, daydreams on repeat\nWorld outside can wait a minute\nJust me and the beat",
+      gym: "Iron calls, I answer loud\nHeart rate up, can't slow down\nPush past the limit, break the wall\nOne more rep, I won't fall",
+      study: "Pages turn, mind expands\nKnowledge flows like shifting sands\nFocus locked, the world fades out\nIn this zone, there is no doubt",
+      sunset: "Windows down, horizon gold\nCoastal road, never get old\nBassline riding with the tide\nNowhere to go, just enjoy the ride",
+      party: "Lights go low, the bass drops hard\nEverybody move, disregard\nTonight we dance till dawn breaks through\nThis party's ours, it's overdue"
+    };
+
+    document.querySelectorAll('.template-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const key = chip.dataset.template;
+        document.getElementById('lyricsArea').value = templates[key] || '';
+      });
+    });
+
+    // ========== PANEL TOGGLE ==========
+    function togglePanel(id) {
+      document.getElementById(id).classList.toggle('open');
+    }
+
+    // ========== PLAY BUTTON ==========
+    document.getElementById('playBtn').addEventListener('click', function() {
+      const btn = this;
+      const original = btn.textContent;
+      btn.textContent = 'GENERATING...';
+      btn.style.opacity = '0.7';
+      btn.style.pointerEvents = 'none';
+
+      setTimeout(() => {
+        btn.textContent = 'PLAY';
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+      }, 2500);
+    });
+  </script>
+</body>
+</html>

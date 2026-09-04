@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Music · Linear Style</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0a0a0b;
+    --surface: #141415;
+    --surface-hover: #1c1c1e;
+    --border: #232325;
+    --border-subtle: #1a1a1c;
+    --fg: #ededef;
+    --fg-secondary: #8a8a8e;
+    --fg-tertiary: #5c5c62;
+    --accent: #5e6ad2;
+    --accent-hover: #6e7add;
+    --accent-subtle: #5e6ad220;
+    --success: #2da44e;
+    --error: #cf222e;
+    --warning: #bf8700;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.5 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Layout */
+  .app {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 48px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+  }
+
+  .logo-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: white;
+  }
+
+  .logo-text {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--fg-secondary);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 0.15s ease;
+  }
+
+  .theme-toggle:hover {
+    background: var(--surface-hover);
+    border-color: var(--border);
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 32px;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--fg-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  /* Genre chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--fg-secondary);
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .chip:hover {
+    background: var(--surface-hover);
+    border-color: var(--border);
+    color: var(--fg);
+  }
+
+  .chip.active {
+    background: var(--accent-subtle);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Inputs */
+  .input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--fg);
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-subtle);
+  }
+
+  .input::placeholder {
+    color: var(--fg-tertiary);
+  }
+
+  textarea.input {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  /* Toggle */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+  }
+
+  .toggle-label {
+    font-size: 14px;
+    color: var(--fg);
+  }
+
+  .toggle {
+    width: 40px;
+    height: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: var(--fg-tertiary);
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.15s ease;
+  }
+
+  .toggle.active {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .toggle.active::after {
+    background: white;
+    left: 20px;
+  }
+
+  /* Button */
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Template chips */
+  .templates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .template-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--fg-secondary);
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .template-chip:hover {
+    background: var(--surface-hover);
+    color: var(--fg);
+  }
+
+  /* Collapsible */
+  .collapsible {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    background: var(--surface);
+    transition: background 0.15s ease;
+  }
+
+  .collapsible-header:hover {
+    background: var(--surface-hover);
+  }
+
+  .collapsible-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .collapsible-icon {
+    color: var(--fg-tertiary);
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible.open .collapsible-icon {
+    transform: rotate(180deg);
+  }
+
+  .collapsible-content {
+    padding: 16px;
+    display: none;
+  }
+
+  .collapsible.open .collapsible-content {
+    display: block;
+  }
+
+  /* Settings grid */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .setting-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--fg-tertiary);
+    margin-bottom: 6px;
+  }
+
+  .setting-group select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--fg);
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* Status */
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--fg-secondary);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--fg-tertiary);
+  }
+
+  .status-dot.active {
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Character count */
+  .char-count {
+    font-size: 12px;
+    color: var(--fg-tertiary);
+    text-align: right;
+    margin-top: 6px;
+  }
+
+  /* History */
+  .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .history-item:last-child {
+    border-bottom: none;
+  }
+
+  .history-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .history-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .history-meta {
+    font-size: 12px;
+    color: var(--fg-tertiary);
+    margin-top: 2px;
+  }
+
+  .history-play {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--fg-secondary);
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-left: 12px;
+  }
+
+  .history-play:hover {
+    background: var(--surface-hover);
+    color: var(--fg);
+  }
+
+  /* Player */
+  .player {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  .player.show {
+    display: block;
+  }
+
+  .player-meta {
+    font-size: 12px;
+    color: var(--fg-tertiary);
+    margin-top: 8px;
+  }
+
+  .player-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .player-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--fg-secondary);
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .player-btn:hover {
+    background: var(--surface-hover);
+    color: var(--fg);
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--fg-tertiary);
+    margin-top: 48px;
+  }
+
+  footer a {
+    color: var(--fg-secondary);
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    color: var(--fg);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <span class="logo-text">AI Music</span>
+    </div>
+    <button class="theme-toggle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
+  </header>
+
+  <div class="section">
+    <div class="section-label">Genre</div>
+    <div class="chips">
+      <span class="chip active">Pop</span>
+      <span class="chip">R&B</span>
+      <span class="chip">Hip-hop</span>
+      <span class="chip">Rock</span>
+      <span class="chip">Electronic</span>
+      <span class="chip">Jazz</span>
+      <span class="chip">Country</span>
+      <span class="chip">Latin</span>
+      <span class="chip">K-pop</span>
+      <span class="chip">Metal</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Subgenre</div>
+    <div class="chips">
+      <span class="chip active">Dance pop</span>
+      <span class="chip">Electropop</span>
+      <span class="chip">Indie pop</span>
+      <span class="chip">Synthpop</span>
+      <span class="chip">Cantopop ballad</span>
+      <span class="chip">Mandopop ballad</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Prompt</div>
+    <input type="text" class="input" value="Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads" />
+  </div>
+
+  <div class="section">
+    <div class="section-label">Lyrics</div>
+    <textarea class="input" placeholder="[verse]&#10;Your lyrics here...&#10;&#10;[chorus]&#10;The catchy hook goes here"></textarea>
+    <div class="char-count">0 / 3,500</div>
+    <div class="templates">
+      <span class="template-chip">Morning coffee</span>
+      <span class="template-chip">Gym pump-up</span>
+      <span class="template-chip">Study focus</span>
+      <span class="template-chip">Sunset drive</span>
+      <span class="template-chip">Party starter</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="toggle-row">
+      <span class="toggle-label">Instrumental (no lyrics)</span>
+      <div class="toggle"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <button class="btn-primary">Generate song</button>
+    <div class="status">
+      <span class="status-dot active"></span>
+      <span>Composing... 45s</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="player">
+      <audio controls style="width: 100%;"></audio>
+      <div class="player-meta">128.5s · 44100 Hz · 2 ch · 256 kbps · MP3</div>
+      <div class="player-actions">
+        <button class="player-btn">Download</button>
+        <button class="player-btn">Open in new tab</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapsible">
+      <div class="collapsible-header">
+        <span class="collapsible-title">Advanced settings</span>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="settings-grid">
+          <div class="setting-group">
+            <label>Sample rate</label>
+            <select>
+              <option>44100 Hz</option>
+              <option>32000 Hz</option>
+              <option>24000 Hz</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>Bitrate</label>
+            <select>
+              <option>256 kbps</option>
+              <option>128 kbps</option>
+              <option>64 kbps</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>Format</label>
+            <select>
+              <option>MP3</option>
+              <option>WAV</option>
+              <option>PCM</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-grid" style="margin-top: 12px;">
+          <div class="setting-group">
+            <label>BPM</label>
+            <select>
+              <option>Auto</option>
+              <option>120</option>
+              <option>140</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>Key</label>
+            <select>
+              <option>Auto</option>
+              <option>C Major</option>
+              <option>A Minor</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label>Mode</label>
+            <select>
+              <option>Auto</option>
+              <option>Major</option>
+              <option>Minor</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="collapsible">
+      <div class="collapsible-header">
+        <span class="collapsible-title">Song history</span>
+        <span class="collapsible-icon">▼</span>
+      </div>
+      <div class="collapsible-content">
+        <div class="history-item">
+          <div class="history-info">
+            <div class="history-title">Summer Vibes</div>
+            <div class="history-meta">2026-09-01 14:30 · 128.5s</div>
+          </div>
+          <button class="history-play">Play</button>
+        </div>
+        <div class="history-item">
+          <div class="history-info">
+            <div class="history-title">Midnight Drive</div>
+            <div class="history-meta">2026-09-01 12:15 · 95.2s</div>
+          </div>
+          <button class="history-play">Play</button>
+        </div>
+        <div class="history-item">
+          <div class="history-info">
+            <div class="history-title">Study Session</div>
+            <div class="history-meta">2026-08-31 22:00 · 180.0s</div>
+          </div>
+          <button class="history-play">Play</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>AI Music · Powered by GMI Cloud</p>
+  </footer>
+</div>
+
+<script>
+  // Toggle collapsible sections
+  document.querySelectorAll('.collapsible-header').forEach(header => {
+    header.addEventListener('click', () => {
+      header.parentElement.classList.toggle('open');
+    });
+  });
+
+  // Toggle switch
+  document.querySelectorAll('.toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      toggle.classList.toggle('active');
+    });
+  });
+
+  // Chip selection
+  document.querySelectorAll('.chips').forEach(container => {
+    container.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        container.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+</html>

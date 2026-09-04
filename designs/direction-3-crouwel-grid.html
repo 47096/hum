@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Music · Crouwel Grid</title>
+<style>
+  :root {
+    --white: #FFFFFF;
+    --blue: #0057FF;
+    --ink: #111111;
+    --grid: #E6EBF2;
+    --surface: #F5F7FA;
+    --muted: #6B7280;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--white);
+    color: var(--ink);
+    font: 14px/1.5 var(--font-body);
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Grid background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Diagonal signature line */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 10%;
+    width: 2px;
+    height: 100vh;
+    background: linear-gradient(180deg, transparent 0%, var(--blue) 30%, var(--blue) 70%, transparent 100%);
+    transform: rotate(15deg);
+    transform-origin: top center;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.15;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 32px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 3px solid var(--ink);
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: var(--blue);
+  }
+
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  h1 span {
+    color: var(--blue);
+  }
+
+  .subtitle {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  /* Navigation */
+  nav {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+  }
+
+  nav a {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  nav a:hover, nav a.active {
+    color: var(--blue);
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 40px;
+    background: var(--white);
+    border: 1px solid var(--grid);
+    padding: 24px;
+    position: relative;
+  }
+
+  .section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--blue);
+  }
+
+  .section-label {
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+
+  /* Chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    background: var(--white);
+    border: 1px solid var(--grid);
+    color: var(--ink);
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+  }
+
+  .chip:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+
+  .chip.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: var(--white);
+  }
+
+  /* Inputs */
+  .input-field {
+    width: 100%;
+    background: var(--white);
+    border: 1px solid var(--grid);
+    color: var(--ink);
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: var(--blue);
+  }
+
+  .input-field::placeholder {
+    color: var(--muted);
+  }
+
+  textarea.input-field {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  /* Toggle */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-top: 1px solid var(--grid);
+    margin-top: 16px;
+  }
+
+  .toggle-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .toggle {
+    width: 48px;
+    height: 24px;
+    background: var(--grid);
+    border: 1px solid var(--grid);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: var(--white);
+    border: 1px solid var(--grid);
+    top: 2px;
+    left: 2px;
+    transition: all 0.2s;
+  }
+
+  .toggle.active {
+    background: var(--blue);
+    border-color: var(--blue);
+  }
+
+  .toggle.active::after {
+    background: var(--white);
+    border-color: var(--blue);
+    left: 26px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background: var(--blue);
+    color: var(--white);
+    border: none;
+    padding: 16px 32px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: 100%;
+    font-family: var(--font-display);
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary:hover {
+    background: var(--ink);
+  }
+
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 100%;
+    background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.1) 50%);
+  }
+
+  .btn-secondary {
+    background: var(--white);
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 12px 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.15s;
+  }
+
+  .btn-secondary:hover {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  /* Status indicator */
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--blue);
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Collapsible sections */
+  .collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 16px 0;
+    border-top: 1px solid var(--grid);
+    margin-top: 16px;
+  }
+
+  .collapsible-header:hover {
+    color: var(--blue);
+  }
+
+  .collapsible-icon {
+    font-family: var(--font-display);
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+
+  .collapsible-header.open .collapsible-icon {
+    transform: rotate(45deg);
+  }
+
+  .collapsible-content {
+    display: none;
+    padding-top: 16px;
+  }
+
+  .collapsible-content.open {
+    display: block;
+  }
+
+  /* Settings grid */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .setting-item {
+    background: var(--surface);
+    border: 1px solid var(--grid);
+    padding: 12px;
+  }
+
+  .setting-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .setting-value {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .setting-value.blue {
+    color: var(--blue);
+  }
+
+  /* History */
+  .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--grid);
+  }
+
+  .history-item:last-child {
+    border-bottom: none;
+  }
+
+  .history-info {
+    flex: 1;
+  }
+
+  .history-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .history-meta {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--font-display);
+    letter-spacing: 1px;
+  }
+
+  .history-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .container { padding: 32px 20px; }
+    h1 { font-size: 36px; }
+    .settings-grid { grid-template-columns: 1fr 1fr; }
+    nav { gap: 16px; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <h1>AI<span>Music</span></h1>
+    </div>
+    <div class="subtitle">Grid-based composition engine</div>
+    <nav>
+      <a href="#" class="active">Create</a>
+      <a href="#">Library</a>
+      <a href="#">Settings</a>
+    </nav>
+  </header>
+
+  <!-- Genre Selection -->
+  <div class="section">
+    <div class="section-label">Genre</div>
+    <div class="chips">
+      <span class="chip active">Pop</span>
+      <span class="chip">R&B</span>
+      <span class="chip">Hip-hop</span>
+      <span class="chip">Rock</span>
+      <span class="chip">Electronic</span>
+      <span class="chip">Jazz</span>
+      <span class="chip">Country</span>
+      <span class="chip">Latin</span>
+      <span class="chip">K-pop</span>
+      <span class="chip">Metal</span>
+    </div>
+  </div>
+
+  <!-- Subgenres -->
+  <div class="section">
+    <div class="section-label">Subgenre</div>
+    <div class="chips">
+      <span class="chip active">Dance Pop</span>
+      <span class="chip">Electropop</span>
+      <span class="chip">Indie Pop</span>
+      <span class="chip">Synthpop</span>
+      <span class="chip">Synthwave</span>
+    </div>
+  </div>
+
+  <!-- Prompt Input -->
+  <div class="section">
+    <div class="section-label">Prompt</div>
+    <input type="text" class="input-field" value="Upbeat dance pop, bright major key, punchy electronic drums" />
+  </div>
+
+  <!-- Lyrics -->
+  <div class="section">
+    <div class="section-label">Lyrics</div>
+    <textarea class="input-field" placeholder="[verse]&#10;Your lyrics here...&#10;&#10;[chorus]&#10;The catchy hook goes here"></textarea>
+
+    <div class="toggle-row">
+      <span class="toggle-label">Instrumental</span>
+      <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+    </div>
+
+    <div style="margin-top: 16px;">
+      <div class="section-label">Templates</div>
+      <div class="chips">
+        <span class="chip">Morning Coffee</span>
+        <span class="chip">Gym Pump-up</span>
+        <span class="chip">Study Focus</span>
+        <span class="chip">Sunset Drive</span>
+        <span class="chip">Party Starter</span>
+      </div>
+    </div>
+
+    <button class="btn-primary" style="margin-top: 24px;">Generate</button>
+
+    <div class="status">
+      <div class="status-dot"></div>
+      <span>COMPOSING — 45S</span>
+    </div>
+  </div>
+
+  <!-- Advanced Settings -->
+  <div class="section">
+    <div class="collapsible-header" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open')">
+      <span class="section-label" style="margin-bottom: 0;">Advanced Settings</span>
+      <span class="collapsible-icon">+</span>
+    </div>
+    <div class="collapsible-content">
+      <div class="settings-grid">
+        <div class="setting-item">
+          <div class="setting-label">Sample Rate</div>
+          <div class="setting-value blue">44100 Hz</div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">Bitrate</div>
+          <div class="setting-value blue">256 kbps</div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">Format</div>
+          <div class="setting-value blue">MP3</div>
+        </div>
+      </div>
+      <div class="settings-grid" style="margin-top: 12px;">
+        <div class="setting-item">
+          <div class="setting-label">BPM</div>
+          <div class="setting-value">Auto</div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">Key</div>
+          <div class="setting-value">Auto</div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">Mode</div>
+          <div class="setting-value">Auto</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Song History -->
+  <div class="section">
+    <div class="collapsible-header" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open')">
+      <span class="section-label" style="margin-bottom: 0;">Song History</span>
+      <span class="collapsible-icon">+</span>
+    </div>
+    <div class="collapsible-content">
+      <div class="history-item">
+        <div class="history-info">
+          <div class="history-title">Summer Vibes</div>
+          <div class="history-meta">Pop · Dance Pop · 128.5s · 2026-09-01</div>
+        </div>
+        <div class="history-actions">
+          <button class="btn-secondary">Play</button>
+          <button class="btn-secondary">Download</button>
+        </div>
+      </div>
+      <div class="history-item">
+        <div class="history-info">
+          <div class="history-title">Midnight Drive</div>
+          <div class="history-meta">Electronic · Synthwave · 95.2s · 2026-09-01</div>
+        </div>
+        <div class="history-actions">
+          <button class="btn-secondary">Play</button>
+          <button class="btn-secondary">Download</button>
+        </div>
+      </div>
+      <div class="history-item">
+        <div class="history-info">
+          <div class="history-title">Neon Dreams</div>
+          <div class="history-meta">Hip-hop · Trap · 142.8s · 2026-08-31</div>
+        </div>
+        <div class="history-actions">
+          <button class="btn-secondary">Play</button>
+          <button class="btn-secondary">Download</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

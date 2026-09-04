@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Music · Studio Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1c1c1e;
+    --panel: #242428;
+    --border: #3a3a40;
+    --fg: #e0e0e4;
+    --muted: #6a6a74;
+    --accent: #4a9eff;
+    --accent-2: #ff6b4a;
+    --ok: #4aff8a;
+    --err: #ff4a4a;
+    --font-display: 'IBM Plex Mono', monospace;
+    --font-body: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.6 var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+  }
+
+  .wrap { max-width: 720px; width: 100%; }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding: 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .logo {
+    width: 56px; height: 56px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    font-family: var(--font-display);
+    font-weight: 700; font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+
+  .sub {
+    font-size: 12px; color: var(--muted);
+    font-family: var(--font-display);
+  }
+
+  /* VU Meter */
+  .vu-meter {
+    display: flex;
+    gap: 3px;
+    margin-left: auto;
+    align-items: flex-end;
+    height: 40px;
+  }
+
+  .vu-bar {
+    width: 6px;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: height 0.3s ease;
+  }
+
+  .vu-bar:nth-child(1) { height: 20px; }
+  .vu-bar:nth-child(2) { height: 30px; }
+  .vu-bar:nth-child(3) { height: 25px; }
+  .vu-bar:nth-child(4) { height: 35px; }
+  .vu-bar:nth-child(5) { height: 28px; }
+  .vu-bar:nth-child(6) { height: 22px; }
+  .vu-bar:nth-child(7) { height: 32px; }
+  .vu-bar:nth-child(8) { height: 18px; }
+
+  /* Cards */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+
+  .card-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-header .led {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+
+  .card-header .led.on { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+
+  label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 11px; font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  input[type="text"], input[type="password"], textarea, select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    padding: 10px 12px;
+    font: inherit; font-family: var(--font-body);
+    font-size: 14px;
+    border-radius: 4px;
+    transition: border-color .15s;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  textarea { resize: vertical; min-height: 120px; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  /* Fader-style selects */
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%236a6a74'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+  }
+
+  /* Buttons */
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    font-family: var(--font-display);
+    font-weight: 600; font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all .15s;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  button:hover:not(:disabled) {
+    background: #3a8aee;
+    transform: translateY(-1px);
+  }
+
+  button:active:not(:disabled) { transform: translateY(0); }
+  button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  button.ghost {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: var(--font-body);
+  }
+
+  button.ghost:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: none;
+  }
+
+  .actions { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+
+  /* Status */
+  .status {
+    margin-left: auto;
+    font-family: var(--font-display);
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+
+  .dot.ok { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .dot.err { background: var(--err); box-shadow: 0 0 6px var(--err); }
+  .dot.work { background: var(--accent); animation: pulse 0.8s infinite; }
+
+  @keyframes pulse { 50% { opacity: 0.2; } }
+
+  /* Progress */
+  .progress-wrap {
+    width: 100%; height: 4px;
+    background: var(--bg);
+    border-radius: 2px;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--ok));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  /* Chips */
+  .chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    font-size: 12px; color: var(--muted);
+    cursor: pointer;
+    transition: all .12s;
+    border-radius: 4px;
+    font-family: var(--font-body);
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* Toggle */
+  .toggle {
+    width: 44px; height: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .toggle.on {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .toggle-knob {
+    width: 18px; height: 18px;
+    background: var(--muted);
+    border-radius: 3px;
+    position: absolute;
+    top: 2px; left: 2px;
+    transition: all .2s;
+  }
+
+  .toggle.on .toggle-knob {
+    transform: translateX(20px);
+    background: #fff;
+  }
+
+  /* Player */
+  .player {
+    padding: 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  audio { width: 100%; }
+
+  .meta {
+    font-family: var(--font-display);
+    font-size: 11px; color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* Genre tabs */
+  .genre-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+
+  /* Subgenre chips */
+  .subgenre-display { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+
+  /* Template chips */
+  .template-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+
+  /* Details */
+  details summary {
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 11px; color: var(--muted);
+    padding: 10px 0;
+    user-select: none;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  details summary:hover { color: var(--accent); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 10px 20px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    border-radius: 4px;
+    opacity: 0; pointer-events: none;
+    transition: all .25s; z-index: 1000;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.err { border-color: var(--err); color: var(--err); }
+
+  /* History */
+  .history-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .history-info { flex: 1; min-width: 0; }
+  .history-title { font-size: 13px; font-weight: 500; }
+  .history-prompt { font-size: 11px; color: var(--muted); }
+  .history-date { font-family: var(--font-display); font-size: 10px; color: var(--muted); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .row { grid-template-columns: 1fr; }
+    header { flex-direction: column; text-align: center; }
+    .vu-meter { margin-left: 0; margin-top: 12px; }
+  }
+
+  ::selection { background: var(--accent); color: #fff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">M3</div>
+    <div>
+      <h1>AI Music</h1>
+      <div class="sub">Describe · Generate · Play</div>
+    </div>
+    <div class="vu-meter">
+      <div class="vu-bar"></div>
+      <div class="vu-bar"></div>
+      <div class="vu-bar"></div>
+      <div class="vu-bar"></div>
+      <div class="vu-bar"></div>
+      <div class="vu-bar"></div>
+      <div class="vu-bar"></div>
+      <div class="vu-bar"></div>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="led on"></div>
+      <span style="font-family:var(--font-display);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;">API Configuration</span>
+    </div>
+    <details>
+      <summary>API key & proxy settings</summary>
+      <div style="margin-top:12px;">
+        <label>Provider</label>
+        <div style="display:flex;gap:6px;margin-bottom:12px;">
+          <span class="chip active">GMI Cloud</span>
+          <span class="chip">MiniMax</span>
+        </div>
+        <label for="apiKey">API key</label>
+        <input type="password" id="apiKey" placeholder="Paste your key here" />
+        <div style="font-family:var(--font-display);font-size:10px;color:var(--muted);margin-top:4px;">
+          Stored only in this browser
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="led"></div>
+      <span style="font-family:var(--font-display);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;">Genre</span>
+    </div>
+    <div class="genre-tabs">
+      <span class="chip active">Pop</span>
+      <span class="chip">R&B</span>
+      <span class="chip">Hip-hop</span>
+      <span class="chip">Rock</span>
+      <span class="chip">Electronic</span>
+      <span class="chip">Jazz</span>
+      <span class="chip">Country</span>
+      <span class="chip">Latin</span>
+      <span class="chip">K-pop</span>
+      <span class="chip">Metal</span>
+    </div>
+    <div class="subgenre-display">
+      <span class="chip active">Upbeat dance pop</span>
+      <span class="chip">Electropop</span>
+      <span class="chip">Indie pop</span>
+      <span class="chip">Synthpop</span>
+    </div>
+
+    <label for="prompt">Style prompt</label>
+    <input type="text" id="prompt" placeholder="Upbeat dance pop, bright major key, punchy electronic drums" />
+
+    <div style="margin-top:16px;">
+      <label>Lyrics</label>
+      <div class="template-chips">
+        <span style="font-family:var(--font-display);font-size:10px;color:var(--muted);">Templates:</span>
+        <span class="chip">Morning coffee</span>
+        <span class="chip">Gym pump-up</span>
+        <span class="chip">Study focus</span>
+        <span class="chip">Sunset drive</span>
+        <span class="chip">Party starter</span>
+      </div>
+      <textarea id="lyrics" placeholder="[verse]&#10;Your lyrics here...&#10;&#10;[chorus]&#10;The catchy hook goes here"></textarea>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+        <label style="margin:0;display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <span class="toggle" role="switch"><span class="toggle-knob"></span></span>
+          <span style="font-size:13px;">Instrumental</span>
+        </label>
+        <span style="font-family:var(--font-display);font-size:10px;color:var(--muted);">0 / 3,500</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button>Generate song</button>
+      <div class="status">
+        <span class="dot"></span>
+        <span>Ready</span>
+      </div>
+    </div>
+
+    <details style="margin-top:16px;">
+      <summary>Advanced settings</summary>
+      <div style="margin-top:12px;">
+        <div class="row">
+          <div>
+            <label>Sample rate</label>
+            <select>
+              <option>44100 Hz</option>
+              <option>32000 Hz</option>
+              <option>24000 Hz</option>
+            </select>
+          </div>
+          <div>
+            <label>Bitrate</label>
+            <select>
+              <option>256 kbps</option>
+              <option>128 kbps</option>
+              <option>64 kbps</option>
+            </select>
+          </div>
+          <div>
+            <label>Format</label>
+            <select>
+              <option>MP3</option>
+              <option>WAV</option>
+              <option>PCM</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <div>
+            <label>BPM</label>
+            <select>
+              <option>Auto</option>
+              <option>90</option><option>100</option><option>110</option>
+              <option>120</option><option>130</option><option>140</option>
+            </select>
+          </div>
+          <div>
+            <label>Key</label>
+            <select>
+              <option>Auto</option>
+              <option>C</option><option>D</option><option>E</option>
+              <option>F</option><option>G</option><option>A</option><option>B</option>
+            </select>
+          </div>
+          <div>
+            <label>Mode</label>
+            <select>
+              <option>Auto</option>
+              <option>Major</option>
+              <option>Minor</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="card" style="display:none;">
+    <div class="card-header">
+      <div class="led on"></div>
+      <span style="font-family:var(--font-display);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;">Output</span>
+    </div>
+    <div class="player">
+      <audio controls></audio>
+      <div class="meta">60s · 44100 Hz · 256 kbps · mp3</div>
+      <div style="margin-top:10px;display:flex;gap:6px;">
+        <span class="chip">Download</span>
+        <span class="chip">Open in new tab</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="led"></div>
+      <span style="font-family:var(--font-display);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;">Song history</span>
+    </div>
+    <div style="padding:16px;text-align:center;color:var(--muted);font-family:var(--font-display);font-size:11px;">
+      No songs yet — generate your first track above
+    </div>
+  </div>
+</div>
+
+<div class="toast" role="alert"></div>
+</body>
+</html>

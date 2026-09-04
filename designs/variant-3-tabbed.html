@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Variant 3 · Tabbed Split</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1c2c;
+    --panel: #262840;
+    --border: #3a3c5a;
+    --fg: #f0f0e0;
+    --muted: #6a6c8a;
+    --accent: #ffcd75;
+    --accent-2: #a7f070;
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.6 var(--font-body);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex; align-items: center;
+    padding: 10px 16px;
+    background: var(--panel);
+    border-bottom: 3px solid var(--border);
+    height: 48px;
+  }
+
+  .logo {
+    font-family: var(--font-pixel);
+    font-size: 10px; color: var(--accent);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  }
+
+  /* Main layout: left player + right tabbed */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: calc(100vh - 48px);
+  }
+
+  /* Left: Player + Playlist */
+  .left {
+    display: flex; flex-direction: column;
+    background: var(--panel);
+    border-right: 3px solid var(--border);
+  }
+
+  .player-section {
+    padding: 20px;
+    border-bottom: 3px solid var(--border);
+  }
+
+  .now-playing {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .song-title {
+    font-family: var(--font-pixel);
+    font-size: 11px; color: var(--fg);
+    margin-bottom: 4px;
+  }
+
+  .song-meta {
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .waveform {
+    display: flex; gap: 2px; align-items: flex-end;
+    height: 32px; margin-bottom: 10px;
+  }
+
+  .wave-bar {
+    width: 4px; background: var(--accent); border-radius: 1px;
+    animation: wave 1.5s ease-in-out infinite;
+  }
+
+  .wave-bar:nth-child(1) { height: 12px; animation-delay: 0s; }
+  .wave-bar:nth-child(2) { height: 20px; animation-delay: 0.1s; }
+  .wave-bar:nth-child(3) { height: 16px; animation-delay: 0.2s; }
+  .wave-bar:nth-child(4) { height: 28px; animation-delay: 0.3s; }
+  .wave-bar:nth-child(5) { height: 22px; animation-delay: 0.4s; }
+  .wave-bar:nth-child(6) { height: 14px; animation-delay: 0.5s; }
+  .wave-bar:nth-child(7) { height: 26px; animation-delay: 0.6s; }
+  .wave-bar:nth-child(8) { height: 18px; animation-delay: 0.7s; }
+
+  @keyframes wave {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.5); }
+  }
+
+  .progress-track {
+    width: 100%; height: 4px;
+    background: var(--border);
+    margin-bottom: 6px;
+  }
+
+  .progress-fill {
+    width: 35%; height: 100%;
+    background: var(--accent);
+  }
+
+  .time-row {
+    display: flex; justify-content: space-between;
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .controls {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+
+  .ctrl-btn {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    color: var(--fg);
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    cursor: pointer; font-size: 12px;
+  }
+
+  .ctrl-btn.play {
+    width: 40px; height: 40px;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .ctrl-btn:hover { border-color: var(--accent); }
+
+  /* Playlist */
+  .playlist-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .playlist-title {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .playlist-count {
+    font-family: var(--font-pixel);
+    font-size: 6px; color: var(--muted);
+  }
+
+  .playlist {
+    flex: 1; overflow-y: auto;
+  }
+
+  .playlist-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .playlist-item:hover { background: rgba(255,205,117,0.05); }
+  .playlist-item.active { background: rgba(255,205,117,0.1); }
+
+  .track-num {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    width: 16px; text-align: center;
+  }
+
+  .track-info { flex: 1; min-width: 0; }
+
+  .track-name {
+    font-size: 12px; font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .track-genre { font-size: 10px; color: var(--muted); }
+
+  .track-duration {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+  }
+
+  .playing-indicator {
+    display: flex; gap: 2px; align-items: flex-end; height: 10px;
+  }
+
+  .playing-bar {
+    width: 2px; background: var(--accent);
+    animation: wave 1s ease-in-out infinite;
+  }
+
+  .playing-bar:nth-child(1) { height: 5px; animation-delay: 0s; }
+  .playing-bar:nth-child(2) { height: 8px; animation-delay: 0.2s; }
+  .playing-bar:nth-child(3) { height: 3px; animation-delay: 0.4s; }
+
+  /* Right: Tabbed panel */
+  .right {
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  .tab-bar {
+    display: flex;
+    border-bottom: 3px solid var(--border);
+    background: var(--panel);
+  }
+
+  .tab {
+    flex: 1;
+    padding: 12px 16px;
+    font-family: var(--font-pixel);
+    font-size: 8px; color: var(--muted);
+    text-align: center;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    transition: all .15s;
+  }
+
+  .tab:hover { color: var(--fg); }
+
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: var(--bg);
+  }
+
+  .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Create form */
+  label {
+    display: block;
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--accent);
+    margin-bottom: 6px; text-transform: uppercase;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    color: var(--fg);
+    padding: 10px 12px;
+    font: 14px/1.4 var(--font-body);
+    margin-bottom: 12px;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  textarea { resize: vertical; min-height: 100px; }
+
+  .genre-grid {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .genre-chip {
+    background: transparent;
+    border: 2px solid var(--border);
+    padding: 6px 10px;
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    cursor: pointer;
+  }
+
+  .genre-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .genre-chip.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  .subgenre-row {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .sub-chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    font-size: 11px; color: var(--muted);
+    cursor: pointer;
+  }
+
+  .sub-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .sub-chip.active { border-color: var(--accent); color: var(--accent); }
+
+  .template-row {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .template-chip {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    font-size: 10px; color: var(--muted);
+    cursor: pointer;
+  }
+
+  .template-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .toggle-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .toggle {
+    width: 36px; height: 20px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    position: relative; cursor: pointer;
+  }
+
+  .toggle.on { background: var(--accent); border-color: var(--accent); }
+
+  .toggle-knob {
+    width: 12px; height: 12px;
+    background: var(--muted);
+    position: absolute; top: 2px; left: 2px;
+  }
+
+  .toggle.on .toggle-knob {
+    transform: translateX(16px);
+    background: var(--bg);
+  }
+
+  .toggle-label { font-size: 12px; color: var(--muted); }
+
+  .generate-btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: 3px solid var(--fg);
+    padding: 12px 24px;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--fg);
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .generate-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--fg);
+  }
+
+  /* Settings panel */
+  .settings-group {
+    margin-bottom: 20px;
+  }
+
+  .settings-label {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; }
+    .left { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="logo">♪ AI Music</div>
+</div>
+
+<!-- Main: split -->
+<div class="main">
+  <!-- Left: Player + Playlist -->
+  <div class="left">
+    <div class="player-section">
+      <div class="now-playing">▶ Now Playing</div>
+      <div class="song-title">Sunset Drive</div>
+      <div class="song-meta">Synthwave · 110 BPM · A minor</div>
+
+      <div class="waveform">
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+      </div>
+
+      <div class="progress-track"><div class="progress-fill"></div></div>
+      <div class="time-row">
+        <span>0:21</span>
+        <span>1:00</span>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn">⏮</button>
+        <button class="ctrl-btn play">▶</button>
+        <button class="ctrl-btn">⏭</button>
+      </div>
+    </div>
+
+    <div class="playlist-header">
+      <div class="playlist-title">Playlist</div>
+      <div class="playlist-count">5 tracks</div>
+    </div>
+
+    <div class="playlist">
+      <div class="playlist-item active">
+        <div class="track-num">
+          <div class="playing-indicator">
+            <div class="playing-bar"></div>
+            <div class="playing-bar"></div>
+            <div class="playing-bar"></div>
+          </div>
+        </div>
+        <div class="track-info">
+          <div class="track-name">Sunset Drive</div>
+          <div class="track-genre">Synthwave</div>
+        </div>
+        <div class="track-duration">1:00</div>
+      </div>
+
+      <div class="playlist-item">
+        <div class="track-num">2</div>
+        <div class="track-info">
+          <div class="track-name">Morning Coffee</div>
+          <div class="track-genre">Chill acoustic</div>
+        </div>
+        <div class="track-duration">0:58</div>
+      </div>
+
+      <div class="playlist-item">
+        <div class="track-num">3</div>
+        <div class="track-info">
+          <div class="track-name">Gym Pump-Up</div>
+          <div class="track-genre">Trap</div>
+        </div>
+        <div class="track-duration">1:02</div>
+      </div>
+
+      <div class="playlist-item">
+        <div class="track-num">4</div>
+        <div class="track-info">
+          <div class="track-name">Study Focus</div>
+          <div class="track-genre">Lo-fi hip-hop</div>
+        </div>
+        <div class="track-duration">0:55</div>
+      </div>
+
+      <div class="playlist-item">
+        <div class="track-num">5</div>
+        <div class="track-info">
+          <div class="track-name">Party Starter</div>
+          <div class="track-genre">Dance pop</div>
+        </div>
+        <div class="track-duration">1:01</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Tabbed -->
+  <div class="right">
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('create')">Create</div>
+      <div class="tab" onclick="switchTab('settings')">Settings</div>
+      <div class="tab" onclick="switchTab('history')">History</div>
+    </div>
+
+    <div class="tab-content">
+      <!-- Create tab -->
+      <div class="tab-panel active" id="tab-create">
+        <label>Genre</label>
+        <div class="genre-grid">
+          <span class="genre-chip active">Pop</span>
+          <span class="genre-chip">R&B</span>
+          <span class="genre-chip">Hip-hop</span>
+          <span class="genre-chip">Rock</span>
+          <span class="genre-chip">Electronic</span>
+          <span class="genre-chip">Jazz</span>
+          <span class="genre-chip">Country</span>
+          <span class="genre-chip">Latin</span>
+        </div>
+
+        <label>Subgenres</label>
+        <div class="subgenre-row">
+          <span class="sub-chip active">Upbeat dance pop</span>
+          <span class="sub-chip">Electropop</span>
+          <span class="sub-chip">Indie pop</span>
+          <span class="sub-chip">Synthpop</span>
+        </div>
+
+        <label>Style prompt</label>
+        <input type="text" placeholder="Upbeat dance pop, bright major key, punchy electronic drums" />
+
+        <label>Lyrics templates</label>
+        <div class="template-row">
+          <span class="template-chip">Morning coffee</span>
+          <span class="template-chip">Gym pump-up</span>
+          <span class="template-chip">Study focus</span>
+          <span class="template-chip">Sunset drive</span>
+          <span class="template-chip">Party starter</span>
+        </div>
+
+        <label>Lyrics</label>
+        <textarea placeholder="[verse]&#10;Your lyrics here...&#10;&#10;[chorus]&#10;The catchy hook goes here"></textarea>
+
+        <div class="toggle-row">
+          <span class="toggle" role="switch"><span class="toggle-knob"></span></span>
+          <span class="toggle-label">Instrumental (no lyrics)</span>
+        </div>
+
+        <button class="generate-btn">Generate Song</button>
+      </div>
+
+      <!-- Settings tab -->
+      <div class="tab-panel" id="tab-settings">
+        <div class="settings-group">
+          <div class="settings-label">API Configuration</div>
+          <label>Provider</label>
+          <div style="display:flex;gap:6px;margin-bottom:12px;">
+            <span class="genre-chip active">GMI Cloud</span>
+            <span class="genre-chip">MiniMax</span>
+          </div>
+          <label>API key</label>
+          <input type="password" placeholder="Paste your key here" />
+          <div style="font-size:10px;color:var(--muted);margin-bottom:12px;">
+            Stored only in this browser
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-label">Audio Quality</div>
+          <div class="settings-row">
+            <div>
+              <label>Sample rate</label>
+              <select>
+                <option>44100 Hz</option>
+                <option>32000 Hz</option>
+                <option>24000 Hz</option>
+              </select>
+            </div>
+            <div>
+              <label>Bitrate</label>
+              <select>
+                <option>256 kbps</option>
+                <option>128 kbps</option>
+                <option>64 kbps</option>
+              </select>
+            </div>
+            <div>
+              <label>Format</label>
+              <select>
+                <option>MP3</option>
+                <option>WAV</option>
+                <option>PCM</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-label">Music Theory</div>
+          <div class="settings-row">
+            <div>
+              <label>BPM</label>
+              <select>
+                <option>Auto</option>
+                <option>90</option><option>100</option><option>110</option>
+                <option>120</option><option>130</option><option>140</option>
+              </select>
+            </div>
+            <div>
+              <label>Key</label>
+              <select>
+                <option>Auto</option>
+                <option>C</option><option>D</option><option>E</option>
+                <option>F</option><option>G</option><option>A</option><option>B</option>
+              </select>
+            </div>
+            <div>
+              <label>Mode</label>
+              <select>
+                <option>Auto</option>
+                <option>Major</option>
+                <option>Minor</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- History tab -->
+      <div class="tab-panel" id="tab-history">
+        <div style="font-family:var(--font-pixel);font-size:8px;color:var(--muted);text-align:center;padding:40px 0;">
+          Full history view coming soon
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>

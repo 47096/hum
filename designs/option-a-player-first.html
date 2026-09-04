@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Option A · Player First</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1c2c;
+    --panel: #262840;
+    --border: #3a3c5a;
+    --fg: #f0f0e0;
+    --muted: #6a6c8a;
+    --accent: #ffcd75;
+    --accent-2: #a7f070;
+    --ok: #a7f070;
+    --err: #ff6b6b;
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 14px/1.6 var(--font-body);
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .wrap { max-width: 480px; width: 100%; }
+
+  /* Header */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: var(--panel);
+    border: 3px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--font-pixel);
+    font-size: 14px; color: var(--accent);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  }
+
+  .new-btn {
+    background: var(--accent-2);
+    color: var(--bg);
+    border: 3px solid var(--fg);
+    padding: 8px 16px;
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--fg);
+  }
+
+  .new-btn:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--fg);
+  }
+
+  /* Player Card */
+  .player-card {
+    background: var(--panel);
+    border: 3px solid var(--border);
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .player-card::after {
+    content: "";
+    position: absolute;
+    bottom: -3px; right: -3px;
+    width: calc(100% - 6px);
+    height: 3px;
+    background: var(--border);
+  }
+
+  .player-card::before {
+    content: "";
+    position: absolute;
+    bottom: -3px; right: -3px;
+    width: 3px;
+    height: calc(100% - 6px);
+    background: var(--border);
+  }
+
+  .now-playing-label {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .song-title {
+    font-family: var(--font-pixel);
+    font-size: 10px; color: var(--fg);
+    margin-bottom: 4px;
+  }
+
+  .song-meta {
+    font-size: 11px; color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* Waveform visualization */
+  .waveform {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    height: 40px;
+    margin-bottom: 12px;
+  }
+
+  .wave-bar {
+    width: 4px;
+    background: var(--accent);
+    border-radius: 1px;
+    animation: wave 1.5s ease-in-out infinite;
+  }
+
+  .wave-bar:nth-child(1) { height: 15px; animation-delay: 0s; }
+  .wave-bar:nth-child(2) { height: 25px; animation-delay: 0.1s; }
+  .wave-bar:nth-child(3) { height: 20px; animation-delay: 0.2s; }
+  .wave-bar:nth-child(4) { height: 35px; animation-delay: 0.3s; }
+  .wave-bar:nth-child(5) { height: 28px; animation-delay: 0.4s; }
+  .wave-bar:nth-child(6) { height: 18px; animation-delay: 0.5s; }
+  .wave-bar:nth-child(7) { height: 32px; animation-delay: 0.6s; }
+  .wave-bar:nth-child(8) { height: 22px; animation-delay: 0.7s; }
+  .wave-bar:nth-child(9) { height: 30px; animation-delay: 0.8s; }
+  .wave-bar:nth-child(10) { height: 16px; animation-delay: 0.9s; }
+  .wave-bar:nth-child(11) { height: 26px; animation-delay: 1.0s; }
+  .wave-bar:nth-child(12) { height: 20px; animation-delay: 1.1s; }
+
+  @keyframes wave {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.5); }
+  }
+
+  /* Progress bar */
+  .progress-track {
+    width: 100%; height: 6px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .progress-fill {
+    width: 35%; height: 100%;
+    background: var(--accent);
+  }
+
+  .time-row {
+    display: flex; justify-content: space-between;
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+  }
+
+  .ctrl-btn {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    color: var(--fg);
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .ctrl-btn.play {
+    width: 44px; height: 44px;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  .ctrl-btn:hover {
+    border-color: var(--accent);
+  }
+
+  /* Playlist */
+  .playlist-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .playlist-title {
+    font-family: var(--font-pixel);
+    font-size: 9px; color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .playlist-count {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+  }
+
+  .playlist {
+    background: var(--panel);
+    border: 3px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .playlist-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border);
+    cursor: pointer;
+    transition: background .1s;
+  }
+
+  .playlist-item:last-child { border-bottom: none; }
+  .playlist-item:hover { background: rgba(255,205,117,0.05); }
+  .playlist-item.active { background: rgba(255,205,117,0.1); }
+
+  .track-num {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    width: 20px; text-align: center;
+  }
+
+  .track-info { flex: 1; min-width: 0; }
+
+  .track-name {
+    font-size: 13px; font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .track-genre {
+    font-size: 11px; color: var(--muted);
+  }
+
+  .track-duration {
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+  }
+
+  .playing-indicator {
+    display: flex; gap: 2px; align-items: flex-end; height: 12px;
+  }
+
+  .playing-bar {
+    width: 3px;
+    background: var(--accent);
+    animation: wave 1s ease-in-out infinite;
+  }
+
+  .playing-bar:nth-child(1) { height: 6px; animation-delay: 0s; }
+  .playing-bar:nth-child(2) { height: 10px; animation-delay: 0.2s; }
+  .playing-bar:nth-child(3) { height: 4px; animation-delay: 0.4s; }
+
+  /* Create modal overlay */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .modal-overlay.show { display: flex; justify-content: center; align-items: flex-start; }
+
+  .modal {
+    background: var(--panel);
+    border: 3px solid var(--accent);
+    padding: 20px;
+    max-width: 480px; width: 100%;
+    margin-top: 40px;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute; top: 12px; right: 12px;
+    background: transparent; border: none;
+    color: var(--muted); font-size: 18px; cursor: pointer;
+  }
+
+  .modal-close:hover { color: var(--err); }
+
+  label {
+    display: block;
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--accent);
+    margin-bottom: 6px; text-transform: uppercase;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    color: var(--fg);
+    padding: 10px 12px;
+    font: 14px/1.4 var(--font-body);
+    margin-bottom: 12px;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  textarea { resize: vertical; min-height: 100px; }
+
+  .genre-grid {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .genre-chip {
+    background: transparent;
+    border: 2px solid var(--border);
+    padding: 6px 10px;
+    font-family: var(--font-pixel);
+    font-size: 7px; color: var(--muted);
+    cursor: pointer;
+  }
+
+  .genre-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .genre-chip.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  .generate-btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: 3px solid var(--fg);
+    padding: 12px 24px;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--fg);
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .generate-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--fg);
+  }
+
+  .toggle-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .toggle {
+    width: 36px; height: 20px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    position: relative;
+    cursor: pointer;
+  }
+
+  .toggle.on { background: var(--accent); border-color: var(--accent); }
+
+  .toggle-knob {
+    width: 12px; height: 12px;
+    background: var(--muted);
+    position: absolute; top: 2px; left: 2px;
+  }
+
+  .toggle.on .toggle-knob {
+    transform: translateX(16px);
+    background: var(--bg);
+  }
+
+  .toggle-label {
+    font-size: 12px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">♪ AI Music</div>
+    <button class="new-btn" onclick="document.querySelector('.modal-overlay').classList.add('show')">+ New</button>
+  </header>
+
+  <!-- Player -->
+  <div class="player-card">
+    <div class="now-playing-label">▶ Now Playing</div>
+    <div class="song-title">Sunset Drive</div>
+    <div class="song-meta">Synthwave · 110 BPM · A minor</div>
+
+    <div class="waveform">
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    </div>
+
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="time-row">
+      <span>0:21</span>
+      <span>1:00</span>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl-btn">⏮</button>
+      <button class="ctrl-btn play">▶</button>
+      <button class="ctrl-btn">⏭</button>
+    </div>
+  </div>
+
+  <!-- Playlist -->
+  <div class="playlist-header">
+    <div class="playlist-title">Playlist</div>
+    <div class="playlist-count">5 tracks</div>
+  </div>
+
+  <div class="playlist">
+    <div class="playlist-item active">
+      <div class="track-num">
+        <div class="playing-indicator">
+          <div class="playing-bar"></div>
+          <div class="playing-bar"></div>
+          <div class="playing-bar"></div>
+        </div>
+      </div>
+      <div class="track-info">
+        <div class="track-name">Sunset Drive</div>
+        <div class="track-genre">Synthwave</div>
+      </div>
+      <div class="track-duration">1:00</div>
+    </div>
+
+    <div class="playlist-item">
+      <div class="track-num">2</div>
+      <div class="track-info">
+        <div class="track-name">Morning Coffee</div>
+        <div class="track-genre">Chill acoustic</div>
+      </div>
+      <div class="track-duration">0:58</div>
+    </div>
+
+    <div class="playlist-item">
+      <div class="track-num">3</div>
+      <div class="track-info">
+        <div class="track-name">Gym Pump-Up</div>
+        <div class="track-genre">Trap</div>
+      </div>
+      <div class="track-duration">1:02</div>
+    </div>
+
+    <div class="playlist-item">
+      <div class="track-num">4</div>
+      <div class="track-info">
+        <div class="track-name">Study Focus</div>
+        <div class="track-genre">Lo-fi hip-hop</div>
+      </div>
+      <div class="track-duration">0:55</div>
+    </div>
+
+    <div class="playlist-item">
+      <div class="track-num">5</div>
+      <div class="track-info">
+        <div class="track-name">Party Starter</div>
+        <div class="track-genre">Dance pop</div>
+      </div>
+      <div class="track-duration">1:01</div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('show')">✕</button>
+    <div style="font-family:var(--font-pixel);font-size:12px;color:var(--accent);margin-bottom:16px;">Create New Song</div>
+
+    <label>Genre</label>
+    <div class="genre-grid">
+      <span class="genre-chip active">Pop</span>
+      <span class="genre-chip">R&B</span>
+      <span class="genre-chip">Hip-hop</span>
+      <span class="genre-chip">Rock</span>
+      <span class="genre-chip">Electronic</span>
+      <span class="genre-chip">Jazz</span>
+    </div>
+
+    <label>Style prompt</label>
+    <input type="text" placeholder="Upbeat dance pop, bright major key" />
+
+    <label>Lyrics</label>
+    <textarea placeholder="[verse]&#10;Your lyrics here..."></textarea>
+
+    <div class="toggle-row">
+      <span class="toggle" role="switch"><span class="toggle-knob"></span></span>
+      <span class="toggle-label">Instrumental</span>
+    </div>
+
+    <button class="generate-btn">Generate Song</button>
+  </div>
+</div>
+</body>
+</html>
