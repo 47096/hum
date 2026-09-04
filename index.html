@@ -1700,7 +1700,7 @@ Rules:
           responseHTML += '<pre class="clickable" id="styleDisplay" onclick="toggleEdit(\'style\')">' + escapeHtml(style) + '</pre>';
           responseHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + escapeHtml(style) + '</textarea>';
         }
-        if (lyrics) {
+        if (lyrics && mode !== "instrumental") {
           responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:10px; color:var(--muted); font-weight:400;">click to edit</span></div>';
           responseHTML += '<pre class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + escapeHtml(lyrics) + '</pre>';
           responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
