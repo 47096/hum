@@ -354,6 +354,58 @@
     height: 18px;
   }
 
+  .gen-context {
+    padding: 8px 12px;
+    text-align: center;
+  }
+
+  .gen-context-text {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .gen-context-text strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .generate-btn-full {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .generate-btn-full:hover { background: #6d28d9; }
+  .generate-btn-full:active { background: #5b21b6; transform: scale(0.98); }
+  .generate-btn-full:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .generate-btn-full.generating {
+    background: var(--muted);
+    cursor: not-allowed;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .generate-btn-full.generating::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
   .generate-btn {
     height: 44px;
     padding: 0 20px;
@@ -1213,11 +1265,12 @@
       <div class="chat-bottom">
         <div class="input-container">
           <input class="chat-input" type="text" id="chatInput" placeholder="Describe your song...">
-          <div class="btn-group">
-            <button class="send-btn" id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
-            <button class="generate-btn" id="generateBtn">Generate</button>
-          </div>
+          <button class="send-btn" id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
         </div>
+        <div class="gen-context" id="genContext" style="display:none;">
+          <span class="gen-context-text" id="genContextText">Ready to generate</span>
+        </div>
+        <button class="generate-btn-full" id="generateBtn">Generate</button>
       </div>
       <div class="gen-progress" id="genProgress">
         <div class="gen-progress-bar" id="genProgressBar"></div>
@@ -1599,6 +1652,20 @@
   });
   switchMode(mode);
 
+  function updateGenContext() {
+    const genContext = $("genContext");
+    const genContextText = $("genContextText");
+    if (!genContext || !genContextText) return;
+
+    if (currentTitle || currentStyle) {
+      genContext.style.display = "block";
+      const name = currentTitle || "Untitled";
+      genContextText.innerHTML = 'Ready to generate: <strong>' + escapeHtml(name) + '</strong>';
+    } else {
+      genContext.style.display = "none";
+    }
+  }
+
   function addMessage(role, content) {
     const messageDiv = document.createElement("div");
     messageDiv.className = "msg " + (role === "user" ? "user-msg" : "ai-msg");
@@ -1783,6 +1850,9 @@ Rules:
 
         addMessage("ai", responseHTML || escapeHtml(aiResponse));
 
+        // Update context hint
+        updateGenContext();
+
         // Add to chat history
         chatHistory.push({ role: "assistant", content: aiResponse });
         if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
@@ -1848,6 +1918,7 @@ Rules:
     if (field === "title") currentTitle = newValue;
     if (field === "style") currentStyle = newValue;
     if (field === "lyrics") currentLyrics = newValue;
+    updateGenContext();
     toast(field.charAt(0).toUpperCase() + field.slice(1) + " updated", "ok");
   }
 
