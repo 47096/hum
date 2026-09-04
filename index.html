@@ -54,7 +54,7 @@
 
   .logo {
     font-family: var(--font-body);
-    font-size: 10px; color: var(--fg);
+    font-size: 14px; font-weight: 600; color: var(--fg);
   }
 
   .topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
@@ -103,7 +103,7 @@
   label {
     display: block;
     font-family: var(--font-body);
-    font-size: 10px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
     margin-bottom: 8px; text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -610,7 +610,7 @@
 
   .gen-progress-text {
     font-family: var(--font-body);
-    font-size: 10px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
     text-align: center;
   }
 
@@ -630,7 +630,7 @@
 
   .playlist-title {
     font-family: var(--font-body);
-    font-size: 10px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
     text-transform: uppercase;
   }
 
@@ -664,7 +664,7 @@
 
   .track-num {
     font-family: var(--font-body);
-    font-size: 10px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
     width: 16px; text-align: center;
     flex-shrink: 0;
   }
@@ -707,7 +707,7 @@
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
 
-  .track-genre { font-size: 10px; color: var(--muted); }
+  .track-genre { font-size: 11px; color: var(--muted); }
   .track-date { font-size: 9px; color: var(--muted); opacity: 0.6; }
 
   .track-right {
@@ -717,7 +717,7 @@
 
   .track-duration {
     font-family: var(--font-body);
-    font-size: 10px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
   }
 
   .track-download {
@@ -789,7 +789,7 @@
 
   .empty-text {
     font-family: var(--font-body);
-    font-size: 10px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
     line-height: 1.8;
   }
 
@@ -973,7 +973,7 @@
     display: flex; align-items: center; justify-content: center;
     width: 100%;
     font-family: var(--font-body);
-    font-size: 10px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
   }
 
   .time-wrap {
@@ -1057,7 +1057,7 @@
 
   .modal-title {
     font-family: var(--font-body);
-    font-size: 10px; color: var(--fg);
+    font-size: 11px; color: var(--fg);
   }
 
   .modal-close {
@@ -1099,7 +1099,7 @@
 
   .settings-label {
     font-family: var(--font-body);
-    font-size: 10px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
     text-transform: uppercase;
     margin-bottom: 10px;
     padding-bottom: 6px;
@@ -1125,7 +1125,7 @@
   select:focus { outline: none; border-color: var(--fg); }
 
   .help-text {
-    font-size: 10px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
     margin-top: -8px; margin-bottom: 12px;
   }
 
@@ -1174,7 +1174,7 @@
     color: var(--muted);
     padding: 4px 12px;
     font-family: var(--font-body);
-    font-size: 10px;
+    font-size: 11px;
     cursor: pointer;
     transition: all .12s;
   }
@@ -1833,17 +1833,17 @@ Rules:
         // Add AI response to chat
         let responseHTML = "";
         if (title) {
-          responseHTML += '<div class="label">Title <span style="font-size:10px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+          responseHTML += '<div class="label">Title <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
           responseHTML += '<pre class="clickable" id="titleDisplay" onclick="toggleEdit(\'title\')">' + escapeHtml(title) + '</pre>';
           responseHTML += '<textarea id="titleEdit" class="inline-edit" style="display:none;">' + escapeHtml(title) + '</textarea>';
         }
         if (style) {
-          responseHTML += '<div class="label">Style <span style="font-size:10px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+          responseHTML += '<div class="label">Style <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
           responseHTML += '<pre class="clickable" id="styleDisplay" onclick="toggleEdit(\'style\')">' + escapeHtml(style) + '</pre>';
           responseHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + escapeHtml(style) + '</textarea>';
         }
         if (lyrics && mode !== "instrumental") {
-          responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:10px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+          responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
           responseHTML += '<pre class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + escapeHtml(lyrics) + '</pre>';
           responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
         }
