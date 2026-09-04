@@ -2048,10 +2048,11 @@ Rules:
     renderPlaylist();
   }
 
-  function downloadTrack(url, title) {
+  function downloadTrack(url, title, format) {
+    const ext = format || "mp3";
     const a = document.createElement("a");
     a.href = url;
-    a.download = (title || "track") + ".mp3";
+    a.download = (title || "track") + "." + ext;
     a.target = "_blank";
     a.rel = "noopener";
     document.body.appendChild(a);
@@ -2149,7 +2150,7 @@ Rules:
     } else if (action === "lyrics") {
       showLyrics(h);
     } else if (action === "download") {
-      downloadTrack(h.audioUrl, h.title);
+      downloadTrack(h.audioUrl, h.title, h.settings?.format);
     } else if (action === "delete") {
       if (confirm("Delete \"" + (h.title || "Untitled") + "\"?")) { deleteFromHistory(h.id); }
     } else {
