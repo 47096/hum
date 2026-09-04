@@ -1341,6 +1341,9 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
+  // HTML escape helper — prevents XSS from user/LLM content
+  const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
   // Icon helper — replaces element content with a Lucide icon
   function setIcon(el, name) {
     el.innerHTML = "";
@@ -1508,7 +1511,8 @@
 
     const contentDiv = document.createElement("div");
     contentDiv.className = "message-content";
-    contentDiv.innerHTML = content;
+    // Escape user messages; AI messages contain intentional HTML (pre, textarea)
+    contentDiv.innerHTML = role === "user" ? escapeHtml(content) : content;
 
     messageDiv.appendChild(avatarDiv);
     messageDiv.appendChild(contentDiv);
@@ -1630,9 +1634,6 @@ Rules:
         // Parse AI response
         const { style, lyrics } = parseAIResponse(aiResponse);
 
-        // Helper to escape HTML
-        const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
         // Add AI response to chat
         let responseHTML = "";
         if (style) {
@@ -1646,7 +1647,7 @@ Rules:
           responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
         }
 
-        addMessage("ai", responseHTML || aiResponse);
+        addMessage("ai", responseHTML || escapeHtml(aiResponse));
 
         // Add to chat history
         chatHistory.push({ role: "assistant", content: aiResponse });
@@ -1656,7 +1657,7 @@ Rules:
     } catch (err) {
       // Remove loading message
       chatMessages.removeChild(loadingDiv);
-      addMessage("ai", "Sorry, I encountered an error: " + err.message);
+      addMessage("ai", "Sorry, I encountered an error: " + escapeHtml(err.message));
     }
   }
 
@@ -2246,7 +2247,7 @@ Rules:
     if (entry.prompt) {
       html += '<div class="lyrics-prompt">';
       html += '<div class="lyrics-prompt-label">Style</div>';
-      html += '<div class="lyrics-prompt-text">' + entry.prompt + '</div>';
+      html += '<div class="lyrics-prompt-text">' + escapeHtml(entry.prompt) + '</div>';
       html += '</div>';
     }
 
@@ -2260,9 +2261,9 @@ Rules:
         if (sectionLines.length > 0) {
           html += '<div class="lyrics-section">';
           if (currentSection) {
-            html += '<div class="lyrics-section-label">' + currentSection + '</div>';
+            html += '<div class="lyrics-section-label">' + escapeHtml(currentSection) + '</div>';
           }
-          html += '<div class="lyrics-section-text">' + sectionLines.join("\n") + '</div>';
+          html += '<div class="lyrics-section-text">' + escapeHtml(sectionLines.join("\n")) + '</div>';
           html += '</div>';
         }
         sectionLines = [];
