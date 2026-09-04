@@ -2074,29 +2074,20 @@ Rules:
     history.forEach((h, i) => {
       const item = document.createElement("div");
       item.className = "playlist-item" + (i === currentTrackIndex ? " active" : "");
+      item.dataset.index = i;
 
       const art = document.createElement("div");
       art.className = "track-art";
+      art.dataset.action = "play-art";
       art.innerHTML = '<i data-lucide="music"></i>';
       const playOverlay = document.createElement("div");
       playOverlay.className = "track-art-play";
       playOverlay.innerHTML = '<i data-lucide="' + (i === currentTrackIndex && isPlaying ? 'pause' : 'play') + '"></i>';
       art.appendChild(playOverlay);
-      art.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (i === currentTrackIndex) {
-          togglePlay();
-        } else {
-          playTrack(i, false);
-        }
-      });
 
       const info = document.createElement("div");
       info.className = "track-info";
-      info.addEventListener("click", (e) => {
-        e.stopPropagation();
-        showLyrics(h);
-      });
+      info.dataset.action = "lyrics";
       const name = document.createElement("div");
       name.className = "track-name";
       name.textContent = h.title || "Untitled";
@@ -2115,31 +2106,46 @@ Rules:
       dur.textContent = h.duration || "—";
       const dl = document.createElement("button");
       dl.className = "track-download";
+      dl.dataset.action = "download";
       dl.innerHTML = '<i data-lucide="download"></i>';
       dl.setAttribute("aria-label", "Download track");
-      dl.addEventListener("click", (e) => {
-        e.stopPropagation();
-        downloadTrack(h.audioUrl, h.title);
-      });
       const del = document.createElement("button");
       del.className = "track-delete";
+      del.dataset.action = "delete";
       del.innerHTML = '<i data-lucide="trash-2"></i>';
       del.setAttribute("aria-label", "Delete track");
-      del.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (confirm("Delete \"" + (h.title || "Untitled") + "\"?")) {
-          deleteFromHistory(h.id);
-        }
-      });
       right.append(dur, dl, del);
 
       item.append(art, info, right);
-      item.addEventListener("click", () => playTrack(i));
       playlist.appendChild(item);
     });
     lucide.createIcons({ nodes: playlist.querySelectorAll("[data-lucide]") });
     playlist.scrollTop = scrollTop;
   }
+
+  // Event delegation for playlist — single handler for all click actions
+  $("playlist").addEventListener("click", (e) => {
+    const history = getHistory();
+    const item = e.target.closest(".playlist-item");
+    if (!item) return;
+    const i = parseInt(item.dataset.index);
+    const h = history[i];
+    if (!h) return;
+
+    const action = e.target.closest("[data-action]")?.dataset.action;
+
+    if (action === "play-art") {
+      if (i === currentTrackIndex) { togglePlay(); } else { playTrack(i, false); }
+    } else if (action === "lyrics") {
+      showLyrics(h);
+    } else if (action === "download") {
+      downloadTrack(h.audioUrl, h.title);
+    } else if (action === "delete") {
+      if (confirm("Delete \"" + (h.title || "Untitled") + "\"?")) { deleteFromHistory(h.id); }
+    } else {
+      playTrack(i);
+    }
+  });
 
   $("clearHistory").addEventListener("click", () => {
     if (!confirm("Delete all saved songs?")) return;
