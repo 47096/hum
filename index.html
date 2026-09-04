@@ -1404,7 +1404,6 @@
   // ─── Sparkle AI generation ───
 
   async function generateWithAI(field, prompt) {
-    console.log("generateWithAI called:", field);
     const btn = field === "style" ? $("sparkleStyle") : $("sparkleLyrics");
     const target = field === "style" ? $("prompt") : $("lyrics");
     const currentValue = target.value.trim();
@@ -1414,7 +1413,6 @@
       return;
     }
 
-    console.log("getEndpoint():", getEndpoint());
     btn.classList.add("loading");
     btn.disabled = true;
 
@@ -1426,7 +1424,6 @@
       const userPrompt = currentValue || (field === "style" ? "upbeat pop song" : "song about missing someone");
 
       const key = $("apiKey").value.trim();
-      console.log("API key length:", key.length);
       if (!key) {
         toast("Set your API key first", "err");
         return;
@@ -1459,7 +1456,6 @@
       if (!resp.ok) throw new Error("API error (" + resp.status + ")");
 
       const data = await resp.json();
-      console.log("LLM response:", JSON.stringify(data, null, 2));
 
       // Try different response formats
       const generated = data.choices?.[0]?.message?.content?.trim()
@@ -1472,7 +1468,6 @@
         target.value = generated;
         toast("Generated!", "ok");
       } else {
-        console.log("No content in response:", data);
         throw new Error("No content returned");
       }
     } catch (err) {
