@@ -206,32 +206,28 @@ def voice_clone():
         import base64
         audio_bytes = base64.b64decode(audio_base64)
 
-        # Voice clone via GMI Cloud — uses same endpoint as music generation
-        # Generate a unique voice_id
-        import uuid
-        voice_id = "hum-" + str(uuid.uuid4())[:8]
+        # Voice clone via GMI Cloud
+        # Endpoint: POST /api/v1/ie/requestqueue/apikey/requests
+        # Model: minimax-audio-voice-clone-speech-2.6-hd
 
-        # Send voice clone request through GMI Cloud autoroute
-        clone_url = "https://console.gmicloud.ai/api/v1/ie/recommendation/autoroute"
+        clone_url = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests"
         clone_headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         }
 
+        # Try using data URL for source_audio
+        audio_data_url = f"data:audio/mpeg;base64,{audio_base64}"
+
         clone_body = {
-            "model": "minimax/speech-2.8-turbo",
-            "messages": [
-                {"role": "user", "content": "Clone this voice"}
-            ],
-            "voice_clone": {
-                "audio": audio_base64,
-                "voice_id": voice_id,
-                "name": name
-            },
-            "mode": "balanced"
+            "model": "minimax-audio-voice-clone-speech-2.6-hd",
+            "payload": {
+                "text": "Hello, this is a test of the cloned voice.",
+                "source_audio": audio_data_url
+            }
         }
 
-        logger.info(f"Voice clone request: voice_id={voice_id}, name={name}, audio_size={len(audio_bytes)}")
+        logger.info(f"Voice clone request: name={name}, audio_size={len(audio_bytes)}")
         clone_resp = requests.post(clone_url, headers=clone_headers, json=clone_body, timeout=120)
         logger.info(f"Clone response: {clone_resp.status_code} {clone_resp.text[:200]}")
 
@@ -240,9 +236,42 @@ def voice_clone():
 
         clone_result = clone_resp.json()
 
-        # Return voice_id to the frontend
+        # Check if request was successful
+        status = clone_result.get("status", "")
+        if status == "failed":
+            error_msg = clone_result.get("error", "Voice clone failed")
+            return cors_response(json.dumps({"error": error_msg}), 400)
+
+        # For async API, we need to poll for the result
+        request_id = clone_result.get("request_id")
+        if request_id:
+            # Poll for completion
+            import time
+            poll_url = f"{clone_url}/{request_id}"
+            for _ in range(30):  # Poll for up to 30 seconds
+                time.sleep(2)
+                poll_resp = requests.get(poll_url, headers={"Authorization": f"Bearer {api_key}"}, timeout=30)
+                if poll_resp.status_code == 200:
+                    poll_result = poll_resp.json()
+                    poll_status = poll_result.get("status", "")
+                    if poll_status == "success":
+                        # Extract voice_id from outcome
+                        voice_id = poll_result.get("outcome", {}).get("voice_id", "")
+                        if not voice_id:
+                            voice_id = "cloned-" + str(hash(name))[:8]
+                        result = {
+                            "voice_id": voice_id,
+                            "name": name,
+                            "status": "success"
+                        }
+                        return cors_response(json.dumps(result), 200)
+                    elif poll_status == "failed":
+                        error_msg = poll_result.get("error", "Voice clone failed")
+                        return cors_response(json.dumps({"error": error_msg}), 400)
+
+        # If we get here, return the initial response
         result = {
-            "voice_id": voice_id,
+            "voice_id": clone_result.get("outcome", {}).get("voice_id", "cloned-voice"),
             "name": name,
             "status": "success"
         }
