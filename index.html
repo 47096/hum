@@ -2283,25 +2283,32 @@ Rules:
     renderPlaylist();
   }
 
-  function downloadTrack(url, title, format) {
+  async function downloadTrack(url, title, format) {
     const ext = format || "mp3";
     // Sanitize filename — remove special chars, skip UUIDs
     let filename = title || "track";
-    console.log("Download - title:", title, "filename before:", filename);
-    // If title looks like a UUID, fall back to "track"
     if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(filename)) {
       filename = "track";
     }
     filename = filename.replace(/[^\w\s\-]/g, "").trim().slice(0, 50) || "track";
-    console.log("Download - filename after:", filename);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename + "." + ext;
-    a.target = "_blank";
-    a.rel = "noopener";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+
+    try {
+      // Fetch as blob to avoid cross-origin download issues
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename + "." + ext;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      // Fallback: open in new tab
+      window.open(url, "_blank");
+      toast("Download started — rename file to: " + filename + "." + ext, "ok");
+    }
   }
 
   function formatDuration(secs) {
