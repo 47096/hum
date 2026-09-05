@@ -344,14 +344,17 @@
     display: grid;
     place-items: center;
     flex-shrink: 0;
-    font-size: 20px;
-    font-weight: 300;
     transition: all .15s;
   }
 
   .input-wrapper .image-btn:hover {
     background: rgba(0,0,0,0.05);
     color: var(--fg);
+  }
+
+  .input-wrapper .image-btn svg {
+    width: 20px;
+    height: 20px;
   }
 
   .input-wrapper .chat-input {
@@ -1372,7 +1375,7 @@
         <div class="input-container">
           <input type="file" id="imageInput" accept="image/*" style="display:none;">
           <div class="input-wrapper">
-            <button class="image-btn" id="imageBtn" aria-label="Upload image">+</button>
+            <button class="image-btn" id="imageBtn" aria-label="Upload image"><i data-lucide="image"></i></button>
             <textarea class="chat-input" id="chatInput" placeholder="Describe your song..." rows="1"></textarea>
           </div>
           <button class="send-btn" id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
