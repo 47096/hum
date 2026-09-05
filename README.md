@@ -1,6 +1,8 @@
-# AI Music — GMI Cloud
+# Hum — AI Music Generator
 
-Generate songs from lyrics using MiniMax Music 3.0 via GMI Cloud or MiniMax APIs.
+Generate songs and instrumentals using AI. Chat with the AI to create style prompts and lyrics, then generate music.
+
+**Live app:** [https://47096.github.io/hum/](https://47096.github.io/hum/)
 
 ## How it works
 
@@ -8,11 +10,25 @@ Generate songs from lyrics using MiniMax Music 3.0 via GMI Cloud or MiniMax APIs
 Browser → Render proxy (CORS) → GMI Cloud / MiniMax API → MP3
 ```
 
+## Features
+
+- **Chat-based creation** — describe your song in natural language
+- **12 genre templates** — Pop, Hip-Hop, R&B, Latin, EDM, Afrobeats, Rock, K-Pop, Country, Lo-fi, Jazz, Soul
+- **Image-to-song** — upload an image and AI generates style/lyrics based on the visual mood
+- **YouTube links** — paste a YouTube URL to create a song inspired by it
+- **Song & Instrumental modes** — toggle between songs with lyrics and music-only tracks
+- **Click-to-edit** — edit title, style, and lyrics inline in the chat
+- **AI-generated titles** — AI names each track automatically
+- **Embedded lyrics** — downloaded MP3s include lyrics for Apple Music
+- **Song history** — saved locally, replay or delete past generations
+- **Download all** — export all tracks at once
+- **Customizable** — sample rate, bitrate, format (MP3/WAV/PCM), BPM, key, mode
+
 ## Setup
 
 ### 1. Get an API key
 
-**GMI Cloud (free during campaign, ends Sep 6, 2026):**
+**GMI Cloud (free during campaign):**
 - Sign up at [console.gmicloud.ai](https://console.gmicloud.ai)
 - Go to **API Keys** and create one
 
@@ -28,11 +44,10 @@ The proxy is in the `proxy/` folder and deploys automatically via Render Bluepri
 2. Click **"New"** → **"Blueprint"**
 3. Connect this repo
 4. Click **"Apply"** — Render will deploy the proxy automatically
-5. Copy the URL (e.g. `https://ai-music-proxy.onrender.com`)
+5. Copy the URL (e.g. `https://hum-proxy.onrender.com`)
 
-**Why Render instead of Cloudflare Workers?**
-- No timeout limits (Cloudflare free plan has a 100s timeout)
-- Handles long-running song generation (5+ minutes)
+**Why Render?**
+- No timeout limits (handles long-running generation)
 - Free tier: 750 hours/month, no credit card required
 
 ### 3. Host the frontend on GitHub Pages
@@ -40,46 +55,32 @@ The proxy is in the `proxy/` folder and deploys automatically via Render Bluepri
 1. Push this repo to GitHub
 2. Go to **Settings → Pages → Source → Deploy from branch**
 3. Select `main` branch, `/ (root)` folder
-4. Your site will be live at `https://<username>.github.io/<repo>/`
+4. Your site will be live at `https://<username>.github.io/hum/`
 
 ### 4. Configure in browser
 
 1. Open the GitHub Pages URL
 2. Select your provider (GMI Cloud or MiniMax)
 3. Paste your API key
-4. Expand **Proxy settings** and paste your Render proxy URL
+4. Paste your Render proxy URL
 5. Done — generate songs from any device
-
-## Features
-
-- **10 genres** with subgenre presets: Pop, R&B, Hip-hop, Rock, Electronic, Jazz, Country, Latin, K-pop, Metal
-- **Lyrics templates**: Birthday, Love ballad, Hype track, Lullaby, Diss track, Story song
-- **Song structure reference**: [Verse], [Chorus], [Bridge], [Hook], etc.
-- **Style remix**: Generate 2-3 versions of the same lyrics in different genres
-- **Advanced settings**: Sample rate, bitrate, format (MP3/WAV/PCM)
-- **Song history**: Saved locally, replay or delete past generations
-- **Copy/paste settings**: Share your config as JSON via clipboard
-- **Long song support**: No timeout limits via Render proxy
 
 ## Local development
 
-For local use, you can skip Render and run the Python proxy:
+For local use, run the Python proxy:
 
 ```bash
-python3 gmi_proxy.py
+cd proxy
+pip install -r requirements.txt
+python app.py
 # Open http://localhost:8765
 ```
-
-The app auto-detects: no proxy URL set → falls back to `localhost:8765`.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
 | `index.html` | Frontend app (single file, no build step) |
-| `proxy/app.py` | Render CORS proxy (Python/Flask) |
+| `proxy/app.py` | CORS proxy with lyrics embedding (Python/Flask) |
 | `proxy/requirements.txt` | Python dependencies |
 | `render.yaml` | Render deployment config |
-| `gmi_proxy.py` | Local Python CORS proxy (optional) |
-| `test-gmi-music.sh` | CLI test script |
-| `mockups.html` | Design concept mockups |
