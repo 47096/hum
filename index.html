@@ -2303,7 +2303,8 @@ Rules:
     if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(filename)) {
       filename = "track";
     }
-    filename = filename.replace(/[^\w\s\-]/g, "").trim().slice(0, 50) || "track";
+    // Only remove characters that are invalid in filenames (Windows/Mac/Linux)
+    filename = filename.replace(/[<>:"/\\|?*]/g, "").trim().slice(0, 100) || "track";
 
     try {
       // Fetch via proxy — embeds lyrics if provided
