@@ -647,40 +647,6 @@
     color: var(--bg);
   }
 
-  .gen-progress {
-    display: none;
-    padding: 0 16px 12px;
-    flex-shrink: 0;
-  }
-
-  .gen-progress.active { display: block; }
-
-  .gen-progress-bar {
-    width: 100%; height: 3px;
-    background: var(--border);
-    margin-bottom: 6px;
-    overflow: hidden;
-  }
-
-  .gen-progress-bar::after {
-    content: "";
-    display: block;
-    width: 40%; height: 100%;
-    background: var(--fg);
-    animation: progress-slide 1.5s ease-in-out infinite;
-  }
-
-  @keyframes progress-slide {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(350%); }
-  }
-
-  .gen-progress-text {
-    font-family: var(--font-body);
-    font-size: 11px; color: var(--muted);
-    text-align: center;
-  }
-
   /* Right: Playlist */
   .right {
     display: flex; flex-direction: column;
@@ -1396,10 +1362,6 @@
           <span class="gen-context-text" id="genContextText">Ready to generate</span>
         </div>
         <button class="generate-btn-full" id="generateBtn"><span class="btn-spinner"></span><span class="btn-text">Generate</span></button>
-      </div>
-      <div class="gen-progress" id="genProgress">
-        <div class="gen-progress-bar" id="genProgressBar"></div>
-        <div class="gen-progress-text" id="genProgressText">0s elapsed</div>
       </div>
     </div>
   </div>
@@ -3313,7 +3275,6 @@ Rules:
       isGenerating = false;
       generateBtn.querySelector(".btn-text").textContent = "Generate";
       generateBtn.classList.remove("generating");
-      $("genProgress").classList.remove("active");
       toast("Cancelled", "ok");
       return;
     }
@@ -3337,14 +3298,6 @@ Rules:
     abortController = new AbortController();
     generateBtn.querySelector(".btn-text").textContent = "Cancel";
     generateBtn.classList.add("generating");
-    $("genProgress").classList.add("active");
-
-    // Progress timer
-    const genStart = Date.now();
-    const genTimer = setInterval(() => {
-      const secs = Math.round((Date.now() - genStart) / 1000);
-      $("genProgressText").textContent = secs + "s elapsed" + (secs > 30 ? " · almost there…" : "");
-    }, 1000);
 
     try {
       const payload = buildPayload(lyrics, prompt);
@@ -3381,12 +3334,10 @@ Rules:
       console.error(err);
       toast(err.message || String(err), "err");
     } finally {
-      clearInterval(genTimer);
       abortController = null;
       isGenerating = false;
       generateBtn.querySelector(".btn-text").textContent = "Generate";
       generateBtn.classList.remove("generating");
-      $("genProgress").classList.remove("active");
     }
   });
 
