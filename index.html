@@ -2118,7 +2118,7 @@ Rules:
     bubble.appendChild(img);
     const text = document.createElement("div");
     text.className = "image-text";
-    text.textContent = "Analyze this image and create a song";
+    text.textContent = "Analyse this image and create a song";
     bubble.appendChild(text);
     messageDiv.appendChild(bubble);
     chatMessages.appendChild(messageDiv);
@@ -2140,7 +2140,7 @@ Rules:
       role: "user",
       content: [
         { type: "image_url", image_url: { url: base64 } },
-        { type: "text", text: "Analyze this image and create a song based on it. Describe the mood, colours, scene, and emotion you see." }
+        { type: "text", text: "Analyse this image and create a song based on it. Describe the mood, colours, scene, and emotion you see." }
       ]
     });
     if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
@@ -2154,7 +2154,7 @@ Rules:
 
     try {
       const systemPrompt = mode === "instrumental"
-        ? `You are a music style prompt generator. When given an image, analyze the mood, colours, scene, and emotion. Generate a detailed style prompt for instrumental music that captures that visual feeling.
+        ? `You are a music style prompt generator. When given an image, analyse the mood, colours, scene, and emotion. Generate a detailed style prompt for instrumental music that captures that visual feeling.
 
 IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
 
@@ -2167,7 +2167,7 @@ Rules:
 - "lyrics": always empty string for instrumental mode
 - NEVER include markdown code blocks or any text outside the JSON object
 - Do NOT repeat the user's prompt or add explanations`
-        : `You are a songwriting assistant. When given an image, analyze the mood, colours, scene, and emotion. Generate a style prompt and lyrics that capture that visual feeling.
+        : `You are a songwriting assistant. When given an image, analyse the mood, colours, scene, and emotion. Generate a style prompt and lyrics that capture that visual feeling.
 
 IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
 
