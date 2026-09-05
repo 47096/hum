@@ -1760,6 +1760,7 @@
     try {
       // Try to parse as JSON
       const json = JSON.parse(text);
+      console.log("AI response:", json);
       if (json.title) currentTitle = json.title;
       if (json.style) currentStyle = json.style;
       if (json.lyrics) {
@@ -2902,6 +2903,7 @@ Rules:
 
       const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
       const trackTitle = currentTitle || titleLine || "Untitled";
+      console.log("Saving track - currentTitle:", currentTitle, "titleLine:", titleLine, "trackTitle:", trackTitle);
       const dur = activeProvider === "minimax" ? (final.extra_info?.music_duration || 0) : ((final.outcome?.duration_ms || 0) / 1000);
       saveToHistory({
         id: crypto.randomUUID(),
