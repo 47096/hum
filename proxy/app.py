@@ -216,10 +216,11 @@ def voice_clone():
 
         logger.info(f"Uploading audio to temporary host: name={name}, audio_size={len(audio_bytes)}")
         try:
-            # Use 0x0.st for temporary file hosting
-            upload_resp = requests.post(
-                "https://0x0.st",
-                files={"file": ("voice.mp3", audio_bytes, "audio/mpeg")},
+            # Use transfer.sh for temporary file hosting
+            upload_resp = requests.put(
+                "https://transfer.sh/voice.mp3",
+                data=audio_bytes,
+                headers={"Content-Type": "audio/mpeg"},
                 timeout=30
             )
             logger.info(f"Upload response: {upload_resp.status_code} {upload_resp.text[:200]}")
@@ -227,7 +228,7 @@ def voice_clone():
             if upload_resp.status_code != 200:
                 return cors_response(json.dumps({"error": f"Upload failed with status {upload_resp.status_code}: {upload_resp.text[:100]}"}), 500)
 
-            # 0x0.st returns the URL directly as plain text
+            # transfer.sh returns the URL directly as plain text
             audio_url = upload_resp.text.strip()
             if not audio_url.startswith("http"):
                 return cors_response(json.dumps({"error": f"Invalid URL returned: {audio_url}"}), 500)
