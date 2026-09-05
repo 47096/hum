@@ -215,21 +215,30 @@ def voice_clone():
         voice_id = "hum-" + str(uuid.uuid4())[:8]
 
         logger.info(f"Uploading audio to temporary host: name={name}, audio_size={len(audio_bytes)}")
-        upload_resp = requests.post(
-            "https://file.io",
-            files={"file": ("voice.mp3", audio_bytes, "audio/mpeg")},
-            data={"expires": "1h"},
-            timeout=30
-        )
+        try:
+            upload_resp = requests.post(
+                "https://file.io",
+                files={"file": ("voice.mp3", audio_bytes, "audio/mpeg")},
+                data={"expires": "1h"},
+                timeout=30
+            )
+            logger.info(f"Upload response: {upload_resp.status_code} {upload_resp.text[:200]}")
 
-        if upload_resp.status_code != 200 or not upload_resp.json().get("success"):
-            return cors_response(json.dumps({"error": "Failed to upload audio file"}), 500)
+            if upload_resp.status_code != 200:
+                return cors_response(json.dumps({"error": f"Upload failed with status {upload_resp.status_code}"}), 500)
 
-        audio_url = upload_resp.json().get("link")
-        if not audio_url:
-            return cors_response(json.dumps({"error": "No URL returned from upload"}), 500)
+            upload_json = upload_resp.json()
+            if not upload_json.get("success"):
+                return cors_response(json.dumps({"error": f"Upload failed: {upload_json.get('message', 'Unknown error')}"}), 500)
 
-        logger.info(f"Audio uploaded: {audio_url}")
+            audio_url = upload_json.get("link")
+            if not audio_url:
+                return cors_response(json.dumps({"error": "No URL returned from upload"}), 500)
+
+            logger.info(f"Audio uploaded: {audio_url}")
+        except Exception as e:
+            logger.error(f"Upload error: {e}")
+            return cors_response(json.dumps({"error": f"Failed to upload audio: {str(e)}"}), 500)
 
         # Step 2: Call voice clone API with the public URL
         clone_url = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests"
@@ -248,13 +257,20 @@ def voice_clone():
         }
 
         logger.info(f"Voice clone request: voice_id={voice_id}, audio_url={audio_url}")
-        clone_resp = requests.post(clone_url, headers=clone_headers, json=clone_body, timeout=120)
-        logger.info(f"Clone response: {clone_resp.status_code} {clone_resp.text[:200]}")
+        try:
+            clone_resp = requests.post(clone_url, headers=clone_headers, json=clone_body, timeout=120)
+            logger.info(f"Clone response: {clone_resp.status_code} {clone_resp.text[:500]}")
 
-        if clone_resp.status_code != 200:
-            return cors_response(clone_resp.text, clone_resp.status_code)
+            if clone_resp.status_code != 200:
+                return cors_response(clone_resp.text, clone_resp.status_code)
 
-        clone_result = clone_resp.json()
+            clone_result = clone_resp.json()
+        except requests.exceptions.JSONDecodeError:
+            logger.error(f"Failed to parse clone response as JSON: {clone_resp.text}")
+            return cors_response(json.dumps({"error": "Invalid response from voice clone API"}), 500)
+        except Exception as e:
+            logger.error(f"Clone request error: {e}")
+            return cors_response(json.dumps({"error": f"Voice clone request failed: {str(e)}"}), 500)
 
         # Check if request was successful
         status = clone_result.get("status", "")
