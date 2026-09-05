@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voice Clone Flows — Hum</title>
+<style>
+  :root {
+    --bg: #f7f7f8;
+    --panel: #ffffff;
+    --border: #e5e5e5;
+    --fg: #111111;
+    --muted: #6b6b6b;
+    --accent: #44403c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding: 40px;
+  }
+
+  h1 { font-size: 28px; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 40px; }
+
+  .flow {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+
+  .flow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .flow-number {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .flow-name {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .flow-desc {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .flow-steps {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .step {
+    flex: 1;
+    min-width: 200px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .step-number {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .step-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .step-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .step-preview {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 8px;
+  }
+
+  .step-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 18px;
+    padding-top: 40px;
+  }
+
+  /* Mockup elements */
+  .mock-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    border-radius: 6px 6px 0 0;
+  }
+
+  .mock-logo {
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mock-logo-icon {
+    width: 24px;
+    height: 24px;
+    background: #292524;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 300;
+  }
+
+  .mock-icons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .mock-icon {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .mock-icon.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .mock-mode-bar {
+    display: flex;
+    padding: 8px;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mock-mode-btn {
+    flex: 1;
+    padding: 6px;
+    text-align: center;
+    font-size: 11px;
+    border-radius: 6px;
+    color: var(--muted);
+    background: var(--bg);
+  }
+
+  .mock-mode-btn.active {
+    background: var(--panel);
+    color: var(--fg);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .mock-chat {
+    padding: 16px;
+    min-height: 120px;
+  }
+
+  .mock-msg {
+    margin-bottom: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .mock-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(68,64,60,0.12);
+    color: #44403c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .mock-bubble {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .mock-bubble.user {
+    background: rgba(0,0,0,0.06);
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin-left: auto;
+    max-width: 80%;
+  }
+
+  .mock-input-area {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .mock-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    font-size: 11px;
+    background: var(--bg);
+  }
+
+  .mock-send {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  .mock-generate {
+    width: 100%;
+    padding: 10px;
+    background: #111111;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  .mock-voice-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(68,64,60,0.08);
+    border-radius: 6px;
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  .mock-voice-dot {
+    width: 6px;
+    height: 6px;
+    background: #4ade80;
+    border-radius: 50%;
+  }
+
+  /* Settings mockup */
+  .mock-settings {
+    padding: 20px;
+  }
+
+  .mock-settings-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .mock-settings-section {
+    margin-bottom: 16px;
+  }
+
+  .mock-settings-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .mock-upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .mock-voice-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+
+  .mock-voice-avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .mock-voice-name {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .mock-voice-status {
+    font-size: 11px;
+    color: #4ade80;
+  }
+
+  /* Modal mockup */
+  .mock-modal {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 400px;
+  }
+
+  .mock-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mock-modal-title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .mock-modal-close {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .mock-modal-body {
+    padding: 20px;
+  }
+
+  .mock-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .mock-btn-secondary {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--fg);
+    cursor: pointer;
+  }
+
+  .mock-btn-primary {
+    padding: 8px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* Toggle mockup */
+  .mock-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+
+  .mock-toggle-label {
+    font-size: 13px;
+  }
+
+  .mock-toggle {
+    width: 40px;
+    height: 22px;
+    background: var(--border);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .mock-toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    transition: all .15s;
+  }
+
+  .mock-toggle.on {
+    background: var(--accent);
+  }
+
+  .mock-toggle.on::after {
+    left: 21px;
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<h1>Voice Clone Flows — Hum</h1>
+<p class="subtitle">5 different ways to integrate voice cloning into the app</p>
+
+<!-- Flow 1: Settings Upload -->
+<div class="flow">
+  <div class="flow-header">
+    <div class="flow-name">Flow 1: Settings Upload</div>
+    <div class="flow-number">01</div>
+  </div>
+  <div class="flow-desc">Upload voice in Settings. Voice is saved and used automatically when generating. Simple and non-intrusive.</div>
+
+  <div class="flow-steps">
+    <div class="step">
+      <div class="step-number">Step 1</div>
+      <div class="step-title">Open Settings</div>
+      <div class="step-desc">User clicks the three dots icon to open settings</div>
+      <div class="step-preview">
+        <div class="mock-topbar">
+          <div class="mock-logo"><div class="mock-logo-icon">H</div> Hum</div>
+          <div class="mock-icons">
+            <div class="mock-icon active">⋮</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 2</div>
+      <div class="step-title">Upload Voice</div>
+      <div class="step-desc">User uploads audio sample in Voice section</div>
+      <div class="step-preview">
+        <div class="mock-settings">
+          <div class="mock-settings-title">Settings</div>
+          <div class="mock-settings-section">
+            <div class="mock-settings-label">Voice Clone</div>
+            <div class="mock-upload-area">
+              🎤 Drop audio file here or click to upload<br>
+              <span style="font-size:10px; color:#9a9a9a;">MP3, WAV • 10-30 seconds • Clear vocals</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 3</div>
+      <div class="step-title">Voice Ready</div>
+      <div class="step-desc">Voice is cloned and saved. Shows in settings.</div>
+      <div class="step-preview">
+        <div class="mock-settings">
+          <div class="mock-settings-title">Settings</div>
+          <div class="mock-settings-section">
+            <div class="mock-settings-label">Voice Clone</div>
+            <div class="mock-voice-card">
+              <div class="mock-voice-avatar">V</div>
+              <div>
+                <div class="mock-voice-name">My Voice</div>
+                <div class="mock-voice-status">✓ Ready to use</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 4</div>
+      <div class="step-title">Generate Song</div>
+      <div class="step-desc">User creates song as normal. Voice is used automatically.</div>
+      <div class="step-preview">
+        <div class="mock-voice-indicator">
+          <div class="mock-voice-dot"></div>
+          Using cloned voice: My Voice
+        </div>
+        <button class="mock-generate">Generate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Flow 2: Topbar Icon -->
+<div class="flow">
+  <div class="flow-header">
+    <div class="flow-name">Flow 2: Topbar Icon</div>
+    <div class="flow-number">02</div>
+  </div>
+  <div class="flow-desc">Microphone icon in topbar for quick voice access. Opens a modal for upload and management.</div>
+
+  <div class="flow-steps">
+    <div class="step">
+      <div class="step-number">Step 1</div>
+      <div class="step-title">Click Mic Icon</div>
+      <div class="step-desc">User clicks microphone icon in topbar</div>
+      <div class="step-preview">
+        <div class="mock-topbar">
+          <div class="mock-logo"><div class="mock-logo-icon">H</div> Hum</div>
+          <div class="mock-icons">
+            <div class="mock-icon">🎤</div>
+            <div class="mock-icon">⋮</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 2</div>
+      <div class="step-title">Voice Modal Opens</div>
+      <div class="step-desc">Modal shows upload area and existing voices</div>
+      <div class="step-preview">
+        <div class="mock-modal">
+          <div class="mock-modal-header">
+            <div class="mock-modal-title">Voice Clone</div>
+            <div class="mock-modal-close">✕</div>
+          </div>
+          <div class="mock-modal-body">
+            <div class="mock-upload-area">
+              🎤 Drop audio file here<br>
+              <span style="font-size:10px;">or click to browse</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 3</div>
+      <div class="step-title">Upload & Clone</div>
+      <div class="step-desc">User uploads audio, voice is cloned</div>
+      <div class="step-preview">
+        <div class="mock-modal">
+          <div class="mock-modal-header">
+            <div class="mock-modal-title">Voice Clone</div>
+            <div class="mock-modal-close">✕</div>
+          </div>
+          <div class="mock-modal-body">
+            <div class="mock-voice-card">
+              <div class="mock-voice-avatar">V</div>
+              <div>
+                <div class="mock-voice-name">Cloning...</div>
+                <div class="mock-voice-status" style="color:var(--muted);">Processing audio</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 4</div>
+      <div class="step-title">Generate with Voice</div>
+      <div class="step-desc">Voice is ready. User generates song normally.</div>
+      <div class="step-preview">
+        <div class="mock-topbar">
+          <div class="mock-logo"><div class="mock-logo-icon">H</div> Hum</div>
+          <div class="mock-icons">
+            <div class="mock-icon active">🎤</div>
+            <div class="mock-icon">⋮</div>
+          </div>
+        </div>
+        <div style="padding:8px; font-size:11px; color:#4ade80; text-align:center;">✓ Voice ready</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Flow 3: Chat Inline -->
+<div class="flow">
+  <div class="flow-header">
+    <div class="flow-name">Flow 3: Chat Inline</div>
+    <div class="flow-number">03</div>
+  </div>
+  <div class="flow-desc">Voice clone happens within the chat flow. User uploads voice as part of the conversation.</div>
+
+  <div class="flow-steps">
+    <div class="step">
+      <div class="step-number">Step 1</div>
+      <div class="step-title">Chat with AI</div>
+      <div class="step-desc">User describes the song they want</div>
+      <div class="step-preview">
+        <div class="mock-chat">
+          <div class="mock-msg">
+            <div class="mock-avatar">U</div>
+            <div class="mock-bubble user">Create a pop song about summer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 2</div>
+      <div class="step-title">AI Suggests Voice</div>
+      <div class="step-desc">AI asks if user wants to use a custom voice</div>
+      <div class="step-preview">
+        <div class="mock-chat">
+          <div class="mock-msg">
+            <div class="mock-avatar">A</div>
+            <div class="mock-bubble">
+              I've created your song. Would you like to use a custom voice?<br><br>
+              <span style="color:var(--accent); font-weight:500;">🎤 Upload voice sample</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 3</div>
+      <div class="step-title">Upload in Chat</div>
+      <div class="step-desc">User uploads audio directly in the chat</div>
+      <div class="step-preview">
+        <div class="mock-chat">
+          <div class="mock-msg">
+            <div class="mock-avatar">U</div>
+            <div class="mock-bubble user">
+              🎤 my-voice-sample.mp3
+            </div>
+          </div>
+          <div class="mock-msg">
+            <div class="mock-avatar">A</div>
+            <div class="mock-bubble">Cloning your voice...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 4</div>
+      <div class="step-title">Generate with Voice</div>
+      <div class="step-desc">Voice is cloned. Song is generated with the custom voice.</div>
+      <div class="step-preview">
+        <div class="mock-chat">
+          <div class="mock-msg">
+            <div class="mock-avatar">A</div>
+            <div class="mock-bubble">
+              ✓ Voice cloned successfully!<br>
+              Generating your song with your voice...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Flow 4: Generate Button Modal -->
+<div class="flow">
+  <div class="flow-header">
+    <div class="flow-name">Flow 4: Generate Button Modal</div>
+    <div class="flow-number">04</div>
+  </div>
+  <div class="flow-desc">When user clicks Generate, a modal asks if they want to use a custom voice. Clean separation of concerns.</div>
+
+  <div class="flow-steps">
+    <div class="step">
+      <div class="step-number">Step 1</div>
+      <div class="step-title">Click Generate</div>
+      <div class="step-desc">User clicks the Generate button</div>
+      <div class="step-preview">
+        <button class="mock-generate">Generate</button>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 2</div>
+      <div class="step-title">Voice Selection Modal</div>
+      <div class="step-desc">Modal asks: use default AI voice or custom voice?</div>
+      <div class="step-preview">
+        <div class="mock-modal">
+          <div class="mock-modal-header">
+            <div class="mock-modal-title">Choose Voice</div>
+            <div class="mock-modal-close">✕</div>
+          </div>
+          <div class="mock-modal-body">
+            <div class="mock-toggle-row">
+              <div class="mock-toggle-label">Use custom voice</div>
+              <div class="mock-toggle"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 3</div>
+      <div class="step-title">Upload (if needed)</div>
+      <div class="step-desc">If no custom voice exists, show upload option</div>
+      <div class="step-preview">
+        <div class="mock-modal">
+          <div class="mock-modal-header">
+            <div class="mock-modal-title">Upload Voice</div>
+            <div class="mock-modal-close">✕</div>
+          </div>
+          <div class="mock-modal-body">
+            <div class="mock-upload-area">
+              🎤 Drop audio file here<br>
+              <span style="font-size:10px;">10-30 seconds of clear audio</span>
+            </div>
+          </div>
+          <div class="mock-modal-footer">
+            <button class="mock-btn-secondary">Cancel</button>
+            <button class="mock-btn-primary">Upload & Generate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 4</div>
+      <div class="step-title">Generate</div>
+      <div class="step-desc">Song is generated with selected voice</div>
+      <div class="step-preview">
+        <div style="text-align:center; padding:16px;">
+          <div style="font-size:14px; font-weight:500; margin-bottom:8px;">Generating...</div>
+          <div style="font-size:11px; color:var(--muted);">Using: My Voice</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Flow 5: Persistent Sidebar -->
+<div class="flow">
+  <div class="flow-header">
+    <div class="flow-name">Flow 5: Persistent Sidebar</div>
+    <div class="flow-number">05</div>
+  </div>
+  <div class="flow-desc">Voice panel is always visible in the left panel, below the chat. Voice status is always clear.</div>
+
+  <div class="flow-steps">
+    <div class="step">
+      <div class="step-number">Step 1</div>
+      <div class="step-title">Voice Panel Visible</div>
+      <div class="step-desc">Voice section shows below the chat input</div>
+      <div class="step-preview">
+        <div style="padding:12px; border-top:1px solid var(--border);">
+          <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">Voice</div>
+          <div class="mock-upload-area" style="padding:12px;">
+            🎤 Upload voice sample
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 2</div>
+      <div class="step-title">Upload & Clone</div>
+      <div class="step-desc">User uploads audio, voice is cloned</div>
+      <div class="step-preview">
+        <div style="padding:12px; border-top:1px solid var(--border);">
+          <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">Voice</div>
+          <div class="mock-voice-card">
+            <div class="mock-voice-avatar" style="width:28px; height:28px; font-size:12px;">V</div>
+            <div>
+              <div class="mock-voice-name" style="font-size:12px;">Cloning...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 3</div>
+      <div class="step-title">Voice Ready</div>
+      <div class="step-desc">Voice is ready, shown with status indicator</div>
+      <div class="step-preview">
+        <div style="padding:12px; border-top:1px solid var(--border);">
+          <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">Voice</div>
+          <div class="mock-voice-card">
+            <div class="mock-voice-avatar" style="width:28px; height:28px; font-size:12px;">V</div>
+            <div>
+              <div class="mock-voice-name" style="font-size:12px;">My Voice</div>
+              <div class="mock-voice-status" style="font-size:10px;">✓ Ready</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-arrow">→</div>
+
+    <div class="step">
+      <div class="step-number">Step 4</div>
+      <div class="step-title">Generate</div>
+      <div class="step-desc">Generate button shows voice is being used</div>
+      <div class="step-preview">
+        <div class="mock-voice-indicator">
+          <div class="mock-voice-dot"></div>
+          Voice: My Voice
+        </div>
+        <button class="mock-generate">Generate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Comparison -->
+<div class="flow">
+  <div class="flow-header">
+    <div class="flow-name">Comparison</div>
+  </div>
+
+  <table style="width:100%; border-collapse:collapse; font-size:13px;">
+    <thead>
+      <tr style="border-bottom:2px solid var(--border);">
+        <th style="text-align:left; padding:12px 8px;">Flow</th>
+        <th style="text-align:left; padding:12px 8px;">Complexity</th>
+        <th style="text-align:left; padding:12px 8px;">Discoverability</th>
+        <th style="text-align:left; padding:12px 8px;">Best For</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 8px; font-weight:500;">1. Settings Upload</td>
+        <td style="padding:12px 8px;">Low</td>
+        <td style="padding:12px 8px;">Medium</td>
+        <td style="padding:12px 8px;">Simple, non-intrusive</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 8px; font-weight:500;">2. Topbar Icon</td>
+        <td style="padding:12px 8px;">Medium</td>
+        <td style="padding:12px 8px;">High</td>
+        <td style="padding:12px 8px;">Quick access, visible</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 8px; font-weight:500;">3. Chat Inline</td>
+        <td style="padding:12px 8px;">High</td>
+        <td style="padding:12px 8px;">Medium</td>
+        <td style="padding:12px 8px;">Conversational flow</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 8px; font-weight:500;">4. Generate Modal</td>
+        <td style="padding:12px 8px;">Medium</td>
+        <td style="padding:12px 8px;">High</td>
+        <td style="padding:12px 8px;">Clean separation</td>
+      </tr>
+      <tr>
+        <td style="padding:12px 8px; font-weight:500;">5. Persistent Sidebar</td>
+        <td style="padding:12px 8px;">Low</td>
+        <td style="padding:12px 8px;">Very High</td>
+        <td style="padding:12px 8px;">Always visible, clear status</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

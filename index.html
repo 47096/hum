@@ -372,6 +372,40 @@
     height: 20px;
   }
 
+  .voice-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+    background: rgba(68,64,60,0.06);
+    border-radius: 8px;
+    font-size: 12px;
+  }
+
+  .voice-dot {
+    width: 6px;
+    height: 6px;
+    background: #4ade80;
+    border-radius: 50%;
+  }
+
+  .voice-remove {
+    margin-left: auto;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 11px;
+  }
+
+  .voice-remove:hover {
+    color: var(--fg);
+  }
+
+  .voice-btn.active {
+    background: rgba(68,64,60,0.1);
+    color: var(--accent);
+  }
+
   .input-wrapper .chat-input {
     flex: 1;
     border: none;
@@ -1354,11 +1388,18 @@
       <div class="chat-bottom">
         <div class="input-container">
           <input type="file" id="imageInput" accept="image/*" style="display:none;">
+          <input type="file" id="voiceInput" accept="audio/*" style="display:none;">
           <div class="input-wrapper">
+            <button class="image-btn" id="voiceBtn" aria-label="Upload voice for cloning"><i data-lucide="mic"></i></button>
             <button class="image-btn" id="imageBtn" aria-label="Upload image"><i data-lucide="image"></i></button>
             <textarea class="chat-input" id="chatInput" placeholder="Describe your song..." rows="1"></textarea>
           </div>
           <button class="send-btn" id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
+        </div>
+        <div class="voice-status" id="voiceStatus" style="display:none;">
+          <div class="voice-dot"></div>
+          <span>Voice: <strong id="voiceName">My Voice</strong></span>
+          <span class="voice-remove" id="voiceRemove">✕</span>
         </div>
         <div class="gen-context" id="genContext" style="display:none;">
           <span class="gen-context-text" id="genContextText">Ready to generate</span>
@@ -2081,6 +2122,142 @@ Rules:
     imageInput.value = ""; // Reset input
   });
 
+  // Voice clone
+  const voiceInput = $("voiceInput");
+  const voiceBtn = $("voiceBtn");
+  const voiceStatus = $("voiceStatus");
+  const voiceName = $("voiceName");
+  const voiceRemove = $("voiceRemove");
+  const VOICE_KEY = "hum_voice_clone";
+
+  // Load saved voice on startup
+  function loadSavedVoice() {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(VOICE_KEY));
+      if (saved && saved.voiceId) {
+        showVoiceStatus(saved.name || "My Voice");
+      }
+    } catch { /* ignore */ }
+  }
+
+  function showVoiceStatus(name) {
+    voiceName.textContent = name;
+    voiceStatus.style.display = "flex";
+    voiceBtn.classList.add("active");
+    // Update generate button text
+    const btnText = generateBtn.querySelector(".btn-text");
+    if (btnText && !isGenerating) {
+      btnText.textContent = "Generate with " + name;
+    }
+  }
+
+  function hideVoiceStatus() {
+    voiceStatus.style.display = "none";
+    voiceBtn.classList.remove("active");
+    sessionStorage.removeItem(VOICE_KEY);
+    // Reset generate button text
+    const btnText = generateBtn.querySelector(".btn-text");
+    if (btnText && !isGenerating) {
+      btnText.textContent = "Generate";
+    }
+  }
+
+  voiceBtn.addEventListener("click", () => {
+    voiceInput.click();
+  });
+
+  voiceRemove.addEventListener("click", hideVoiceStatus);
+
+  voiceInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("audio/")) {
+      toast("Please upload an audio file (MP3, WAV, M4A)", "err");
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast("Audio file too large — max 10MB", "err");
+      return;
+    }
+
+    const key = $("apiKey").value.trim();
+    if (!key) {
+      openSettings();
+      toast("Set your API key first", "err");
+      return;
+    }
+
+    if (!getEndpoint()) {
+      openSettings();
+      toast("Set your proxy URL first", "err");
+      return;
+    }
+
+    // Show cloning status in chat
+    addMessage("user", "🎤 " + file.name);
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "msg ai-msg";
+    loadingDiv.innerHTML = '<div class="ai-avatar">A</div><div class="ai-text">Cloning voice...</div>';
+    chatMessages.appendChild(loadingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      // Read file as base64
+      const reader = new FileReader();
+      const base64 = await new Promise((resolve, reject) => {
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      // Call voice clone API via proxy
+      const resp = await fetch(getEndpoint() + "/voice-clone", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key,
+          "X-Provider": activeProvider
+        },
+        body: JSON.stringify({
+          audio: base64,
+          name: file.name.replace(/\.[^/.]+$/, "") // Remove extension
+        })
+      });
+
+      chatMessages.removeChild(loadingDiv);
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || "Voice cloning failed");
+      }
+
+      const result = await resp.json();
+      const voiceId = result.voice_id || result.voiceId;
+      const voiceNameStr = result.name || file.name.replace(/\.[^/.]+$/, "");
+
+      if (!voiceId) throw new Error("No voice ID returned");
+
+      // Save voice to session
+      sessionStorage.setItem(VOICE_KEY, JSON.stringify({
+        voiceId: voiceId,
+        name: voiceNameStr
+      }));
+
+      showVoiceStatus(voiceNameStr);
+      addMessage("ai", "✓ Voice cloned successfully! Your voice is ready to use.");
+
+    } catch (err) {
+      chatMessages.removeChild(loadingDiv);
+      addMessage("ai", "Voice cloning failed: " + escapeHtml(err.message));
+    }
+
+    voiceInput.value = ""; // Reset input
+  });
+
   async function sendImageMessage(base64, filename) {
     // Show image in chat
     const messageDiv = document.createElement("div");
@@ -2544,6 +2721,7 @@ Rules:
   }
 
   loadSettings();
+  loadSavedVoice();
   settingsFields.forEach(id => { $(id).addEventListener("change", saveSettings); });
 
   // ─── Lyrics templates ───
@@ -3189,6 +3367,13 @@ Rules:
     const songMode = $("songMode").value || undefined;
     const instrumentalOn = mode === "instrumental";
 
+    // Check for cloned voice
+    let voiceId = null;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(VOICE_KEY));
+      if (saved && saved.voiceId) voiceId = saved.voiceId;
+    } catch { /* ignore */ }
+
     if (activeProvider === "minimax") {
       // Using INSTRUMENTAL_LYRICS constant
       const p = {
@@ -3207,6 +3392,7 @@ Rules:
       if (bpm) p.audio_setting.bpm = bpm;
       if (key) p.audio_setting.key = key;
       if (songMode) p.audio_setting.mode = songMode;
+      if (voiceId) p.voice_id = voiceId;
       return p;
     }
 
@@ -3215,6 +3401,7 @@ Rules:
     if (bpm) payload.bpm = bpm;
     if (key) payload.key = key;
     if (songMode) payload.mode = songMode;
+    if (voiceId) payload.voice_id = voiceId;
     const p = { model: "minimax-music-3.0", payload };
     if (!prompt) delete p.payload.prompt;
     return p;
@@ -3355,7 +3542,18 @@ Rules:
     } finally {
       abortController = null;
       isGenerating = false;
-      generateBtn.querySelector(".btn-text").textContent = "Generate";
+      // Restore button text based on voice status
+      const btnText = generateBtn.querySelector(".btn-text");
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(VOICE_KEY));
+        if (saved && saved.voiceId) {
+          btnText.textContent = "Generate with " + (saved.name || "My Voice");
+        } else {
+          btnText.textContent = "Generate";
+        }
+      } catch {
+        btnText.textContent = "Generate";
+      }
       generateBtn.classList.remove("generating");
     }
   });

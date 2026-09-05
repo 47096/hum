@@ -177,3 +177,54 @@ def download_proxy():
     except Exception as e:
         logger.error(f"Download error: {e}\n{traceback.format_exc()}")
         return cors_response(json.dumps({"error": str(e)}), 500)
+
+@app.route("/voice-clone", methods=["POST", "OPTIONS"])
+def voice_clone():
+    try:
+        if request.method == "OPTIONS":
+            return ("", 204, CORS_HEADERS)
+
+        api_key = request.headers.get("Authorization", "").replace("Bearer ", "")
+        if not api_key:
+            return cors_response(json.dumps({"error": "Missing API key"}), 401)
+
+        body = request.get_json(silent=True)
+        if not body:
+            return cors_response(json.dumps({"error": "Missing body"}), 400)
+
+        audio_base64 = body.get("audio")
+        name = body.get("name", "My Voice")
+
+        if not audio_base64:
+            return cors_response(json.dumps({"error": "Missing audio data"}), 400)
+
+        # Remove data URL prefix if present
+        if "," in audio_base64:
+            audio_base64 = audio_base64.split(",", 1)[1]
+
+        # Decode base64 audio
+        import base64
+        audio_bytes = base64.b64decode(audio_base64)
+
+        # Call MiniMax voice clone API
+        url = "https://api.minimax.chat/v1/voice_clone"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+        }
+
+        files = {
+            "audio": ("voice.mp3", audio_bytes, "audio/mpeg"),
+        }
+        data = {
+            "name": name,
+        }
+
+        logger.info(f"Voice clone request: name={name}, audio_size={len(audio_bytes)}")
+        resp = requests.post(url, headers=headers, files=files, data=data, timeout=60)
+        logger.info(f"Voice clone response: {resp.status_code} {resp.text[:200]}")
+
+        return cors_response(resp.text, resp.status_code)
+
+    except Exception as e:
+        logger.error(f"Voice clone error: {e}\n{traceback.format_exc()}")
+        return cors_response(json.dumps({"error": str(e)}), 500)
