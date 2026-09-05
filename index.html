@@ -667,6 +667,7 @@
     position: relative;
     cursor: pointer;
     overflow: hidden;
+    color: #ffffff;
   }
 
   .track-art-play {
@@ -1506,6 +1507,32 @@
   // HTML escape helper — prevents XSS from user/LLM content
   const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+  // Track art colour palette — soft pastels and vibrant tones
+  const trackColours = [
+    "#efe9e7", "#dae0f2", "#f9cff2", "#f2c6de", "#e8d5b7",
+    "#b8e0d2", "#d5c4a1", "#c3aed6", "#f5deb3", "#d4a5a5",
+    "#a8d8ea", "#aa96da", "#fcbad3", "#ffffd2", "#b5ead7",
+    "#c7ceea", "#e2f0cb", "#ffdac1", "#b5b8ff", "#ffc8dd",
+    "#e8a0bf", "#ba90c6", "#c0dbea", "#fbe7c6", "#b4f0e8",
+    "#d6e4f0", "#f6c6a8", "#c9b1ff", "#bde0fe", "#ffc6d9",
+  ];
+
+  // Hash function — generates consistent number from string
+  function hashString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  }
+
+  // Get colour for a track based on its title
+  function getTrackColour(title) {
+    const hash = hashString(title || "Untitled");
+    return trackColours[hash % trackColours.length];
+  }
+
   // Icon helper — replaces element content with a Lucide icon
   function setIcon(el, name) {
     el.innerHTML = "";
@@ -2266,6 +2293,7 @@ Rules:
       const art = document.createElement("div");
       art.className = "track-art";
       art.dataset.action = "play-art";
+      art.style.background = getTrackColour(h.title);
       art.innerHTML = '<i data-lucide="music"></i>';
       const playOverlay = document.createElement("div");
       playOverlay.className = "track-art-play";
