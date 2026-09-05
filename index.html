@@ -312,14 +312,18 @@
   .input-container .chat-input {
     flex: 1;
     border: 1px solid var(--border);
-    border-radius: 24px;
+    border-radius: 16px;
     padding: 12px 18px;
     font-size: 14px;
     background: var(--bg);
     color: var(--fg);
     font-family: var(--font-body);
     outline: none;
-    min-height: 44px;
+    min-height: 48px;
+    max-height: 150px;
+    resize: none;
+    overflow-y: auto;
+    line-height: 1.5;
   }
 
   .input-container .chat-input::placeholder {
@@ -1298,7 +1302,7 @@
       </div>
       <div class="chat-bottom">
         <div class="input-container">
-          <input class="chat-input" type="text" id="chatInput" placeholder="Describe your song...">
+          <textarea class="chat-input" id="chatInput" placeholder="Describe your song..." rows="1"></textarea>
           <button class="send-btn" id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
         </div>
         <div class="gen-context" id="genContext" style="display:none;">
@@ -1794,6 +1798,7 @@
     // Add user message to chat
     addMessage("user", userMessage);
     chatInput.value = "";
+    chatInput.style.height = "auto";
 
     // Check for API key and endpoint
     const key = $("apiKey").value.trim();
@@ -1991,6 +1996,12 @@ Rules:
       e.preventDefault();
       sendChatMessage();
     }
+  });
+
+  // Auto-resize textarea
+  chatInput.addEventListener("input", () => {
+    chatInput.style.height = "auto";
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 150) + "px";
   });
 
   // Quick prompts
