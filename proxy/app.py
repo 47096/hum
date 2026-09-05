@@ -206,8 +206,8 @@ def voice_clone():
         import base64
         audio_bytes = base64.b64decode(audio_base64)
 
-        # Step 1: Upload audio file to MiniMax
-        upload_url = "https://api.minimax.io/v1/files/upload"
+        # Step 1: Upload audio file via GMI Cloud
+        upload_url = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests/voice/upload"
         upload_headers = {
             "Authorization": f"Bearer {api_key}",
         }
@@ -226,13 +226,13 @@ def voice_clone():
             return cors_response(upload_resp.text, upload_resp.status_code)
 
         upload_result = upload_resp.json()
-        file_id = upload_result.get("file", {}).get("file_id")
+        file_id = upload_result.get("file_id") or upload_result.get("file", {}).get("file_id")
 
         if not file_id:
-            return cors_response(json.dumps({"error": "Failed to upload audio file"}), 500)
+            return cors_response(json.dumps({"error": "Failed to upload audio file", "response": upload_result}), 500)
 
-        # Step 2: Clone voice using the uploaded file
-        clone_url = "https://api.minimax.io/v1/voice_clone"
+        # Step 2: Clone voice via GMI Cloud
+        clone_url = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests/voice/clone"
         clone_headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
