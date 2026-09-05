@@ -210,24 +210,44 @@ def voice_clone():
         # Endpoint: POST /api/v1/ie/requestqueue/apikey/requests
         # Model: minimax-audio-voice-clone-speech-2.6-hd
 
+        # Step 1: Upload audio to temporary file host to get a public URL
+        import uuid
+        voice_id = "hum-" + str(uuid.uuid4())[:8]
+
+        logger.info(f"Uploading audio to temporary host: name={name}, audio_size={len(audio_bytes)}")
+        upload_resp = requests.post(
+            "https://file.io",
+            files={"file": ("voice.mp3", audio_bytes, "audio/mpeg")},
+            data={"expires": "1h"},
+            timeout=30
+        )
+
+        if upload_resp.status_code != 200 or not upload_resp.json().get("success"):
+            return cors_response(json.dumps({"error": "Failed to upload audio file"}), 500)
+
+        audio_url = upload_resp.json().get("link")
+        if not audio_url:
+            return cors_response(json.dumps({"error": "No URL returned from upload"}), 500)
+
+        logger.info(f"Audio uploaded: {audio_url}")
+
+        # Step 2: Call voice clone API with the public URL
         clone_url = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests"
         clone_headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         }
 
-        # Try using data URL for source_audio
-        audio_data_url = f"data:audio/mpeg;base64,{audio_base64}"
-
         clone_body = {
             "model": "minimax-audio-voice-clone-speech-2.6-hd",
             "payload": {
                 "text": "Hello, this is a test of the cloned voice.",
-                "source_audio": audio_data_url
+                "source_audio": audio_url,
+                "voice_id": voice_id
             }
         }
 
-        logger.info(f"Voice clone request: name={name}, audio_size={len(audio_bytes)}")
+        logger.info(f"Voice clone request: voice_id={voice_id}, audio_url={audio_url}")
         clone_resp = requests.post(clone_url, headers=clone_headers, json=clone_body, timeout=120)
         logger.info(f"Clone response: {clone_resp.status_code} {clone_resp.text[:200]}")
 
