@@ -320,9 +320,8 @@
     font-family: var(--font-body);
     outline: none;
     min-height: 48px;
-    max-height: 150px;
     resize: none;
-    overflow-y: auto;
+    overflow: hidden;
     line-height: 1.5;
   }
 
@@ -2001,7 +2000,7 @@ Rules:
   // Auto-resize textarea
   chatInput.addEventListener("input", () => {
     chatInput.style.height = "auto";
-    chatInput.style.height = Math.min(chatInput.scrollHeight, 150) + "px";
+    chatInput.style.height = chatInput.scrollHeight + "px";
   });
 
   // Quick prompts
