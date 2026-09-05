@@ -306,7 +306,7 @@
   .input-container {
     display: flex;
     gap: 8px;
-    align-items: center;
+    align-items: flex-end;
   }
 
   .input-container .chat-input {
@@ -323,6 +323,7 @@
     resize: none;
     overflow: hidden;
     line-height: 1.5;
+    height: auto;
   }
 
   .input-container .chat-input::placeholder {
@@ -2007,6 +2008,8 @@ Rules:
   document.querySelectorAll(".quick-prompt[data-prompt]").forEach(btn => {
     btn.addEventListener("click", () => {
       chatInput.value = btn.dataset.prompt;
+      chatInput.style.height = "auto";
+      chatInput.style.height = chatInput.scrollHeight + "px";
       chatInput.focus();
     });
   });
