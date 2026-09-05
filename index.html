@@ -1654,7 +1654,7 @@
 
       clearTimeout(timeout);
 
-      if (!resp.ok) throw new Error("API error (" + resp.status + ")");
+      if (!resp.ok) throw new Error("Something went wrong — try again");
 
       const data = await resp.json();
 
@@ -1874,7 +1874,7 @@ Rules:
 
       clearTimeout(timeout);
 
-      if (!resp.ok) throw new Error("API error (" + resp.status + ")");
+      if (!resp.ok) throw new Error("Something went wrong — try again");
 
       const data = await resp.json();
       const aiResponse = data.choices?.[0]?.message?.content?.trim()
@@ -2770,11 +2770,11 @@ Rules:
         return submitRequest(payload, retries - 1);
       }
       if (resp.status === 401 || resp.status === 403) throw new Error("Invalid API key — check your settings");
-      if (resp.status === 429) throw new Error("Rate limited — wait a moment and try again");
-      throw new Error("Server error (" + resp.status + ") — try again later");
+      if (resp.status === 429) throw new Error("Too many requests — take a breather and try again");
+      throw new Error("Something went wrong — try again in a minute");
     }
     try { return await resp.json(); }
-    catch { throw new Error("Server returned invalid response (not JSON)"); }
+    catch { throw new Error("Unexpected response — try again"); }
   }
 
   async function pollRequest(requestId) {
@@ -2789,7 +2789,7 @@ Rules:
           r = await fetch(url, { headers: { "Authorization": "Bearer " + key, "X-Provider": activeProvider }, signal });
           if (!r.ok) {
             if (r.status === 401 || r.status === 403) throw new Error("Invalid API key — check your settings");
-            throw new Error("Server error (" + r.status + ")");
+            throw new Error("Something went wrong — trying again");
           }
           j = await r.json();
           break;
