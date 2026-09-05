@@ -2285,11 +2285,13 @@ Rules:
     const ext = format || "mp3";
     // Sanitize filename — remove special chars, skip UUIDs
     let filename = title || "track";
+    console.log("Download - title:", title, "filename before:", filename);
     // If title looks like a UUID, fall back to "track"
     if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(filename)) {
       filename = "track";
     }
     filename = filename.replace(/[^\w\s\-]/g, "").trim().slice(0, 50) || "track";
+    console.log("Download - filename after:", filename);
     const a = document.createElement("a");
     a.href = url;
     a.download = filename + "." + ext;
