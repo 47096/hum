@@ -670,6 +670,24 @@
     text-transform: uppercase;
   }
 
+  .playlist-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .playlist-action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 14px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .playlist-action-btn:hover { border-color: var(--fg); color: var(--fg); }
+
   .playlist-clear {
     background: transparent;
     border: 1px solid var(--border);
@@ -1378,7 +1396,10 @@
   <div class="right">
     <div class="playlist-header">
       <div class="playlist-title" id="playlistTitle">Playlist</div>
-      <button class="playlist-clear" id="clearHistory">Clear all</button>
+      <div class="playlist-actions">
+        <button class="playlist-action-btn" id="downloadAll">Download all</button>
+        <button class="playlist-clear" id="clearHistory">Clear all</button>
+      </div>
     </div>
 
     <div class="playlist" id="playlist" aria-live="polite" aria-label="Playlist">
@@ -2660,6 +2681,30 @@ Rules:
     currentTrackIndex = -1;
     renderPlaylist();
     toast("History cleared", "ok");
+  });
+
+  $("downloadAll").addEventListener("click", async () => {
+    const history = getHistory();
+    if (history.length === 0) {
+      toast("No songs to download", "err");
+      return;
+    }
+
+    toast("Downloading " + history.length + " tracks...", "ok");
+
+    // Download each track with a small delay to avoid overwhelming
+    for (let i = 0; i < history.length; i++) {
+      const h = history[i];
+      if (h.audioUrl) {
+        await downloadTrack(h.audioUrl, h.title, h.settings?.format, h.lyrics);
+        // Small delay between downloads
+        if (i < history.length - 1) {
+          await new Promise(r => setTimeout(r, 500));
+        }
+      }
+    }
+
+    toast("All downloads started", "ok");
   });
 
   renderPlaylist();
