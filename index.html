@@ -1097,6 +1097,51 @@
   .remix-count-select { display: none; }
   .remix-count-select.remix-count-show { display: block; }
 
+  .settings-section {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .settings-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    background: var(--bg);
+    transition: background .15s;
+  }
+
+  .settings-section-header:hover { background: rgba(0,0,0,0.03); }
+
+  .settings-section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--fg);
+  }
+
+  .settings-section-arrow {
+    font-size: 12px;
+    color: var(--muted);
+    transition: transform .2s;
+  }
+
+  .settings-section.open .settings-section-arrow {
+    transform: rotate(180deg);
+  }
+
+  .settings-section-body {
+    display: none;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .settings-section.open .settings-section-body {
+    display: block;
+  }
+
   .settings-label {
     font-family: var(--font-body);
     font-size: 11px; color: var(--muted);
@@ -1355,107 +1400,118 @@
       <button class="modal-close" id="settingsClose" aria-label="Close settings"><i data-lucide="x"></i></button>
     </div>
 
-    <div class="settings-group">
-      <div class="settings-label">API</div>
-      <label>Provider</label>
-      <div class="provider-row">
-        <span class="template-chip provider-tab active" data-provider="gmi" role="button" tabindex="0">GMI Cloud</span>
-        <span class="template-chip provider-tab" data-provider="minimax" role="button" tabindex="0">MiniMax</span>
+    <!-- Essentials -->
+    <div class="settings-section open">
+      <div class="settings-section-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="settings-section-title">API Connection</div>
+        <div class="settings-section-arrow">▼</div>
       </div>
-      <label id="apiKeyLabel">GMI Cloud API key</label>
-      <input type="password" id="apiKey" placeholder="Paste your key here" autocomplete="off" />
-      <div class="help-text" id="apiKeyHelp">Get one at console.gmicloud.ai → API Keys. Free until Sep 6, 2026.</div>
-      <label>CORS Proxy URL</label>
-      <input type="text" id="proxyUrl" placeholder="https://your-proxy-url.com" />
-      <div class="help-text">Pre-configured for GitHub Pages. Only change if you deploy your own Worker.</div>
-    </div>
-
-    <div class="settings-group">
-      <div class="settings-label">Audio quality</div>
-      <div class="settings-row">
-        <div>
-          <label for="sampleRate">Sample rate</label>
-          <select id="sampleRate">
-            <option value="44100">44100 Hz</option>
-            <option value="32000">32000 Hz</option>
-            <option value="24000">24000 Hz</option>
-            <option value="16000">16000 Hz</option>
-          </select>
+      <div class="settings-section-body">
+        <label>Provider</label>
+        <div class="provider-row">
+          <span class="template-chip provider-tab active" data-provider="gmi" role="button" tabindex="0">GMI Cloud</span>
+          <span class="template-chip provider-tab" data-provider="minimax" role="button" tabindex="0">MiniMax</span>
         </div>
-        <div>
-          <label for="bitrate">Bitrate</label>
-          <select id="bitrate">
-            <option value="256000">256 kbps</option>
-            <option value="128000">128 kbps</option>
-            <option value="64000">64 kbps</option>
-          </select>
-        </div>
-        <div>
-          <label for="format">Format</label>
-          <select id="format">
-            <option value="mp3">MP3</option>
-            <option value="wav">WAV</option>
-            <option value="pcm">PCM</option>
-          </select>
-        </div>
+        <label id="apiKeyLabel">GMI Cloud API key</label>
+        <input type="password" id="apiKey" placeholder="Paste your key here" autocomplete="off" />
+        <div class="help-text" id="apiKeyHelp">Get one at console.gmicloud.ai → API Keys. Free until Sep 6, 2026.</div>
+        <label>CORS Proxy URL</label>
+        <input type="text" id="proxyUrl" placeholder="https://your-proxy-url.com" />
+        <div class="help-text">Pre-configured for GitHub Pages. Only change if you deploy your own Worker.</div>
       </div>
     </div>
 
-    <div class="settings-group">
-      <div class="settings-label">Music theory</div>
-      <div class="settings-row">
-        <div>
-          <label for="bpm">BPM</label>
-          <select id="bpm">
-            <option value="">Auto</option>
-            <option value="60">60</option><option value="70">70</option><option value="80">80</option>
-            <option value="90">90</option><option value="100">100</option><option value="110">110</option>
-            <option value="120">120</option><option value="130">130</option><option value="140">140</option>
-            <option value="150">150</option><option value="160">160</option>
-          </select>
+    <!-- Advanced -->
+    <div class="settings-section">
+      <div class="settings-section-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="settings-section-title">Audio & Music Theory</div>
+        <div class="settings-section-arrow">▼</div>
+      </div>
+      <div class="settings-section-body">
+        <div class="settings-label">Audio quality</div>
+        <div class="settings-row">
+          <div>
+            <label for="sampleRate">Sample rate</label>
+            <select id="sampleRate">
+              <option value="44100">44100 Hz</option>
+              <option value="32000">32000 Hz</option>
+              <option value="24000">24000 Hz</option>
+              <option value="16000">16000 Hz</option>
+            </select>
+          </div>
+          <div>
+            <label for="bitrate">Bitrate</label>
+            <select id="bitrate">
+              <option value="256000">256 kbps</option>
+              <option value="128000">128 kbps</option>
+              <option value="64000">64 kbps</option>
+            </select>
+          </div>
+          <div>
+            <label for="format">Format</label>
+            <select id="format">
+              <option value="mp3">MP3</option>
+              <option value="wav">WAV</option>
+              <option value="pcm">PCM</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label for="songKey">Key</label>
-          <select id="songKey">
-            <option value="">Auto</option>
-            <option value="C">C</option><option value="C#">C#</option><option value="D">D</option>
-            <option value="D#">D#</option><option value="E">E</option><option value="F">F</option>
-            <option value="F#">F#</option><option value="G">G</option><option value="G#">G#</option>
-            <option value="A">A</option><option value="A#">A#</option><option value="B">B</option>
-          </select>
+        <div class="settings-label" style="margin-top:16px">Music theory</div>
+        <div class="settings-row">
+          <div>
+            <label for="bpm">BPM</label>
+            <select id="bpm">
+              <option value="">Auto</option>
+              <option value="60">60</option><option value="70">70</option><option value="80">80</option>
+              <option value="90">90</option><option value="100">100</option><option value="110">110</option>
+              <option value="120">120</option><option value="130">130</option><option value="140">140</option>
+              <option value="150">150</option><option value="160">160</option>
+            </select>
+          </div>
+          <div>
+            <label for="songKey">Key</label>
+            <select id="songKey">
+              <option value="">Auto</option>
+              <option value="C">C</option><option value="C#">C#</option><option value="D">D</option>
+              <option value="D#">D#</option><option value="E">E</option><option value="F">F</option>
+              <option value="F#">F#</option><option value="G">G</option><option value="G#">G#</option>
+              <option value="A">A</option><option value="A#">A#</option><option value="B">B</option>
+            </select>
+          </div>
+          <div>
+            <label for="songMode">Mode</label>
+            <select id="songMode">
+              <option value="">Auto</option>
+              <option value="major">Major</option>
+              <option value="minor">Minor</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label for="songMode">Mode</label>
-          <select id="songMode">
-            <option value="">Auto</option>
-            <option value="major">Major</option>
-            <option value="minor">Minor</option>
-          </select>
+        <div class="settings-label" style="margin-top:16px">Style remix</div>
+        <div class="toggle-row remix-toggle-row">
+          <span class="toggle" id="remixToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
+          <span class="toggle-label">Generate multiple versions</span>
         </div>
+        <select id="remixCount" class="remix-count-select">
+          <option value="2">2 versions</option>
+          <option value="3" selected>3 versions</option>
+        </select>
       </div>
     </div>
 
-    <div class="settings-group">
-      <div class="settings-label">Style remix</div>
-      <div class="toggle-row remix-toggle-row">
-        <span class="toggle" id="remixToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
-        <span class="toggle-label">Generate multiple versions</span>
+    <!-- Share -->
+    <div class="settings-section">
+      <div class="settings-section-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="settings-section-title">Share & Export</div>
+        <div class="settings-section-arrow">▼</div>
       </div>
-      <select id="remixCount" class="remix-count-select">
-        <option value="2">2 versions</option>
-        <option value="3" selected>3 versions</option>
-      </select>
-    </div>
-
-    <div class="settings-group">
-      <div class="settings-label">AI Lyrics & Style</div>
-      <div class="help-text">Uses the same proxy URL above. Sparkle buttons call the LLM to generate lyrics and style prompts.</div>
-    </div>
-
-    <div class="settings-actions">
-      <button class="settings-action-btn" id="shareBtn">Share link</button>
-      <button class="settings-action-btn" id="copySettingsBtn">Copy settings</button>
-      <button class="settings-action-btn" id="pasteSettingsBtn">Paste settings</button>
+      <div class="settings-section-body">
+        <div class="settings-actions">
+          <button class="settings-action-btn" id="shareBtn">Share link</button>
+          <button class="settings-action-btn" id="copySettingsBtn">Copy settings</button>
+          <button class="settings-action-btn" id="pasteSettingsBtn">Paste settings</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
