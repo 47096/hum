@@ -3262,7 +3262,7 @@ Rules:
         }
       }
       if (j.status === "success") return j;
-      if (j.status === "failed") throw new Error("Generation failed — check your API key");
+      if (j.status === "failed") throw new Error(j.message || "Generation failed — try again or check your settings");
       await new Promise(r => setTimeout(r, POLL_INTERVAL));
     }
     throw new Error("Timed out after 3 minutes");
