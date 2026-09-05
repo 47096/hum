@@ -2255,9 +2255,11 @@ Rules:
 
   function downloadTrack(url, title, format) {
     const ext = format || "mp3";
+    // Sanitize filename — remove special chars, limit length
+    let filename = (title || "track").replace(/[^\w\s\-]/g, "").trim().slice(0, 50) || "track";
     const a = document.createElement("a");
     a.href = url;
-    a.download = (title || "track") + "." + ext;
+    a.download = filename + "." + ext;
     a.target = "_blank";
     a.rel = "noopener";
     document.body.appendChild(a);
