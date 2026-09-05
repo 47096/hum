@@ -1093,9 +1093,6 @@
 
   .settings-group { margin-bottom: 20px; }
   .provider-row { display: flex; gap: 6px; margin-bottom: 12px; }
-  .remix-toggle-row { margin-bottom: 10px; }
-  .remix-count-select { display: none; }
-  .remix-count-select.remix-count-show { display: block; }
 
   .settings-section {
     border: 1px solid var(--border);
@@ -1487,15 +1484,6 @@
             </select>
           </div>
         </div>
-        <div class="settings-label" style="margin-top:16px">Style remix</div>
-        <div class="toggle-row remix-toggle-row">
-          <span class="toggle" id="remixToggle" role="switch" tabindex="0" aria-checked="false"><span class="toggle-knob"></span></span>
-          <span class="toggle-label">Generate multiple versions</span>
-        </div>
-        <select id="remixCount" class="remix-count-select">
-          <option value="2">2 versions</option>
-          <option value="3" selected>3 versions</option>
-        </select>
       </div>
     </div>
 
@@ -2154,30 +2142,6 @@ Rules:
   loadSettings();
   settingsFields.forEach(id => { $(id).addEventListener("change", saveSettings); });
 
-  // ─── Style templates ───
-  const styleTemplates = {
-    "Pop Anthem": "Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads, catchy melodic hook, 120 BPM, feel-good summer anthem energy, radio-ready production",
-    "Trap Banger": "Hard-hitting trap, booming 808 sub-bass, rapid hi-hat rolls, dark piano melody, aggressive and intense, 140 BPM, D minor, festival-ready energy, speaker-rattling power",
-    "Chill Lo-fi": "Lo-fi hip-hop, crackling vinyl texture, mellow jazz piano samples, lazy drum pattern, rainy-day study vibes, warm and comforting, 80 BPM, F major, instrumental focus",
-    "Indie Folk": "Indie folk, warm fingerpicked acoustic guitar, soft brushed drums, gentle and organic, singer-songwriter intimacy, 95 BPM, G major, campfire warmth, heartfelt storytelling",
-    "R&B Smooth": "Smooth R&B slow jam, silky Rhodes piano, deep sub-bass, finger-snapped rhythm, candlelit intimacy, late-night bedroom vibes, 85 BPM, D minor, breathy vocals",
-    "Reggaeton Heat": "Reggaeton, dembow beat, booming bass, urban party energy, Bad Bunny-inspired swagger, club-ready heat, 95 BPM, A minor, infectious perreo rhythm, Latin fire",
-    "Rock Energy": "Classic rock, crunchy Marshall amp tone, driving power chords, pounding drums, arena-sized energy, 70s swagger, 130 BPM, E major, guitar solo, Led Zeppelin spirit",
-    "Electronic Drop": "Euphoric trance, soaring synth leads, sweeping build-ups, uplifting breakdowns, hands-in-the-air moments, 138 BPM, A minor, peak-time energy, festival euphoria",
-    "Acoustic Ballad": "Emotional acoustic ballad, fingerpicked steel-string guitar, soft brushed drums, gentle and intimate, 75 BPM, G major, heartfelt male vocals, tear-jerking beauty",
-    "Hip-Hop Bounce": "Boom bap, dusty vinyl samples, chopped soul loops, punchy kick-snare pattern, 90s golden era, lyrical and head-nodding, 90 BPM, D minor, DJ Premier style",
-    "Synthwave Retro": "Synthwave, pulsing analog synths, gated reverb drums, nostalgic and cinematic, neon-lit highway, 80s retro, 110 BPM, A minor, freedom and escape, John Hughes vibes",
-    "Country Roads": "Modern country, twangy Telecaster, pedal steel weeping, storytelling lyrics, Nashville polish, 110 BPM, G major, open-highway freedom, heartfelt authenticity",
-    "Funk Groove": "Funky grooves, slap bass, wah-wah guitar, tight rhythm section, James Brown-inspired energy, 115 BPM, E minor, dance-floor fire, irresistible pocket",
-    "Jazz Lounge": "Smooth jazz, warm tenor saxophone melody, brushed snare, walking upright bass, candlelit lounge atmosphere, 100 BPM, Bb major, effortless sophistication",
-    "Metal Assault": "Heavy metal, thunderous double-kick drums, screaming guitar solos, powerful riffs, Iron Maiden-inspired gallop, 150 BPM, E minor, epic and triumphant, relentless energy",
-    "Ambient Drift": "Ambient, lush evolving pads, no percussion, ethereal textures, Brian Eno-inspired spaciousness, 70 BPM, C major, meditative and calming, floating sensation",
-    "Soul Classic": "Classic soul, punchy brass section, handclaps, walking bassline, gospel choir backing, Motown warmth, 105 BPM, F major, joyful and uplifting, vintage charm",
-    "Cinematic Epic": "Epic orchestral, sweeping strings, dramatic brass section, pounding timpani, cinematic build-up, 110 BPM, D minor, movie soundtrack energy, heroic and triumphant",
-    "Latin Pop": "Latin pop, catchy bilingual hooks, polished production, crossover appeal, Shakira-inspired energy, 105 BPM, G major, mainstream and infectious, tropical vibes",
-    "K-Pop Dance": "K-pop dance track, bright synth hooks, powerful choreography energy, polished production, 125 BPM, A major, stadium-ready anthem, confident and fierce",
-  };
-
   // ─── Lyrics templates ───
   const lyricsTemplates = {
     "Love Song": { prompt: "Romantic pop ballad, gentle piano, soft strings, intimate and heartfelt, 75 BPM, F major, wedding first dance energy, timeless and emotional", lyrics: `[verse]\nFrom the moment that I saw you\nI knew my heart was true\nEvery smile you give me\nMakes the world feel new\n\n[chorus]\nYou're the one I've been waiting for\nThe one I adore\nForever and always\nI'll love you more and more\n\n[verse]\nHand in hand we walk together\nThrough the storm and sun\nEvery step beside you\nFeels like we've just begun\n\n[chorus]\nYou're the one I've been waiting for\nThe one I adore\nForever and always\nI'll love you more and more\n\n[outro]\nTill the end of time` },
@@ -2200,23 +2164,6 @@ Rules:
     "Dream Pop": { prompt: "Dream pop, ethereal synths, reverb-drenched guitars, soft vocals, atmospheric and floating, 90 BPM, F major, nostalgic and wistful, shoegaze influence", lyrics: `[verse]\nFloating through the clouds above\nEverything is made of love\nColors blending, soft and bright\nDancing in the pale moonlight\n\n[chorus]\nDream away, don't let go\nLet the gentle breezes blow\nEvery star is shining bright\nIn this dream we hold tonight\n\n[verse]\nWhispers echoing in space\nTime is standing still in place\nHearts are beating, soft and slow\nIn this world we've come to know\n\n[chorus]\nDream away, don't let go\nLet the gentle breezes blow\nEvery star is shining bright\nIn this dream we hold tonight\n\n[outro]\nDream on, dream on, dream on` },
     "Urban Night": { prompt: "Dark R&B, atmospheric pads, trap-influenced beats, moody and introspective, 85 BPM, D minor, city lights, late-night driving, Frank Ocean vibes", lyrics: `[verse]\nCity streets are wet with rain\nNeon signs are glowing again\nWindows down, I'm driving slow\nWatching all the people go\n\n[chorus]\nUrban night, don't let me down\nShow me all around this town\nEvery corner has a story\nEvery shadow hides a glory\n\n[verse]\nSkyscrapers are touching stars\nPeople driving in their cars\nEveryone is searching for\nSomething more than what's in store\n\n[chorus]\nUrban night, don't let me down\nShow me all around this town\nEvery corner has a story\nEvery shadow hides a glory\n\n[outro]\nThe city sleeps, but I'm awake` },
   };
-
-  // ─── Remix toggle ───
-  let remixOn = false;
-  const remixToggle = $("remixToggle");
-  const remixCount = $("remixCount");
-
-  function toggleRemix() {
-    remixOn = !remixOn;
-    remixToggle.classList.toggle("on", remixOn);
-    remixToggle.setAttribute("aria-checked", String(remixOn));
-    remixCount.classList.toggle("remix-count-show", remixOn);
-  }
-
-  remixToggle.addEventListener("click", toggleRemix);
-  remixToggle.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleRemix(); }
-  });
 
   // ─── Toast ───
   const toastEl = $("toast");
@@ -2753,14 +2700,6 @@ Rules:
     }
   });
 
-  function pickRandomStyles(n) {
-    const templates = Object.keys(styleTemplates);
-    const shuffled = templates.sort(() => Math.random() - 0.5).slice(0, n);
-    return shuffled.map(name => {
-      return { category: name, prompt: styleTemplates[name] };
-    });
-  }
-
   function buildPayload(lyrics, prompt) {
     const bpm = $("bpm").value ? parseInt($("bpm").value) : undefined;
     const key = $("songKey").value || undefined;
@@ -2891,78 +2830,35 @@ Rules:
     }, 1000);
 
     try {
-      if (remixOn) {
-        const count = parseInt(remixCount.value);
-        const styles = pickRandomStyles(count);
-        const payloads = styles.map(s => buildPayload(lyrics, s.prompt));
-        const submitResults = await Promise.allSettled(payloads.map(p => submitRequest(p)));
+      const payload = buildPayload(lyrics, prompt);
+      const submitResult = await submitRequest(payload);
 
-        let finals;
-        if (activeProvider === "minimax") {
-          finals = submitResults;
-        } else {
-          const requestIds = submitResults
-            .filter(r => r.status === "fulfilled")
-            .map(r => r.value.request_id);
-          const pollResults = await Promise.allSettled(requestIds.map(id => pollRequest(id)));
-          finals = pollResults;
-        }
-
-        let successCount = 0;
-        finals.forEach((result, i) => {
-          if (result.status !== "fulfilled") return;
-          const f = result.value;
-          const audioUrl = extractAudioUrl(f);
-          if (!audioUrl) return;
-          const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
-          const trackTitle = currentTitle || titleLine || "Untitled";
-          const dur = activeProvider === "minimax" ? (f.extra_info?.music_duration || 0) : ((f.outcome?.duration_ms || 0) / 1000);
-          saveToHistory({
-            id: crypto.randomUUID() + "-" + i,
-            title: trackTitle.slice(0, 60) + " (" + styles[i].category + ")",
-            lyrics, prompt: styles[i].prompt,
-            audioUrl, duration: formatDuration(dur),
-            date: new Date().toLocaleString(),
-            settings: getCurrentSettings()
-          });
-          successCount++;
-        });
-
-        if (successCount === 0) throw new Error("All remixes failed");
-        toast(successCount + " of " + count + " remixes ready", successCount < count ? "err" : "ok");
-        playTrack(0);
-
+      let final;
+      if (activeProvider === "minimax") {
+        final = submitResult;
       } else {
-        const payload = buildPayload(lyrics, prompt);
-        const submitResult = await submitRequest(payload);
-
-        let final;
-        if (activeProvider === "minimax") {
-          final = submitResult;
-        } else {
-          const requestId = submitResult.request_id;
-          if (!requestId) throw new Error("Unexpected response from server");
-          final = await pollRequest(requestId);
-        }
-
-        const audioUrl = extractAudioUrl(final);
-        if (!audioUrl) throw new Error("No audio returned");
-
-        const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
-        const trackTitle = currentTitle || titleLine || "Untitled";
-        const dur = activeProvider === "minimax" ? (final.extra_info?.music_duration || 0) : ((final.outcome?.duration_ms || 0) / 1000);
-        saveToHistory({
-          id: crypto.randomUUID(),
-          title: trackTitle.slice(0, 60),
-          lyrics, prompt,
-          audioUrl, duration: formatDuration(dur),
-          date: new Date().toLocaleString(),
-          settings: getCurrentSettings()
-        });
-
-        playTrack(0);
-        toast("Song ready", "ok");
+        const requestId = submitResult.request_id;
+        if (!requestId) throw new Error("Unexpected response from server");
+        final = await pollRequest(requestId);
       }
+
+      const audioUrl = extractAudioUrl(final);
+      if (!audioUrl) throw new Error("No audio returned");
+
+      const titleLine = lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
+      const trackTitle = currentTitle || titleLine || "Untitled";
+      const dur = activeProvider === "minimax" ? (final.extra_info?.music_duration || 0) : ((final.outcome?.duration_ms || 0) / 1000);
+      saveToHistory({
+        id: crypto.randomUUID(),
+        title: trackTitle.slice(0, 60),
+        lyrics, prompt,
+        audioUrl, duration: formatDuration(dur),
+        date: new Date().toLocaleString(),
+        settings: getCurrentSettings()
+      });
+
+      playTrack(0);
+      toast("Song ready", "ok");
     } catch (err) {
       if (err.name === "AbortError") return;
       console.error(err);
