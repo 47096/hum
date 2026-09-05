@@ -2283,7 +2283,7 @@ Rules:
     renderPlaylist();
   }
 
-  async function downloadTrack(url, title, format) {
+  async function downloadTrack(url, title, format, lyrics) {
     const ext = format || "mp3";
     // Sanitize filename — remove special chars, skip UUIDs
     let filename = title || "track";
@@ -2293,8 +2293,11 @@ Rules:
     filename = filename.replace(/[^\w\s\-]/g, "").trim().slice(0, 50) || "track";
 
     try {
-      // Fetch via proxy to avoid CORS issues
-      const proxyUrl = getEndpoint() + "/download?url=" + encodeURIComponent(url);
+      // Fetch via proxy — embeds lyrics if provided
+      let proxyUrl = getEndpoint() + "/download?url=" + encodeURIComponent(url);
+      if (lyrics) {
+        proxyUrl += "&lyrics=" + encodeURIComponent(lyrics);
+      }
       const resp = await fetch(proxyUrl);
       const blob = await resp.blob();
       const blobUrl = URL.createObjectURL(blob);
@@ -2403,7 +2406,7 @@ Rules:
     } else if (action === "lyrics") {
       showLyrics(h);
     } else if (action === "download") {
-      downloadTrack(h.audioUrl, h.title, h.settings?.format);
+      downloadTrack(h.audioUrl, h.title, h.settings?.format, h.lyrics);
     } else if (action === "delete") {
       if (confirm("Delete \"" + (h.title || "Untitled") + "\"?")) { deleteFromHistory(h.id); }
     } else {

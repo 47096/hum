@@ -3,6 +3,9 @@ import requests
 import json
 import logging
 import traceback
+from mutagen.id3 import ID3, USLT
+from mutagen.mp3 import MP3
+import io
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -110,20 +113,66 @@ def download_proxy():
             return ("", 204, CORS_HEADERS)
 
         url = request.args.get("url")
+        lyrics = request.args.get("lyrics", "")
         if not url:
             return cors_response(json.dumps({"error": "Missing url parameter"}), 400)
 
         logger.info(f"Download proxy: {url}")
-        resp = requests.get(url, timeout=60, stream=True)
+        resp = requests.get(url, timeout=60)
 
-        # Forward the audio content
+        if resp.status_code != 200:
+            return Response(resp.content, status=resp.status_code, headers={
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json",
+            })
+
+        audio_data = resp.content
+
+        # Embed lyrics if provided
+        if lyrics and url.lower().endswith(".mp3"):
+            try:
+                audio_file = io.BytesIO(audio_data)
+                audio_file.name = "track.mp3"
+
+                # Try to add ID3 tags
+                try:
+                    tags = ID3(audio_file)
+                except:
+                    tags = ID3()
+
+                # Add lyrics as USLT frame (Unsynchronized Lyrics)
+                tags.add(USLT(
+                    encoding=3,  # UTF-8
+                    lang="eng",
+                    desc="",
+                    text=lyrics
+                ))
+
+                # Write tags back to audio data
+                audio_file_out = io.BytesIO()
+                tags.save(audio_file)
+                audio_file.seek(0)
+
+                # Re-read with mutagen to apply tags
+                mp3 = MP3(audio_file)
+                mp3.tags = tags
+                mp3.save(audio_file)
+
+                audio_file.seek(0)
+                audio_data = audio_file.read()
+                logger.info(f"Embedded lyrics ({len(lyrics)} chars)")
+            except Exception as e:
+                logger.warning(f"Failed to embed lyrics: {e}")
+                # Continue without lyrics — don't fail the download
+
+        # Return the audio with CORS headers
         headers = {
             "Access-Control-Allow-Origin": "*",
-            "Content-Type": resp.headers.get("Content-Type", "audio/mpeg"),
-            "Content-Length": resp.headers.get("Content-Length", ""),
+            "Content-Type": "audio/mpeg",
+            "Content-Length": str(len(audio_data)),
         }
 
-        return Response(resp.content, status=resp.status_code, headers=headers)
+        return Response(audio_data, status=200, headers=headers)
 
     except Exception as e:
         logger.error(f"Download error: {e}\n{traceback.format_exc()}")
