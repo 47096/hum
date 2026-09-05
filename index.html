@@ -2228,7 +2228,7 @@ Rules:
         })
       });
 
-      chatMessages.removeChild(loadingDiv);
+      if (loadingDiv.parentNode === chatMessages) chatMessages.removeChild(loadingDiv);
 
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({}));
@@ -2251,7 +2251,7 @@ Rules:
       addMessage("ai", "✓ Voice cloned successfully! Your voice is ready to use.");
 
     } catch (err) {
-      chatMessages.removeChild(loadingDiv);
+      if (loadingDiv.parentNode === chatMessages) chatMessages.removeChild(loadingDiv);
       addMessage("ai", "Voice cloning failed: " + escapeHtml(err.message));
     }
 
