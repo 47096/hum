@@ -1247,24 +1247,6 @@
     margin-top: -8px; margin-bottom: 12px;
   }
 
-  .settings-actions {
-    display: flex; gap: 6px; flex-wrap: wrap;
-    margin-top: 16px;
-  }
-
-  .settings-action-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 6px 12px;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all .12s;
-    border-radius: 4px;
-  }
-
-  .settings-action-btn:hover { border-color: var(--fg); color: var(--fg); }
-
   /* Toast */
   .toast {
     position: fixed; bottom: 84px; left: 50%;
@@ -1502,10 +1484,10 @@
         </div>
         <label id="apiKeyLabel">GMI Cloud API key</label>
         <input type="password" id="apiKey" placeholder="Paste your key here" autocomplete="off" />
-        <div class="help-text" id="apiKeyHelp">Get one at console.gmicloud.ai → API Keys. Free until Sep 6, 2026.</div>
+        <div class="help-text" id="apiKeyHelp">Get one at console.gmicloud.ai → API Keys</div>
         <label>CORS Proxy URL</label>
         <input type="text" id="proxyUrl" placeholder="https://your-proxy-url.com" />
-        <div class="help-text">Pre-configured for GitHub Pages. Only change if you deploy your own Worker.</div>
+        <div class="help-text">Your Render proxy URL</div>
       </div>
     </div>
 
@@ -1574,21 +1556,6 @@
               <option value="minor">Minor</option>
             </select>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Share -->
-    <div class="settings-section">
-      <div class="settings-section-header" onclick="this.parentElement.classList.toggle('open')">
-        <div class="settings-section-title">Share & Export</div>
-        <div class="settings-section-arrow">▼</div>
-      </div>
-      <div class="settings-section-body">
-        <div class="settings-actions">
-          <button class="settings-action-btn" id="shareBtn">Share link</button>
-          <button class="settings-action-btn" id="copySettingsBtn">Copy settings</button>
-          <button class="settings-action-btn" id="pasteSettingsBtn">Paste settings</button>
         </div>
       </div>
     </div>
@@ -3411,34 +3378,6 @@ Rules:
   });
 
   // ─── Share / Copy / Paste ───
-  $("shareBtn").addEventListener("click", async () => {
-    const data = { p: currentStyle, l: currentLyrics };
-    if (!data.p && !data.l) { toast("Nothing to share", "err"); return; }
-    const hash = btoa(encodeURIComponent(JSON.stringify(data)));
-    const url = window.location.origin + window.location.pathname + "#" + hash;
-    try { await navigator.clipboard.writeText(url); toast("Share link copied", "ok"); }
-    catch { toast("Failed to copy", "err"); }
-  });
-
-  $("copySettingsBtn").addEventListener("click", async () => {
-    const data = { style: currentStyle, lyrics: currentLyrics, sampleRate: $("sampleRate").value, bitrate: $("bitrate").value, format: $("format").value };
-    try { await navigator.clipboard.writeText(JSON.stringify(data)); toast("Settings copied", "ok"); }
-    catch { toast("Failed to copy", "err"); }
-  });
-
-  $("pasteSettingsBtn").addEventListener("click", async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      const data = JSON.parse(text);
-      if (data.style !== undefined) currentStyle = data.style;
-      if (data.lyrics !== undefined) currentLyrics = data.lyrics;
-      if (data.sampleRate) $("sampleRate").value = data.sampleRate;
-      if (data.bitrate) $("bitrate").value = data.bitrate;
-      if (data.format) $("format").value = data.format;
-      toast("Settings pasted", "ok");
-    } catch { toast("No valid settings in clipboard", "err"); }
-  });
-
   // ─── Load shared settings from URL hash ───
   if (window.location.hash.length > 1) {
     try {
