@@ -208,7 +208,7 @@ def voice_clone():
 
         # Voice clone via GMI Cloud
         # Endpoint: POST /api/v1/ie/requestqueue/apikey/requests
-        # Model: minimax-audio-voice-clone-speech-2.6-hd
+        # Model: minimax-audio-voice-clone-speech-2.8-hd
 
         # Step 1: Upload audio to temporary file host to get a public URL
         import uuid
@@ -246,7 +246,7 @@ def voice_clone():
         }
 
         clone_body = {
-            "model": "minimax-audio-voice-clone-speech-2.6-hd",
+            "model": "minimax-audio-voice-clone-speech-2.8-hd",
             "payload": {
                 "text": "Hello, this is a test of the cloned voice.",
                 "source_audio": audio_url,
