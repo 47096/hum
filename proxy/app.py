@@ -102,3 +102,29 @@ def proxy(request_id=""):
     except Exception as e:
         logger.error(f"Request error: {e}\n{traceback.format_exc()}")
         return cors_response(json.dumps({"error": str(e)}), 500)
+
+@app.route("/download", methods=["GET", "OPTIONS"])
+def download_proxy():
+    try:
+        if request.method == "OPTIONS":
+            return ("", 204, CORS_HEADERS)
+
+        url = request.args.get("url")
+        if not url:
+            return cors_response(json.dumps({"error": "Missing url parameter"}), 400)
+
+        logger.info(f"Download proxy: {url}")
+        resp = requests.get(url, timeout=60, stream=True)
+
+        # Forward the audio content
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": resp.headers.get("Content-Type", "audio/mpeg"),
+            "Content-Length": resp.headers.get("Content-Length", ""),
+        }
+
+        return Response(resp.content, status=resp.status_code, headers=headers)
+
+    except Exception as e:
+        logger.error(f"Download error: {e}\n{traceback.format_exc()}")
+        return cors_response(json.dumps({"error": str(e)}), 500)
