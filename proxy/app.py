@@ -256,7 +256,7 @@ def voice_clone():
 
         logger.info(f"Voice clone request: voice_id={voice_id}, audio_url={audio_url}")
         try:
-            clone_resp = requests.post(clone_url, headers=clone_headers, json=clone_body, timeout=120)
+            clone_resp = requests.post(clone_url, headers=clone_headers, json=clone_body, timeout=300)
             logger.info(f"Clone response: {clone_resp.status_code} {clone_resp.text[:500]}")
 
             if clone_resp.status_code != 200:
