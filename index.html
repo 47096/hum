@@ -1875,6 +1875,15 @@
     const userMessage = chatInput.value.trim();
     if (!userMessage) return;
 
+    // Check for YouTube URL
+    const youtubeRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
+    const youtubeMatch = userMessage.match(youtubeRegex);
+
+    if (youtubeMatch) {
+      await sendYouTubeMessage(youtubeMatch[0], youtubeMatch[1], userMessage);
+      return;
+    }
+
     // Add user message to chat
     addMessage("user", userMessage);
     chatInput.value = "";
@@ -2221,6 +2230,152 @@ Rules:
 
       // Add AI response to chat
       let responseHTML = "";
+      if (title) {
+        responseHTML += '<div class="label">Title <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+        responseHTML += '<pre class="clickable" id="titleDisplay" onclick="toggleEdit(\'title\')">' + escapeHtml(title) + '</pre>';
+        responseHTML += '<textarea id="titleEdit" class="inline-edit" style="display:none;">' + escapeHtml(title) + '</textarea>';
+      }
+      if (style) {
+        responseHTML += '<div class="label">Style <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+        responseHTML += '<pre class="clickable" id="styleDisplay" onclick="toggleEdit(\'style\')">' + escapeHtml(style) + '</pre>';
+        responseHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + escapeHtml(style) + '</textarea>';
+      }
+      if (lyrics && mode !== "instrumental") {
+        responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+        responseHTML += '<pre class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + escapeHtml(lyrics) + '</pre>';
+        responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
+      }
+
+      addMessage("ai", responseHTML || escapeHtml(aiResponse));
+
+      // Update context hint
+      updateGenContext();
+
+      // Add to chat history
+      chatHistory.push({ role: "assistant", content: aiResponse });
+      if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
+    } catch (err) {
+      // Remove loading message
+      chatMessages.removeChild(loadingDiv);
+      if (err.name === "AbortError") {
+        addMessage("ai", "Request timed out — please try again.");
+      } else {
+        addMessage("ai", "Sorry, I encountered an error: " + escapeHtml(err.message));
+      }
+    }
+  }
+
+  async function sendYouTubeMessage(url, videoId, fullMessage) {
+    // Show YouTube link in chat
+    addMessage("user", fullMessage);
+    chatInput.value = "";
+    chatInput.style.height = "auto";
+
+    // Check for API key and endpoint
+    const key = $("apiKey").value.trim();
+    if (!key) {
+      addMessage("ai", "Please set your API key in Settings first.");
+      return;
+    }
+    if (!getEndpoint()) {
+      addMessage("ai", "Please set your proxy URL in Settings first.");
+      return;
+    }
+
+    // Show loading state
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "msg ai-msg";
+    loadingDiv.innerHTML = '<div class="ai-avatar">A</div><div class="ai-text">Analysing YouTube video...</div>';
+    chatMessages.appendChild(loadingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      // Fetch video metadata via oEmbed API
+      const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+      const oembedResp = await fetch(oembedUrl);
+      const oembedData = await oembedResp.json();
+
+      const videoTitle = oembedData.title || "Unknown";
+      const videoAuthor = oembedData.author_name || "Unknown";
+
+      // Build context for AI
+      const youtubeContext = `YouTube video: "${videoTitle}" by ${videoAuthor}`;
+
+      // Add to chat history
+      chatHistory.push({ role: "user", content: youtubeContext });
+      if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
+
+      const systemPrompt = mode === "instrumental"
+        ? `You are a music style prompt generator. The user wants to create instrumental music inspired by a YouTube video.
+
+YouTube video info: ${youtubeContext}
+
+IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
+
+The JSON must be in this exact format:
+{"title":"Short Track Name","style":"your style prompt here","lyrics":""}
+
+Rules:
+- "title": a short creative name for the track (2-5 words, under40 chars). Inspired by the video.
+- "style": genre, mood, instruments, tempo, key (under200 chars). Be descriptive and detailed. Capture the vibe of the YouTube video.
+- "lyrics": always empty string for instrumental mode
+- NEVER include markdown code blocks or any text outside the JSON object
+- Do NOT repeat the user's prompt or add explanations`
+        : `You are a songwriting assistant. The user wants to create a song inspired by a YouTube video.
+
+YouTube video info: ${youtubeContext}
+
+IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
+
+The JSON must be in this exact format:
+{"title":"Short Song Name","style":"your style prompt here","lyrics":"[verse]\\nYour lyrics here\\n\\n[chorus]\\nChorus here"}
+
+Rules:
+- "title": a short creative name for the song (2-5 words, under40 chars). Inspired by the video.
+- "style": genre, mood, instruments, tempo, key (under200 chars). Capture the vibe of the YouTube video.
+- "lyrics": full song with [verse], [chorus], [bridge], [outro] tags (under3500 chars). Escape newlines as \\n. Inspired by the video's mood/theme.
+- NEVER include markdown code blocks or any text outside the JSON object
+- Do NOT repeat the user's prompt or add explanations`;
+
+      const messages = [
+        { role: "system", content: systemPrompt },
+        ...chatHistory
+      ];
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
+      const resp = await fetch(getEndpoint() + "/llm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key,
+          "X-Provider": activeProvider
+        },
+        body: JSON.stringify({
+          model: "MiniMaxAI/MiniMax-M3",
+          messages: messages,
+          max_tokens: 1000,
+          temperature: 0.8
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!resp.ok) throw new Error("Something went wrong — try again");
+
+      const data = await resp.json();
+      const aiResponse = data.choices?.[0]?.message?.content || "";
+
+      // Remove loading message
+      chatMessages.removeChild(loadingDiv);
+
+      // Parse AI response
+      const { title, style, lyrics } = parseAIResponse(aiResponse);
+
+      // Add AI response to chat
+      let responseHTML = `<div class="label" style="margin-bottom:8px;">Inspired by: ${escapeHtml(videoTitle)}</div>`;
       if (title) {
         responseHTML += '<div class="label">Title <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
         responseHTML += '<pre class="clickable" id="titleDisplay" onclick="toggleEdit(\'title\')">' + escapeHtml(title) + '</pre>';
