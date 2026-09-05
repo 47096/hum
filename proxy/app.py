@@ -206,49 +206,33 @@ def voice_clone():
         import base64
         audio_bytes = base64.b64decode(audio_base64)
 
-        # Step 1: Upload audio file via GMI Cloud
-        upload_url = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests/voice/upload"
-        upload_headers = {
-            "Authorization": f"Bearer {api_key}",
-        }
-        upload_files = {
-            "file": ("voice.mp3", audio_bytes, "audio/mpeg"),
-        }
-        upload_data = {
-            "purpose": "voice_clone",
-        }
+        # Voice clone via GMI Cloud — uses same endpoint as music generation
+        # Generate a unique voice_id
+        import uuid
+        voice_id = "hum-" + str(uuid.uuid4())[:8]
 
-        logger.info(f"Voice clone upload: name={name}, audio_size={len(audio_bytes)}")
-        upload_resp = requests.post(upload_url, headers=upload_headers, files=upload_files, data=upload_data, timeout=60)
-        logger.info(f"Upload response: {upload_resp.status_code} {upload_resp.text[:200]}")
-
-        if upload_resp.status_code != 200:
-            return cors_response(upload_resp.text, upload_resp.status_code)
-
-        upload_result = upload_resp.json()
-        file_id = upload_result.get("file_id") or upload_result.get("file", {}).get("file_id")
-
-        if not file_id:
-            return cors_response(json.dumps({"error": "Failed to upload audio file", "response": upload_result}), 500)
-
-        # Step 2: Clone voice via GMI Cloud
-        clone_url = "https://console.gmicloud.ai/api/v1/ie/requestqueue/apikey/requests/voice/clone"
+        # Send voice clone request through GMI Cloud autoroute
+        clone_url = "https://console.gmicloud.ai/api/v1/ie/recommendation/autoroute"
         clone_headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         }
 
-        # Generate a unique voice_id
-        import uuid
-        voice_id = "hum-" + str(uuid.uuid4())[:8]
-
         clone_body = {
-            "file_id": file_id,
-            "voice_id": voice_id,
+            "model": "minimax/speech-2.8-turbo",
+            "messages": [
+                {"role": "user", "content": "Clone this voice"}
+            ],
+            "voice_clone": {
+                "audio": audio_base64,
+                "voice_id": voice_id,
+                "name": name
+            },
+            "mode": "balanced"
         }
 
-        logger.info(f"Voice clone request: file_id={file_id}, voice_id={voice_id}")
-        clone_resp = requests.post(clone_url, headers=clone_headers, json=clone_body, timeout=60)
+        logger.info(f"Voice clone request: voice_id={voice_id}, name={name}, audio_size={len(audio_bytes)}")
+        clone_resp = requests.post(clone_url, headers=clone_headers, json=clone_body, timeout=120)
         logger.info(f"Clone response: {clone_resp.status_code} {clone_resp.text[:200]}")
 
         if clone_resp.status_code != 200:
