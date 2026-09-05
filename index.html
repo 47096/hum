@@ -1935,7 +1935,7 @@ Rules:
   document.querySelectorAll(".quick-prompt[data-prompt]").forEach(btn => {
     btn.addEventListener("click", () => {
       chatInput.value = btn.dataset.prompt;
-      sendChatMessage();
+      chatInput.focus();
     });
   });
 
