@@ -2203,6 +2203,34 @@ Rules:
     catch { return []; }
   }
 
+  // Migrate old tracks — fix UUID titles
+  function migrateHistory() {
+    const history = getHistory();
+    let changed = false;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    history.forEach(entry => {
+      if (!entry.title || uuidRegex.test(entry.title)) {
+        // Try to extract title from lyrics
+        if (entry.lyrics) {
+          const firstLine = entry.lyrics.split("\n").find(l => l.trim() && !l.startsWith("["));
+          entry.title = firstLine ? firstLine.slice(0, 60) : "Untitled";
+        } else {
+          entry.title = "Untitled";
+        }
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
+      catch { /* ignore */ }
+    }
+  }
+
+  // Run migration on load
+  migrateHistory();
+
   function getCurrentSettings() {
     return {
       sampleRate: $("sampleRate").value,
