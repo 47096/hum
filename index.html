@@ -3159,6 +3159,8 @@ Rules:
   // ─── Generate ───
   let abortController = null;
   let isGenerating = false;
+  let lastGenerateTime = 0;
+  const COOLDOWN_MS = 5000; // 5 second cooldown after generation
   const generateBtn = $("generateBtn");
 
   // Keyboard shortcuts
@@ -3264,7 +3266,13 @@ Rules:
         }
       }
       if (j.status === "success") return j;
-      if (j.status === "failed") throw new Error(j.message || "Generation failed — try again or check your settings");
+      if (j.status === "failed") {
+        const msg = j.message || "";
+        if (msg.includes("rate") || msg.includes("limit") || msg.includes("429")) {
+          throw new Error("Rate limited — wait a moment before generating again");
+        }
+        throw new Error(msg || "Generation failed — try again or check your settings");
+      }
       await new Promise(r => setTimeout(r, POLL_INTERVAL));
     }
     throw new Error("Timed out after 3 minutes");
@@ -3282,6 +3290,14 @@ Rules:
     }
 
     if (isGenerating) return;
+
+    // Cooldown check
+    const now = Date.now();
+    if (now - lastGenerateTime < COOLDOWN_MS) {
+      const remaining = Math.ceil((COOLDOWN_MS - (now - lastGenerateTime)) / 1000);
+      toast("Wait " + remaining + "s before generating again", "err");
+      return;
+    }
 
     const key = $("apiKey").value.trim();
     if (!key) { openSettings(); toast("Set your API key first", "err"); return; }
@@ -3330,6 +3346,7 @@ Rules:
       });
 
       playTrack(0);
+      lastGenerateTime = Date.now();
       toast("Song ready", "ok");
     } catch (err) {
       if (err.name === "AbortError") return;
