@@ -2293,8 +2293,9 @@ Rules:
     filename = filename.replace(/[^\w\s\-]/g, "").trim().slice(0, 50) || "track";
 
     try {
-      // Fetch as blob to avoid cross-origin download issues
-      const resp = await fetch(url, { mode: "cors" });
+      // Fetch via proxy to avoid CORS issues
+      const proxyUrl = getEndpoint() + "/download?url=" + encodeURIComponent(url);
+      const resp = await fetch(proxyUrl);
       const blob = await resp.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -2304,25 +2305,10 @@ Rules:
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      // CORS blocked — try via proxy
-      try {
-        const proxyUrl = getEndpoint() + "/download?url=" + encodeURIComponent(url);
-        const resp = await fetch(proxyUrl);
-        const blob = await resp.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = blobUrl;
-        a.download = filename + "." + ext;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-      } catch {
-        // Final fallback: open in new tab
-        window.open(url, "_blank");
-        toast("Download started — rename file to: " + filename + "." + ext, "ok");
-      }
+    } catch {
+      // Fallback: open in new tab
+      window.open(url, "_blank");
+      toast("Download started — rename file to: " + filename + "." + ext, "ok");
     }
   }
 
