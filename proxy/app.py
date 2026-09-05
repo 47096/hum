@@ -206,24 +206,64 @@ def voice_clone():
         import base64
         audio_bytes = base64.b64decode(audio_base64)
 
-        # Call MiniMax voice clone API
-        url = "https://api.minimax.chat/v1/voice_clone"
-        headers = {
+        # Step 1: Upload audio file to MiniMax
+        upload_url = "https://api.minimax.io/v1/files/upload"
+        upload_headers = {
             "Authorization": f"Bearer {api_key}",
         }
-
-        files = {
-            "audio": ("voice.mp3", audio_bytes, "audio/mpeg"),
+        upload_files = {
+            "file": ("voice.mp3", audio_bytes, "audio/mpeg"),
         }
-        data = {
+        upload_data = {
+            "purpose": "voice_clone",
+        }
+
+        logger.info(f"Voice clone upload: name={name}, audio_size={len(audio_bytes)}")
+        upload_resp = requests.post(upload_url, headers=upload_headers, files=upload_files, data=upload_data, timeout=60)
+        logger.info(f"Upload response: {upload_resp.status_code} {upload_resp.text[:200]}")
+
+        if upload_resp.status_code != 200:
+            return cors_response(upload_resp.text, upload_resp.status_code)
+
+        upload_result = upload_resp.json()
+        file_id = upload_result.get("file", {}).get("file_id")
+
+        if not file_id:
+            return cors_response(json.dumps({"error": "Failed to upload audio file"}), 500)
+
+        # Step 2: Clone voice using the uploaded file
+        clone_url = "https://api.minimax.io/v1/voice_clone"
+        clone_headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+
+        # Generate a unique voice_id
+        import uuid
+        voice_id = "hum-" + str(uuid.uuid4())[:8]
+
+        clone_body = {
+            "file_id": file_id,
+            "voice_id": voice_id,
+        }
+
+        logger.info(f"Voice clone request: file_id={file_id}, voice_id={voice_id}")
+        clone_resp = requests.post(clone_url, headers=clone_headers, json=clone_body, timeout=60)
+        logger.info(f"Clone response: {clone_resp.status_code} {clone_resp.text[:200]}")
+
+        if clone_resp.status_code != 200:
+            return cors_response(clone_resp.text, clone_resp.status_code)
+
+        clone_result = clone_resp.json()
+
+        # Return voice_id to the frontend
+        result = {
+            "voice_id": voice_id,
             "name": name,
+            "status": "success"
         }
 
-        logger.info(f"Voice clone request: name={name}, audio_size={len(audio_bytes)}")
-        resp = requests.post(url, headers=headers, files=files, data=data, timeout=60)
-        logger.info(f"Voice clone response: {resp.status_code} {resp.text[:200]}")
-
-        return cors_response(resp.text, resp.status_code)
+        return cors_response(json.dumps(result), 200)
 
     except Exception as e:
         logger.error(f"Voice clone error: {e}\n{traceback.format_exc()}")
