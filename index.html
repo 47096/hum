@@ -2223,8 +2223,10 @@ Rules:
     });
 
     if (changed) {
-      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); }
-      catch { /* ignore */ }
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        console.log("Migration: fixed", history.filter(h => !uuidRegex.test(h.title)).length, "tracks");
+      } catch { /* ignore */ }
     }
   }
 
