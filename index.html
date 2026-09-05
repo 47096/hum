@@ -460,23 +460,30 @@
   .generate-btn-full:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .generate-btn-full.generating {
-    background: #333333;
+    background: #111111;
     cursor: not-allowed;
-    position: relative;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
 
-  .generate-btn-full.generating::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-    animation: shimmer 1.5s infinite;
+  .generate-btn-full .btn-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: none;
   }
 
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+  .generate-btn-full.generating .btn-spinner {
+    display: block;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   .generate-btn {
@@ -1388,7 +1395,7 @@
         <div class="gen-context" id="genContext" style="display:none;">
           <span class="gen-context-text" id="genContextText">Ready to generate</span>
         </div>
-        <button class="generate-btn-full" id="generateBtn">Generate</button>
+        <button class="generate-btn-full" id="generateBtn"><span class="btn-spinner"></span><span class="btn-text">Generate</span></button>
       </div>
       <div class="gen-progress" id="genProgress">
         <div class="gen-progress-bar" id="genProgressBar"></div>
@@ -3304,7 +3311,7 @@ Rules:
       abortController.abort();
       abortController = null;
       isGenerating = false;
-      generateBtn.textContent = "Generate";
+      generateBtn.querySelector(".btn-text").textContent = "Generate";
       generateBtn.classList.remove("generating");
       $("genProgress").classList.remove("active");
       toast("Cancelled", "ok");
@@ -3328,7 +3335,7 @@ Rules:
     isGenerating = true;
 
     abortController = new AbortController();
-    generateBtn.textContent = "Cancel";
+    generateBtn.querySelector(".btn-text").textContent = "Cancel";
     generateBtn.classList.add("generating");
     $("genProgress").classList.add("active");
 
@@ -3377,7 +3384,7 @@ Rules:
       clearInterval(genTimer);
       abortController = null;
       isGenerating = false;
-      generateBtn.textContent = "Generate";
+      generateBtn.querySelector(".btn-text").textContent = "Generate";
       generateBtn.classList.remove("generating");
       $("genProgress").classList.remove("active");
     }
