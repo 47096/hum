@@ -153,6 +153,7 @@
   /* Mode bar */
   .mode-bar {
     display: flex;
+    justify-content: center;
     gap: 4px;
     padding: 12px 16px;
     background: var(--bg);
@@ -162,13 +163,14 @@
 
   .mode-btn {
     flex: 1;
-    padding: 8px;
+    padding: 8px 16px;
     text-align: center;
     font-size: 13px;
     border-radius: 8px;
     cursor: pointer;
     color: var(--muted);
     transition: all .15s;
+    max-width: 140px;
   }
 
   .mode-btn:hover { color: var(--fg); }
@@ -547,6 +549,8 @@
 
   .generate-btn-full {
     width: 100%;
+    max-width: 260px;
+    margin: 0 auto;
     padding: 14px;
     background: linear-gradient(135deg, #34d399, #73E2A7);
     color: #064e3b;
