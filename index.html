@@ -1545,7 +1545,7 @@
         <div class="msg ai-msg">
           <div class="ai-avatar">H</div>
           <div class="ai-text">
-            <span id="welcomeText">Hey! Create a song by describing your idea, uploading an image, or pasting a YouTube link. Try a genre below to get started.</span>
+            <span id="welcomeText">Hey! Create a song by describing your idea, uploading an image, pasting a YouTube link, or sharing a GitHub repo. Try a genre below to get started.</span>
             <div class="quick-prompts">
               <span class="quick-prompt" role="button" tabindex="0" data-prompt="Upbeat dance pop, bright major key, punchy electronic drums, shimmering synth pads, catchy melodic hook, 120 BPM, feel-good summer anthem energy, radio-ready production, polished and glossy, layered vocals with harmonies, contemporary chart sound">Pop</span>
               <span class="quick-prompt" role="button" tabindex="0" data-prompt="Boom bap, dusty vinyl samples, chopped soul loops, punchy kick-snare pattern, 90s golden era, lyrical and head-nodding, 90 BPM, D minor, DJ Premier style, raw and authentic, boom-bap drums, jazzy samples, storytelling flow">Hip-Hop</span>
@@ -1574,7 +1574,7 @@
           <div class="input-wrapper">
             <button class="image-btn" id="imageBtn" aria-label="Upload image"><i data-lucide="image"></i></button>
             <button class="image-btn" id="docBtn" aria-label="Upload Word or PowerPoint document"><i data-lucide="file-text"></i></button>
-            <textarea class="chat-input" id="chatInput" placeholder="Describe your song..." rows="1"></textarea>
+            <textarea class="chat-input" id="chatInput" placeholder="Describe a song, paste a GitHub repo or YouTube link..." rows="1"></textarea>
           </div>
           <button class="send-btn" id="chatSend" aria-label="Send message"><i data-lucide="chevron-up"></i></button>
         </div>
@@ -1970,7 +1970,7 @@
     const welcomeText = $("welcomeText");
     if (welcomeText) {
       welcomeText.textContent = mode === "song"
-        ? "Hey! Create a song by describing your idea, uploading an image, or pasting a YouTube link. Try a genre below to get started."
+        ? "Hey! Create a song by describing your idea, uploading an image, pasting a YouTube link, or sharing a GitHub repo. Try a genre below to get started."
         : "Hey! Create an instrumental by describing your idea, uploading an image, or pasting a YouTube link. Try a genre below to get started.";
     }
   }
@@ -2091,6 +2091,15 @@
 
     if (youtubeMatch) {
       await sendYouTubeMessage(youtubeMatch[0], youtubeMatch[1], userMessage);
+      return;
+    }
+
+    // Check for GitHub URL
+    const githubRegex = /github\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)/;
+    const githubMatch = userMessage.match(githubRegex);
+
+    if (githubMatch) {
+      await sendGitHubMessage(githubMatch[0], githubMatch[1], githubMatch[2], userMessage);
       return;
     }
 
@@ -2784,6 +2793,176 @@ Rules:
 
       // Update context hint
   
+      // Add to chat history
+      chatHistory.push({ role: "assistant", content: aiResponse });
+      if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
+    } catch (err) {
+      // Remove loading message
+      chatMessages.removeChild(loadingDiv);
+      if (err.name === "AbortError") {
+        addMessage("ai", "Request timed out — please try again.");
+      } else {
+        addMessage("ai", "Sorry, I encountered an error: " + escapeHtml(err.message));
+      }
+    }
+  }
+
+  async function sendGitHubMessage(url, owner, repo, fullMessage) {
+    // Show GitHub link in chat
+    addMessage("user", fullMessage);
+    chatInput.value = "";
+    chatInput.style.height = "auto";
+
+    // Check for API key and endpoint
+    const key = $("apiKey").value.trim();
+    if (!key) {
+      addMessage("ai", "Please set your API key in Settings first.");
+      return;
+    }
+    if (!getEndpoint()) {
+      addMessage("ai", "Please set your proxy URL in Settings first.");
+      return;
+    }
+
+    // Show loading state
+    const loadingDiv = document.createElement("div");
+    loadingDiv.className = "msg ai-msg";
+    loadingDiv.innerHTML = '<div class="ai-avatar">H</div><div class="ai-text thinking-dots">Analysing repository<span>.</span><span>.</span><span>.</span></div>';
+    chatMessages.appendChild(loadingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      // Fetch repo info from GitHub API
+      const repoResp = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+      if (!repoResp.ok) throw new Error("Repository not found");
+      const repoData = await repoResp.json();
+
+      // Fetch README
+      let readmeText = "";
+      try {
+        const readmeResp = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`);
+        if (readmeResp.ok) {
+          readmeText = await readmeResp.text();
+          // Truncate README to first1000 chars
+          readmeText = readmeText.slice(0, 1000);
+        }
+      } catch { /* README not found, continue without it */ }
+
+      // Build context
+      const repoName = repoData.name || repo;
+      const repoDesc = repoData.description || "No description";
+      const repoLang = repoData.language || "Unknown";
+      const repoStars = repoData.stargazers_count || 0;
+      const repoForks = repoData.forks_count || 0;
+
+      const githubContext = `GitHub repo: ${owner}/${repoName}
+Description: ${repoDesc}
+Language: ${repoLang}
+Stars: ${repoStars.toLocaleString()}
+Forks: ${repoForks.toLocaleString()}
+${readmeText ? `\nREADME excerpt:\n${readmeText}` : ""}`;
+
+      // Add to chat history
+      chatHistory.push({ role: "user", content: githubContext });
+      if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
+
+      const systemPrompt = mode === "instrumental"
+        ? `You are a music style prompt generator. The user wants to create instrumental music inspired by a GitHub repository.
+
+Repository info:
+${githubContext}
+
+IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
+
+The JSON must be in this exact format:
+{"title":"Short Track Name","style":"your style prompt here","lyrics":""}
+
+Rules:
+- "title": a short creative name for the track (2-5 words, under40 chars). Inspired by the repo.
+- "style": genre, mood, instruments, tempo, key (under200 chars). Capture the essence of the project.
+- "lyrics": always empty string for instrumental mode
+- NEVER include markdown code blocks or any text outside the JSON object
+- Do NOT repeat the user's prompt or add explanations`
+        : `You are a songwriting assistant. The user wants to create a song inspired by a GitHub repository.
+
+Repository info:
+${githubContext}
+
+IMPORTANT: You MUST respond with ONLY valid JSON. No other text before or after the JSON.
+
+The JSON must be in this exact format:
+{"title":"Short Song Name","style":"your style prompt here","lyrics":"[verse]\\nYour lyrics here\\n\\n[chorus]\\nChorus here"}
+
+Rules:
+- "title": a short creative name for the song (2-5 words, under40 chars). Inspired by the repo.
+- "style": genre, mood, instruments, tempo, key (under200 chars). Capture the essence of the project.
+- "lyrics": full song with [verse], [chorus], [bridge], [outro] tags (under3500 chars). Escape newlines as \\n. Make it fun and creative — sing about the code, the tech stack, the community, or the problem it solves.
+- NEVER include markdown code blocks or any text outside the JSON object
+- Do NOT repeat the user's prompt or add explanations`;
+
+      const messages = [
+        { role: "system", content: systemPrompt },
+        ...chatHistory
+      ];
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
+      const resp = await fetch(getEndpoint() + "/llm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key,
+          "X-Provider": activeProvider
+        },
+        body: JSON.stringify({
+          model: "MiniMaxAI/MiniMax-M3",
+          messages: messages,
+          max_tokens: 1000,
+          temperature: 0.8
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!resp.ok) throw new Error("Something went wrong — try again");
+
+      const data = await resp.json();
+      const aiResponse = data.choices?.[0]?.message?.content || "";
+
+      // Remove loading message
+      chatMessages.removeChild(loadingDiv);
+
+      // Parse AI response
+      const { title, style, lyrics } = parseAIResponse(aiResponse);
+
+      // Add AI response to chat
+      let responseHTML = `<div class="label" style="margin-bottom:8px;">Inspired by: ${escapeHtml(owner)}/${escapeHtml(repoName)}</div>`;
+      responseHTML += '<div class="ai-response-card">';
+      responseHTML += '<button class="regenerate-btn" onclick="handleRegenerate(this)">↻ Regenerate</button>';
+      if (title) {
+        responseHTML += '<div class="label">Title <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+        responseHTML += '<pre class="clickable" id="titleDisplay" onclick="toggleEdit(\'title\')">' + escapeHtml(title) + '</pre>';
+        responseHTML += '<textarea id="titleEdit" class="inline-edit" style="display:none;">' + escapeHtml(title) + '</textarea>';
+      }
+      if (style) {
+        responseHTML += '<div class="label">Style <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+        responseHTML += '<pre class="clickable" id="styleDisplay" onclick="toggleEdit(\'style\')">' + escapeHtml(style) + '</pre>';
+        responseHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + escapeHtml(style) + '</textarea>';
+      }
+      if (lyrics && mode !== "instrumental") {
+        responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+        responseHTML += '<div class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + renderLyricsHTML(lyrics) + '</div>';
+        responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
+      }
+      if (title || style || lyrics) {
+        responseHTML += '<button class="generate-inline-btn" onclick="handleInlineGenerate(this)">🎵 Generate this song</button>';
+      }
+      responseHTML += '</div>';
+
+      addMessage("ai", responseHTML || escapeHtml(aiResponse));
+
       // Add to chat history
       chatHistory.push({ role: "assistant", content: aiResponse });
       if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
