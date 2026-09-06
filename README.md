@@ -19,6 +19,7 @@ Chat with AI → AI generates title/style/lyrics → Click Generate → Music pl
 - **12 genre templates** — Pop, Hip-Hop, R&B, Latin, EDM, Afrobeats, Rock, K-Pop, Country, Lo-fi, Jazz, Soul
 - **Image-to-song** — upload an image and AI generates style/lyrics based on the visual mood
 - **Document-to-song** — upload a Word doc (.docx) or PowerPoint deck (.pptx) and AI creates a song inspired by the content
+- **GitHub repo-to-song** — paste a GitHub URL and AI generates a song about the project
 - **YouTube links** — paste a YouTube URL to create a song inspired by it
 - **Song & Instrumental modes** — toggle between songs with lyrics and music-only tracks
 - **Inline editing** — click to edit title, style, and lyrics directly in the chat
