@@ -1,25 +1,41 @@
 # Hum — AI Music Generator
 
-Generate songs and instrumentals using AI. Chat with the AI to create style prompts and lyrics, then generate music.
+Generate songs and instrumentals using AI. Chat with the AI to create style prompts and lyrics, then generate music — all in one conversation.
 
 **Live app:** [https://47096.github.io/hum/](https://47096.github.io/hum/)
+
+**Built for:** [MiniMax Week](https://www.gmicloud.ai/minimax-week) — Synthesis Track
 
 ## How it works
 
 ```
-Browser → Render proxy (CORS) → GMI Cloud / MiniMax API → MP3
+Chat with AI → AI generates title/style/lyrics → Click Generate → Music plays
 ```
 
 ## Features
 
-- **Chat-based creation** — describe your song in natural language
+### Core
+- **Chat-based creation** — describe your song in natural language, AI handles the rest
 - **12 genre templates** — Pop, Hip-Hop, R&B, Latin, EDM, Afrobeats, Rock, K-Pop, Country, Lo-fi, Jazz, Soul
 - **Image-to-song** — upload an image and AI generates style/lyrics based on the visual mood
 - **YouTube links** — paste a YouTube URL to create a song inspired by it
 - **Song & Instrumental modes** — toggle between songs with lyrics and music-only tracks
-- **Click-to-edit** — edit title, style, and lyrics inline in the chat
-- **AI-generated titles** — AI names each track automatically
+- **Inline editing** — click to edit title, style, and lyrics directly in the chat
+- **Regenerate** — don't like the first result? Click regenerate for a new variation
 - **Embedded lyrics** — downloaded MP3s include lyrics for Apple Music
+
+### UX Polish
+- **Setup banner** — guided API key setup for first-time users
+- **Sectioned lyrics** — lyrics display with verse/chorus labels for easy scanning
+- **Generation timer** — see elapsed time while your song generates
+- **Animated loading** — pulsing dots instead of static "Thinking..." text
+- **Responsive design** — works on desktop, tablet, and mobile with swipe gestures
+- **Keyboard accessible** — full keyboard navigation for all interactive elements
+- **Player controls** — dimmed when no track loaded, active when music plays
+
+### Technical
+- **Single HTML file** — no build step, no dependencies, deploy anywhere
+- **Session storage** — API keys stored securely in sessionStorage
 - **Song history** — saved locally, replay or delete past generations
 - **Download all** — export all tracks at once
 - **Customizable** — sample rate, bitrate, format (MP3/WAV/PCM), BPM, key, mode
@@ -28,11 +44,11 @@ Browser → Render proxy (CORS) → GMI Cloud / MiniMax API → MP3
 
 ### 1. Get an API key
 
-**GMI Cloud (free during campaign):**
+**GMI Cloud:**
 - Sign up at [console.gmicloud.ai](https://console.gmicloud.ai)
 - Go to **API Keys** and create one
 
-**MiniMax (paid):**
+**MiniMax (alternative):**
 - Sign up at [platform.minimax.io](https://platform.minimax.io)
 - Go to **API Keys** and create one
 
@@ -84,3 +100,27 @@ python app.py
 | `proxy/app.py` | CORS proxy with lyrics embedding (Python/Flask) |
 | `proxy/requirements.txt` | Python dependencies |
 | `render.yaml` | Render deployment config |
+
+## Tech Stack
+
+- **Frontend:** Vanilla HTML/CSS/JS (single file, ~3000 lines)
+- **Backend:** Python/Flask proxy for CORS handling
+- **LLM:** MiniMax-M3 via GMI Cloud (chat, lyrics, title generation)
+- **Music:** MiniMax Music3.0 via GMI Cloud (audio generation)
+- **Hosting:** GitHub Pages (frontend) + Render (proxy)
+- **Icons:** Lucide
+- **Fonts:** Inter
+
+## Competition
+
+Built for [MiniMax Week](https://www.gmicloud.ai/minimax-week) — Synthesis Track.
+
+**What makes it different:**
+- Chat-based workflow (not a form)
+- Image and YouTube inputs for creative inspiration
+- Inline editing and regeneration
+- Polished UX with accessibility focus
+
+## License
+
+MIT
