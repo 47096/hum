@@ -2,6 +2,8 @@
 
 Generate songs and instrumentals using AI. Chat with the AI to create style prompts and lyrics, then generate music — all in one conversation.
 
+https://github.com/user-attachments/assets/cce36cd9-dcc2-4a13-82eb-ca20e15ae68b
+
 **Live app:** [https://47096.github.io/hum/](https://47096.github.io/hum/)
 
 **Built for:** [MiniMax Week](https://www.gmicloud.ai/minimax-week) — Synthesis Track
