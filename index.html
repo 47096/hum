@@ -1613,7 +1613,7 @@
 
     <!-- Essentials -->
     <div class="settings-section open">
-      <div class="settings-section-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="settings-section-header" role="button" tabindex="0" aria-expanded="true" onclick="this.parentElement.classList.toggle('open'); this.setAttribute('aria-expanded', this.parentElement.classList.contains('open'))">
         <div class="settings-section-title">API Connection</div>
         <div class="settings-section-arrow">▼</div>
       </div>
@@ -1634,7 +1634,7 @@
 
     <!-- Advanced -->
     <div class="settings-section">
-      <div class="settings-section-header" onclick="this.parentElement.classList.toggle('open')">
+      <div class="settings-section-header" role="button" tabindex="0" aria-expanded="true" onclick="this.parentElement.classList.toggle('open'); this.setAttribute('aria-expanded', this.parentElement.classList.contains('open'))">
         <div class="settings-section-title">Audio & Music Theory</div>
         <div class="settings-section-arrow">▼</div>
       </div>
@@ -2681,6 +2681,16 @@ Rules:
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     }
+  });
+
+  // Keyboard support for settings accordion headers
+  document.querySelectorAll(".settings-section-header").forEach(header => {
+    header.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        header.click();
+      }
+    });
   });
 
   // ─── Mobile tabs ───
