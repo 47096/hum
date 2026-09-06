@@ -596,6 +596,45 @@
     cursor: not-allowed;
   }
 
+  /* AI response card wrapper */
+  .ai-response-card {
+    position: relative;
+  }
+
+  /* Regenerate button */
+  .regenerate-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .regenerate-btn:hover {
+    border-color: var(--fg);
+    color: var(--fg);
+    background: rgba(0,0,0,0.03);
+  }
+
+  .regenerate-btn:active {
+    transform: scale(0.95);
+  }
+
+  .regenerate-btn.loading {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   .generate-btn {
     height: 44px;
     padding: 0 20px;
@@ -2065,7 +2104,8 @@ Rules:
         const { title, style, lyrics } = parseAIResponse(aiResponse);
 
         // Add AI response to chat
-        let responseHTML = "";
+        let responseHTML = '<div class="ai-response-card">';
+        responseHTML += '<button class="regenerate-btn" onclick="handleRegenerate(this)">↻ Regenerate</button>';
         if (title) {
           responseHTML += '<div class="label">Title <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
           responseHTML += '<pre class="clickable" id="titleDisplay" onclick="toggleEdit(\'title\')">' + escapeHtml(title) + '</pre>';
@@ -2086,10 +2126,9 @@ Rules:
         if (title || style || lyrics) {
           responseHTML += '<button class="generate-inline-btn" onclick="handleInlineGenerate(this)">🎵 Generate this song</button>';
         }
+        responseHTML += '</div>';
 
         addMessage("ai", responseHTML || escapeHtml(aiResponse));
-
-        // Update context hint
 
         // Add to chat history
         chatHistory.push({ role: "assistant", content: aiResponse });
@@ -2310,7 +2349,8 @@ Rules:
       const { title, style, lyrics } = parseAIResponse(aiResponse);
 
       // Add AI response to chat
-      let responseHTML = "";
+      let responseHTML = '<div class="ai-response-card">';
+      responseHTML += '<button class="regenerate-btn" onclick="handleRegenerate(this)">↻ Regenerate</button>';
       if (title) {
         responseHTML += '<div class="label">Title <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
         responseHTML += '<pre class="clickable" id="titleDisplay" onclick="toggleEdit(\'title\')">' + escapeHtml(title) + '</pre>';
@@ -2331,11 +2371,12 @@ Rules:
       if (title || style || lyrics) {
         responseHTML += '<button class="generate-inline-btn" onclick="handleInlineGenerate(this)">🎵 Generate this song</button>';
       }
+      responseHTML += '</div>';
 
       addMessage("ai", responseHTML || escapeHtml(aiResponse));
 
-      // Update context hint
-  
+      // Add to chat history
+
       // Add to chat history
       chatHistory.push({ role: "assistant", content: aiResponse });
       if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
@@ -3518,6 +3559,102 @@ Rules:
       isGenerating = false;
       btn.textContent = "🎵 Generate this song";
       btn.classList.remove("generating");
+    }
+  };
+
+  // Handle Regenerate button
+  window.handleRegenerate = async function(btn) {
+    if (btn.classList.contains("loading")) return;
+
+    // Get the last user message from chat history
+    const lastUserMsg = [...chatHistory].reverse().find(m => m.role === "user");
+    if (!lastUserMsg) { toast("No message to regenerate", "err"); return; }
+
+    btn.classList.add("loading");
+    btn.textContent = "...";
+
+    try {
+      // Re-send the last user message
+      const key = $("apiKey").value.trim();
+      if (!key) { openSettings(); toast("Set your API key first", "err"); return; }
+      if (!getEndpoint()) { openSettings(); toast("Set your proxy URL first", "err"); return; }
+
+      const systemPrompt = mode === "song"
+        ? `You are a songwriting assistant. Respond with ONLY a JSON object: {"title":"song title","style":"genre, mood, instruments, tempo, key","lyrics":"full lyrics with [verse] [chorus] [bridge] tags"}. Make it creative and unique.`
+        : `You are a music composition assistant. Respond with ONLY a JSON object: {"title":"track title","style":"genre, mood, instruments, tempo, key","lyrics":""}. Always set lyrics to empty string. Make it creative and unique.`;
+
+      const messages = [
+        { role: "system", content: systemPrompt },
+        ...chatHistory.slice(0, -1), // Exclude the last AI response
+        lastUserMsg
+      ];
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
+      const resp = await fetch(getEndpoint() + "/llm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key,
+          "X-Provider": activeProvider
+        },
+        body: JSON.stringify({
+          model: "MiniMaxAI/MiniMax-M3",
+          messages: messages,
+          max_tokens: 1000,
+          temperature: 0.8
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!resp.ok) throw new Error("Something went wrong — try again");
+
+      const data = await resp.json();
+      const aiResponse = data.choices?.[0]?.message?.content?.trim()
+        || data.reply?.text?.trim()
+        || data.result?.text?.trim()
+        || data.text?.trim()
+        || data.content?.trim();
+
+      if (aiResponse) {
+        const { title, style, lyrics } = parseAIResponse(aiResponse);
+
+        // Replace the card content
+        const card = btn.closest(".ai-response-card");
+        let newHTML = '<button class="regenerate-btn" onclick="handleRegenerate(this)">↻ Regenerate</button>';
+        if (title) {
+          newHTML += '<div class="label">Title <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+          newHTML += '<pre class="clickable" id="titleDisplay" onclick="toggleEdit(\'title\')">' + escapeHtml(title) + '</pre>';
+          newHTML += '<textarea id="titleEdit" class="inline-edit" style="display:none;">' + escapeHtml(title) + '</textarea>';
+        }
+        if (style) {
+          newHTML += '<div class="label">Style <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+          newHTML += '<pre class="clickable" id="styleDisplay" onclick="toggleEdit(\'style\')">' + escapeHtml(style) + '</pre>';
+          newHTML += '<textarea id="styleEdit" class="inline-edit" style="display:none;">' + escapeHtml(style) + '</textarea>';
+        }
+        if (lyrics && mode !== "instrumental") {
+          newHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
+          newHTML += '<pre class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + escapeHtml(lyrics) + '</pre>';
+          newHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
+        }
+        if (title || style || lyrics) {
+          newHTML += '<button class="generate-inline-btn" onclick="handleInlineGenerate(this)">🎵 Generate this song</button>';
+        }
+        card.innerHTML = newHTML;
+
+        // Update chat history
+        chatHistory[chatHistory.length - 1] = { role: "assistant", content: aiResponse };
+
+        toast("Regenerated", "ok");
+      }
+    } catch (err) {
+      console.error(err);
+      toast(err.message || String(err), "err");
+      btn.classList.remove("loading");
+      btn.textContent = "↻ Regenerate";
     }
   };
 
