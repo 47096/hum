@@ -324,6 +324,76 @@
     color: var(--accent);
   }
 
+  /* Setup banner */
+  .setup-banner {
+    padding: 16px 20px;
+    margin: 12px 16px 0;
+    background: rgba(68,64,60,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .setup-banner-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 4px;
+  }
+
+  .setup-banner-text {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .setup-banner-text a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .setup-banner-text a:hover {
+    text-decoration: underline;
+  }
+
+  .setup-banner-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .setup-banner-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--panel);
+    color: var(--fg);
+    outline: none;
+  }
+
+  .setup-banner-input:focus {
+    border-color: var(--fg);
+  }
+
+  .setup-banner-save {
+    padding: 8px 16px;
+    background: var(--fg);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .setup-banner-save:hover {
+    opacity: 0.85;
+  }
+
   /* Bottom input area */
   .chat-bottom {
     padding: 12px 16px;
@@ -1327,6 +1397,14 @@
     <div class="mode-bar">
       <div class="mode-btn active" data-mode="song">Song</div>
       <div class="mode-btn" data-mode="instrumental">Instrumental</div>
+    </div>
+    <div class="setup-banner" id="setupBanner" style="display:none;">
+      <div class="setup-banner-title">🎵&nbsp; Get started</div>
+      <div class="setup-banner-text">Paste your GMI Cloud API key to start creating. <a href="https://console.gmicloud.ai" target="_blank" rel="noopener">Get your key →</a></div>
+      <div class="setup-banner-row">
+        <input type="password" class="setup-banner-input" id="setupKeyInput" placeholder="Paste API key here">
+        <button class="setup-banner-save" id="setupKeySave">Save</button>
+      </div>
     </div>
     <div class="chat-container">
       <div class="chat-messages" id="chatMessages">
@@ -2545,6 +2623,31 @@ Rules:
 
   loadSettings();
   settingsFields.forEach(id => { $(id).addEventListener("change", saveSettings); });
+
+  // ─── Setup banner ───
+  const setupBanner = $("setupBanner");
+  const setupKeyInput = $("setupKeyInput");
+  const setupKeySave = $("setupKeySave");
+
+  function checkSetupBanner() {
+    const key = $("apiKey").value.trim();
+    setupBanner.style.display = key ? "none" : "block";
+  }
+
+  checkSetupBanner();
+
+  setupKeySave.addEventListener("click", () => {
+    const key = setupKeyInput.value.trim();
+    if (!key) { setupKeyInput.focus(); return; }
+    $("apiKey").value = key;
+    saveSettings();
+    setupBanner.style.display = "none";
+    toast("API key saved", "ok");
+  });
+
+  setupKeyInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); setupKeySave.click(); }
+  });
 
   // ─── Lyrics templates ───
   const lyricsTemplates = {
