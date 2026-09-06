@@ -3627,8 +3627,14 @@ Rules:
     isGenerating = true;
 
     abortController = new AbortController();
-    btn.textContent = "Cancel";
     btn.classList.add("generating");
+
+    // Show elapsed time
+    const startTime = Date.now();
+    const timerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      btn.textContent = `Generating... ${elapsed}s`;
+    }, 1000);
 
     try {
       const payload = buildPayload(lyrics, prompt);
@@ -3643,6 +3649,7 @@ Rules:
         final = await pollRequest(requestId);
       }
 
+      clearInterval(timerInterval);
       const audioUrl = extractAudioUrl(final);
       if (!audioUrl) throw new Error("No audio returned");
 
@@ -3662,10 +3669,12 @@ Rules:
       lastGenerateTime = Date.now();
       toast("Song ready", "ok");
     } catch (err) {
+      clearInterval(timerInterval);
       if (err.name === "AbortError") return;
       console.error(err);
       toast(err.message || String(err), "err");
     } finally {
+      clearInterval(timerInterval);
       abortController = null;
       isGenerating = false;
       btn.textContent = "🎵 Generate this song";
