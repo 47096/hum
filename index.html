@@ -1469,7 +1469,7 @@
 <body>
 
 <!-- Top bar -->
-<div class="topbar">
+<header class="topbar">
   <div class="logo"><span class="logo-icon">H</span> Hum</div>
   <div class="mobile-tabs" id="mobileTabs">
     <button class="mobile-tab active" id="mobileCreateBtn">Create</button>
@@ -1478,10 +1478,10 @@
   <div class="topbar-right">
     <button class="topbar-btn" id="settingsBtn" title="Settings"><i data-lucide="more-vertical"></i></button>
   </div>
-</div>
+</header>
 
 <!-- Main: split -->
-<div class="main">
+<main class="main">
   <!-- Left: Chat interface -->
   <div class="left">
     <div class="mode-bar" role="tablist">
@@ -1552,7 +1552,7 @@
       </div>
     </div>
   </div>
-</div>
+</main>
 
 <!-- Lyrics panel -->
 <div class="lyrics-panel" id="lyricsPanel">
@@ -1567,7 +1567,7 @@
 </div>
 
 <!-- Player bar -->
-<div class="player-bar empty">
+<footer class="player-bar empty" role="region" aria-label="Audio player">
 
   <div class="player-track">
     <div class="player-art" id="playerArt"><i data-lucide="music"></i></div>
@@ -1601,7 +1601,7 @@
     <span class="vol-icon" id="volIcon" role="button" tabindex="0" aria-label="Toggle mute"><i data-lucide="volume-2"></i></span>
     <div class="vol-bar" id="volBar"><div class="vol-fill" id="volFill"></div></div>
   </div>
-</div>
+</footer>
 
 <!-- Settings modal -->
 <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
