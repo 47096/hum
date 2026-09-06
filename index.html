@@ -286,6 +286,29 @@
     border-color: var(--accent);
   }
 
+  /* Lyrics sections */
+  .lyrics-sections {
+    margin-top: 4px;
+  }
+  .lyrics-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #999;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+  .lyrics-section-label:first-child {
+    margin-top: 0;
+  }
+  .lyrics-section-text {
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    color: var(--fg);
+  }
+
   /* Thinking dots animation */
   .thinking-dots span {
     animation: dotPulse 1.4s infinite;
@@ -2013,6 +2036,47 @@
     }
   }
 
+  // Parse lyrics into sections for display
+  function parseLyricsSections(lyrics) {
+    if (!lyrics) return [];
+    const sections = [];
+    const lines = lyrics.split("\n");
+    let currentSection = null;
+
+    for (const line of lines) {
+      const tagMatch = line.match(/^\[(.*?)\]\s*$/);
+      if (tagMatch) {
+        if (currentSection) sections.push(currentSection);
+        currentSection = { tag: tagMatch[1], lines: [] };
+      } else if (currentSection) {
+        if (line.trim()) currentSection.lines.push(line);
+      } else {
+        // Lines before any tag
+        if (line.trim()) {
+          if (!currentSection) currentSection = { tag: "Lyrics", lines: [] };
+          currentSection.lines.push(line);
+        }
+      }
+    }
+    if (currentSection) sections.push(currentSection);
+    return sections;
+  }
+
+  // Render lyrics as sectioned HTML
+  function renderLyricsHTML(lyrics) {
+    const sections = parseLyricsSections(lyrics);
+    if (sections.length === 0) return escapeHtml(lyrics);
+
+    let html = '<div class="lyrics-sections">';
+    for (const section of sections) {
+      const tag = section.tag.charAt(0).toUpperCase() + section.tag.slice(1).toLowerCase();
+      html += '<div class="lyrics-section-label">' + escapeHtml(tag) + '</div>';
+      html += '<div class="lyrics-section-text">' + escapeHtml(section.lines.join("\n")) + '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
   async function sendChatMessage() {
     const userMessage = chatInput.value.trim();
     if (!userMessage) return;
@@ -2143,7 +2207,7 @@ Rules:
         }
         if (lyrics && mode !== "instrumental") {
           responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
-          responseHTML += '<pre class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + escapeHtml(lyrics) + '</pre>';
+          responseHTML += '<div class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + renderLyricsHTML(lyrics) + '</div>';
           responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
         }
 
@@ -2388,7 +2452,7 @@ Rules:
       }
       if (lyrics && mode !== "instrumental") {
         responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
-        responseHTML += '<pre class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + escapeHtml(lyrics) + '</pre>';
+        responseHTML += '<div class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + renderLyricsHTML(lyrics) + '</div>';
         responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
       }
 
@@ -2539,7 +2603,7 @@ Rules:
       }
       if (lyrics && mode !== "instrumental") {
         responseHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
-        responseHTML += '<pre class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + escapeHtml(lyrics) + '</pre>';
+        responseHTML += '<div class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + renderLyricsHTML(lyrics) + '</div>';
         responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
       }
 
@@ -3684,7 +3748,7 @@ Rules:
         }
         if (lyrics && mode !== "instrumental") {
           newHTML += '<div class="label" style="margin-top: 8px;">Lyrics <span style="font-size:11px; color:var(--muted); font-weight:400;">click to edit</span></div>';
-          newHTML += '<pre class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + escapeHtml(lyrics) + '</pre>';
+          newHTML += '<div class="clickable" id="lyricsDisplay" onclick="toggleEdit(\'lyrics\')">' + renderLyricsHTML(lyrics) + '</div>';
           newHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
         }
         if (title || style || lyrics) {
