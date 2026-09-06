@@ -1081,6 +1081,13 @@
     flex-shrink: 0;
   }
 
+  .player-bar.empty .ctrl-btn,
+  .player-bar.empty .time-wrap,
+  .player-bar.empty .player-right {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
   .player-track {
     display: flex; align-items: center; gap: 12px;
     width: 240px;
@@ -1519,7 +1526,7 @@
 </div>
 
 <!-- Player bar -->
-<div class="player-bar">
+<div class="player-bar empty">
 
   <div class="player-track">
     <div class="player-art" id="playerArt"><i data-lucide="music"></i></div>
@@ -3028,6 +3035,9 @@ Rules:
 
     currentTrackIndex = index;
     const entry = history[index];
+
+    // Remove empty state from player bar
+    document.querySelector(".player-bar").classList.remove("empty");
 
     audio.src = entry.audioUrl;
     audio.play().then(() => {
