@@ -1439,6 +1439,15 @@
     .lyrics-panel { width: 100%; right: -100%; }
     .lyrics-drag { display: none; }
     input, textarea, select { font-size: 16px; }
+
+    /* Touch target fixes - minimum44px */
+    .ctrl-btn { width: 44px; height: 44px; }
+    .image-btn { width: 44px; height: 44px; min-height: 44px; }
+    .mobile-tab { padding: 8px 16px; min-height: 44px; display: grid; place-items: center; }
+    .quick-prompt { padding: 10px 16px; min-height: 44px; display: inline-flex; align-items: center; }
+    .mode-btn { padding: 10px; min-height: 44px; display: grid; place-items: center; }
+    .lyrics-close { width: 44px; height: 44px; }
+    .playlist-action-btn, .playlist-clear { padding: 10px 16px; min-height: 44px; }
   }
 
   :focus-visible {
