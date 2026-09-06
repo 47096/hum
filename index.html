@@ -2799,6 +2799,38 @@ Rules:
     $("mobileCreateBtn").classList.remove("active");
   });
 
+  // Swipe gesture for tab switching on mobile
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const SWIPE_THRESHOLD = 50;
+
+  document.querySelector(".main").addEventListener("touchstart", (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  document.querySelector(".main").addEventListener("touchend", (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) < SWIPE_THRESHOLD) return;
+
+    const main = document.querySelector(".main");
+    const isPlaylist = main.classList.contains("show-playlist");
+
+    // Swipe left → show playlist
+    if (diff > 0 && !isPlaylist) {
+      main.classList.add("show-playlist");
+      $("mobilePlaylistBtn").classList.add("active");
+      $("mobileCreateBtn").classList.remove("active");
+    }
+    // Swipe right → show create
+    else if (diff < 0 && isPlaylist) {
+      main.classList.remove("show-playlist");
+      $("mobileCreateBtn").classList.add("active");
+      $("mobilePlaylistBtn").classList.remove("active");
+    }
+  }, { passive: true });
+
   // ─── Advanced settings persistence ───
   const settingsFields = ["sampleRate", "bitrate", "format", "bpm", "songKey", "songMode"];
   const SETTINGS_KEY = "gmi_advanced_settings";
