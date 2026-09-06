@@ -1400,9 +1400,9 @@
 <div class="main">
   <!-- Left: Chat interface -->
   <div class="left">
-    <div class="mode-bar">
-      <div class="mode-btn active" data-mode="song">Song</div>
-      <div class="mode-btn" data-mode="instrumental">Instrumental</div>
+    <div class="mode-bar" role="tablist">
+      <button class="mode-btn active" data-mode="song" role="tab" aria-selected="true">Song</button>
+      <button class="mode-btn" data-mode="instrumental" role="tab" aria-selected="false">Instrumental</button>
     </div>
     <div class="setup-banner" id="setupBanner" style="display:none;">
       <div class="setup-banner-title">🎵&nbsp; Get started</div>
@@ -1829,7 +1829,10 @@
   function switchMode(newMode) {
     mode = newMode;
     sessionStorage.setItem("gmi_mode", mode);
-    modeBtns.forEach(t => t.classList.toggle("active", t.dataset.mode === mode));
+    modeBtns.forEach(t => {
+      t.classList.toggle("active", t.dataset.mode === mode);
+      t.setAttribute("aria-selected", t.dataset.mode === mode ? "true" : "false");
+    });
     chatInput.placeholder = mode === "song"
       ? "Describe your song..."
       : "Describe the music you want...";
