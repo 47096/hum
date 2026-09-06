@@ -25,6 +25,17 @@ Chat with AI → AI generates title/style/lyrics → Click Generate → Music pl
 - **Regenerate** — don't like the first result? Click regenerate for a new variation
 - **Embedded lyrics** — downloaded MP3s include lyrics for Apple Music
 
+### How editing works
+- Edit title, style, or lyrics by clicking on them in the chat
+- Click **Generate** to create a song with your edits
+- Use **Regenerate** to get a new variation with the same prompt
+- Each generation creates a new recording — you can't edit an existing song's vocals
+
+### Limitations
+- MiniMax Music3.0 generates complete songs (music + vocals) — partial regeneration isn't supported
+- Changing lyrics means generating a new song, not re-recording vocals
+- The style prompt creates similar vibes but different executions each time
+
 ### UX Polish
 - **Setup banner** — guided API key setup for first-time users
 - **Sectioned lyrics** — lyrics display with verse/chorus labels for easy scanning
