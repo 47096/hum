@@ -3579,7 +3579,8 @@ Rules:
       }
       if (j.status === "success") return j;
       if (j.status === "failed") {
-        const msg = j.message || "";
+        console.error("Generation failed:", j);
+        const msg = j.message || j.error || JSON.stringify(j);
         if (msg.includes("rate") || msg.includes("limit") || msg.includes("429")) {
           throw new Error("Rate limited — wait a moment before generating again");
         }
