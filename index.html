@@ -2958,6 +2958,9 @@ Rules:
       const item = document.createElement("div");
       item.className = "playlist-item" + (i === currentTrackIndex ? " active" : "");
       item.dataset.index = i;
+      item.setAttribute("tabindex", "0");
+      item.setAttribute("role", "button");
+      item.setAttribute("aria-label", (h.title || "Untitled") + " — play track");
 
       const art = document.createElement("div");
       art.className = "track-art";
@@ -3028,6 +3031,15 @@ Rules:
       if (confirm("Delete \"" + (h.title || "Untitled") + "\"?")) { deleteFromHistory(h.id); }
     } else {
       playTrack(i);
+    }
+  });
+
+  // Keyboard support for playlist items
+  $("playlist").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      const item = e.target.closest(".playlist-item");
+      if (item) item.click();
     }
   });
 
