@@ -150,36 +150,6 @@
   .template-chip:hover { border-color: var(--fg); color: var(--fg); }
   .template-chip.active { border-color: var(--fg); color: var(--fg); }
 
-  /* Mode bar */
-  .mode-bar {
-    display: flex;
-    justify-content: center;
-    gap: 4px;
-    padding: 12px 16px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-
-  .mode-btn {
-    flex: 1;
-    padding: 8px 16px;
-    text-align: center;
-    font-size: 13px;
-    border-radius: 8px;
-    cursor: pointer;
-    color: var(--muted);
-    transition: all .15s;
-    max-width: 168px;
-  }
-
-  .mode-btn:hover { color: var(--fg); }
-  .mode-btn.active {
-    background: var(--accent);
-    color: #ffffff;
-    box-shadow: 0 1px 3px rgba(68,64,60,0.2);
-  }
-
   /* Chat interface */
   .chat-container {
     display: flex;
@@ -433,6 +403,31 @@
 
   .setup-banner-save:hover {
     opacity: 0.85;
+  }
+
+  /* Mode tabs */
+  .mode-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+  }
+  .mode-tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .mode-tab:hover { color: var(--fg); }
+  .mode-tab.active {
+    color: var(--fg);
+    border-bottom-color: var(--fg);
   }
 
   /* Bottom input area */
@@ -1487,7 +1482,7 @@
     .image-btn { width: 44px; height: 44px; min-height: 44px; }
     .mobile-tab { padding: 8px 16px; min-height: 44px; display: grid; place-items: center; }
     .quick-prompt { padding: 10px 16px; min-height: 44px; display: inline-flex; align-items: center; }
-    .mode-btn { padding: 10px; min-height: 44px; display: grid; place-items: center; }
+    .mode-tab { padding: 10px; min-height: 44px; }
     .lyrics-close { width: 44px; height: 44px; }
     .playlist-action-btn, .playlist-clear { padding: 10px 16px; min-height: 44px; }
   }
@@ -1535,10 +1530,6 @@
 <main class="main">
   <!-- Left: Chat interface -->
   <div class="left">
-    <div class="mode-bar" role="tablist">
-      <button class="mode-btn active" data-mode="song" role="tab" aria-selected="true">Song</button>
-      <button class="mode-btn" data-mode="instrumental" role="tab" aria-selected="false">Instrumental</button>
-    </div>
     <div class="setup-banner" id="setupBanner" style="display:none;">
       <div class="setup-banner-title">🎵&nbsp; Get started</div>
       <div class="setup-banner-text">Paste your GMI Cloud API key to start creating. <a href="https://console.gmicloud.ai" target="_blank" rel="noopener">Get your key →</a></div>
@@ -1571,6 +1562,10 @@
         </div>
       </div>
       <div class="chat-bottom">
+        <div class="mode-tabs" role="tablist">
+          <button class="mode-tab active" data-mode="song" role="tab" aria-selected="true">Song</button>
+          <button class="mode-tab" data-mode="instrumental" role="tab" aria-selected="false">Instrumental</button>
+        </div>
         <div class="input-container">
           <input type="file" id="imageInput" accept="image/*" style="display:none;">
           <div class="input-wrapper">
@@ -1955,7 +1950,7 @@
 
   // ─── Mode bar (Song vs Instrumental) ───
   let mode = sessionStorage.getItem("gmi_mode") || "song";
-  const modeBtns = document.querySelectorAll(".mode-btn");
+  const modeBtns = document.querySelectorAll(".mode-tab");
 
   function switchMode(newMode) {
     mode = newMode;
