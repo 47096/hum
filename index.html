@@ -14,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" crossorigin="anonymous"></script>
 <style>
   :root {
     --bg: #f7f7f8;
@@ -1569,10 +1570,10 @@
         </div>
         <div class="input-container">
           <input type="file" id="imageInput" accept="image/*" style="display:none;">
-          <input type="file" id="docInput" accept=".docx" style="display:none;">
+          <input type="file" id="docInput" accept=".docx,.pptx" style="display:none;">
           <div class="input-wrapper">
             <button class="image-btn" id="imageBtn" aria-label="Upload image"><i data-lucide="image"></i></button>
-            <button class="image-btn" id="docBtn" aria-label="Upload document"><i data-lucide="file-text"></i></button>
+            <button class="image-btn" id="docBtn" aria-label="Upload Word or PowerPoint document"><i data-lucide="file-text"></i></button>
             <textarea class="chat-input" id="chatInput" placeholder="Describe your song..." rows="1"></textarea>
           </div>
           <button class="send-btn" id="chatSend" aria-label="Send message"><i data-lucide="chevron-up"></i></button>
@@ -2345,8 +2346,10 @@ Rules:
     if (!file) return;
 
     // Validate file type
-    if (!file.name.endsWith(".docx")) {
-      toast("Please upload a Word document (.docx)", "err");
+    const isDocx = file.name.endsWith(".docx");
+    const isPptx = file.name.endsWith(".pptx");
+    if (!isDocx && !isPptx) {
+      toast("Please upload a Word (.docx) or PowerPoint (.pptx) document", "err");
       return;
     }
 
@@ -2371,10 +2374,34 @@ Rules:
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     try {
-      // Extract text from Word doc
+      // Extract text based on file type
       const arrayBuffer = await file.arrayBuffer();
-      const result = await mammoth.extractRawText({ arrayBuffer });
-      const docText = result.value;
+      let docText = "";
+
+      if (isDocx) {
+        // Word document
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        docText = result.value;
+      } else if (isPptx) {
+        // PowerPoint presentation
+        const zip = await JSZip.loadAsync(arrayBuffer);
+        const slideFiles = Object.keys(zip.files).filter(f => f.match(/^ppt\/slides\/slide\d+\.xml$/)).sort();
+
+        const slides = [];
+        for (const slideFile of slideFiles) {
+          const xml = await zip.files[slideFile].async("string");
+          // Extract text from XML (simple regex approach)
+          const textMatches = xml.match(/<a:t>([^<]+)<\/a:t>/g);
+          if (textMatches) {
+            const slideText = textMatches
+              .map(m => m.replace(/<\/?a:t>/g, "").trim())
+              .filter(t => t.length > 0)
+              .join(" ");
+            if (slideText) slides.push(slideText);
+          }
+        }
+        docText = slides.join("\n\n");
+      }
 
       if (!docText || docText.trim().length === 0) {
         throw new Error("No text found in document");
