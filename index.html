@@ -563,6 +563,39 @@
     to { transform: rotate(360deg); }
   }
 
+  /* Inline Generate button inside AI responses */
+  .generate-inline-btn {
+    width: 100%;
+    padding: 10px 16px;
+    margin-top: 12px;
+    background: linear-gradient(135deg, #34d399, #73E2A7);
+    color: #064e3b;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .generate-inline-btn:hover {
+    box-shadow: 0 4px 16px rgba(52,211,153,0.35);
+    transform: translateY(-1px);
+  }
+
+  .generate-inline-btn:active {
+    transform: scale(0.98);
+  }
+
+  .generate-inline-btn.generating {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
   .generate-btn {
     height: 44px;
     padding: 0 20px;
@@ -1447,10 +1480,6 @@
           </div>
           <button class="send-btn" id="chatSend" aria-label="Send message"><i data-lucide="send"></i></button>
         </div>
-        <div class="gen-context" id="genContext" style="display:none;">
-          <span class="gen-context-text" id="genContextText">Ready to generate</span>
-        </div>
-        <button class="generate-btn-full" id="generateBtn"><span class="btn-spinner"></span><span class="btn-text">Generate</span></button>
       </div>
     </div>
   </div>
@@ -1854,20 +1883,6 @@
   });
   switchMode(mode);
 
-  function updateGenContext() {
-    const genContext = $("genContext");
-    const genContextText = $("genContextText");
-    if (!genContext || !genContextText) return;
-
-    if (currentTitle || currentStyle) {
-      genContext.style.display = "block";
-      const name = currentTitle || "Untitled";
-      genContextText.innerHTML = 'Ready to generate: <strong>' + escapeHtml(name) + '</strong>';
-    } else {
-      genContext.style.display = "none";
-    }
-  }
-
   function addMessage(role, content) {
     const messageDiv = document.createElement("div");
     messageDiv.className = "msg " + (role === "user" ? "user-msg" : "ai-msg");
@@ -2060,10 +2075,14 @@ Rules:
           responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
         }
 
+        // Add inline Generate button
+        if (title || style || lyrics) {
+          responseHTML += '<button class="generate-inline-btn" onclick="handleInlineGenerate(this)">🎵 Generate this song</button>';
+        }
+
         addMessage("ai", responseHTML || escapeHtml(aiResponse));
 
         // Update context hint
-        updateGenContext();
 
         // Add to chat history
         chatHistory.push({ role: "assistant", content: aiResponse });
@@ -2130,7 +2149,6 @@ Rules:
     if (field === "title") currentTitle = newValue;
     if (field === "style") currentStyle = newValue;
     if (field === "lyrics") currentLyrics = newValue;
-    updateGenContext();
     toast(field.charAt(0).toUpperCase() + field.slice(1) + " updated", "ok");
   }
 
@@ -2302,11 +2320,15 @@ Rules:
         responseHTML += '<textarea id="lyricsEdit" class="inline-edit" style="display:none;">' + escapeHtml(lyrics) + '</textarea>';
       }
 
+      // Add inline Generate button
+      if (title || style || lyrics) {
+        responseHTML += '<button class="generate-inline-btn" onclick="handleInlineGenerate(this)">🎵 Generate this song</button>';
+      }
+
       addMessage("ai", responseHTML || escapeHtml(aiResponse));
 
       // Update context hint
-      updateGenContext();
-
+  
       // Add to chat history
       chatHistory.push({ role: "assistant", content: aiResponse });
       if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
@@ -2451,8 +2473,7 @@ Rules:
       addMessage("ai", responseHTML || escapeHtml(aiResponse));
 
       // Update context hint
-      updateGenContext();
-
+  
       // Add to chat history
       chatHistory.push({ role: "assistant", content: aiResponse });
       if (chatHistory.length > MAX_CHAT_HISTORY) chatHistory.splice(0, chatHistory.length - MAX_CHAT_HISTORY);
@@ -3287,7 +3308,6 @@ Rules:
   let isGenerating = false;
   let lastGenerateTime = 0;
   const COOLDOWN_MS = 5000; // 5 second cooldown after generation
-  const generateBtn = $("generateBtn");
 
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
@@ -3297,11 +3317,15 @@ Rules:
 
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       e.preventDefault();
-      generateBtn.click();
+      // Find the most recent inline Generate button and click it
+      const btns = document.querySelectorAll(".generate-inline-btn");
+      if (btns.length > 0) btns[btns.length - 1].click();
     }
     if (e.key === "Escape" && abortController) {
       e.preventDefault();
-      generateBtn.click();
+      // Cancel current generation
+      const btns = document.querySelectorAll(".generate-inline-btn.generating");
+      if (btns.length > 0) btns[0].click();
     }
     if (e.key === " " && !isInput) {
       e.preventDefault();
@@ -3404,13 +3428,14 @@ Rules:
     throw new Error("Timed out after 3 minutes");
   }
 
-  generateBtn.addEventListener("click", async () => {
+  // Handle inline Generate button inside AI responses
+  window.handleInlineGenerate = async function(btn) {
     if (abortController) {
       abortController.abort();
       abortController = null;
       isGenerating = false;
-      generateBtn.querySelector(".btn-text").textContent = "Generate";
-      generateBtn.classList.remove("generating");
+      btn.textContent = "🎵 Generate this song";
+      btn.classList.remove("generating");
       toast("Cancelled", "ok");
       return;
     }
@@ -3440,8 +3465,8 @@ Rules:
     isGenerating = true;
 
     abortController = new AbortController();
-    generateBtn.querySelector(".btn-text").textContent = "Cancel";
-    generateBtn.classList.add("generating");
+    btn.textContent = "Cancel";
+    btn.classList.add("generating");
 
     try {
       const payload = buildPayload(lyrics, prompt);
@@ -3481,10 +3506,10 @@ Rules:
     } finally {
       abortController = null;
       isGenerating = false;
-      generateBtn.querySelector(".btn-text").textContent = "Generate";
-      generateBtn.classList.remove("generating");
+      btn.textContent = "🎵 Generate this song";
+      btn.classList.remove("generating");
     }
-  });
+  };
 
   // ─── Share / Copy / Paste ───
   // ─── Load shared settings from URL hash ───
