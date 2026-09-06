@@ -2277,7 +2277,12 @@ Rules:
     if (!display || !edit) return;
 
     const newValue = edit.value;
-    display.textContent = newValue;
+    // For lyrics, re-render with sections; for others, use text
+    if (field === "lyrics") {
+      display.innerHTML = renderLyricsHTML(newValue);
+    } else {
+      display.textContent = newValue;
+    }
     display.style.display = "block";
     edit.style.display = "none";
     // Update the global variables
