@@ -53,6 +53,16 @@ Chat with AI → AI generates title/style/lyrics → Click Generate → Music pl
 - **Download all** — export all tracks at once
 - **Customizable** — sample rate, bitrate, format (MP3/WAV/PCM), BPM, key, mode
 
+## Use Cases
+
+| What | How | Why |
+|------|-----|-----|
+| 📄 **Job search anthem** | Upload your resume | Get a confidence boost track before interviews |
+| 📊 **Executive ballad** | Upload your quarterly deck | Turn data into a memorable song for the all-hands |
+| 📷 **Travel memories** | Upload a vacation photo | Capture the mood in a song to share with friends |
+| 🔗 **Open source pride** | Paste your GitHub repo | Get a developer anthem for your community |
+| 📖 **Study focus** | Upload your lecture notes | Generate a lo-fi track for late-night study sessions |
+
 ## Setup
 
 ### 1. Get an API key
