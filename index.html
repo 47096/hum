@@ -2471,6 +2471,11 @@ Rules:
       chatInput.style.height = "auto";
       chatInput.style.height = chatInput.scrollHeight + "px";
       chatInput.focus();
+      // Flash input border to confirm prompt was loaded
+      const wrapper = chatInput.parentElement;
+      wrapper.style.borderColor = "var(--accent)";
+      wrapper.style.boxShadow = "0 0 02px rgba(68,64,60,0.15)";
+      setTimeout(() => { wrapper.style.borderColor = ""; wrapper.style.boxShadow = ""; }, 1000);
     });
     btn.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
