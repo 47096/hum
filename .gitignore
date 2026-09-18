@@ -6,3 +6,4 @@ screenshot*.png
 .gstack/
 gmi_proxy.py
 test-gmi-music.sh
+.impeccable/

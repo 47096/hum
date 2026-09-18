@@ -119,6 +119,9 @@ python app.py
 
 ## Files
 
+- `demo/hum-of-creation.mp3` — sample generated track (showcase only)
+
+
 | File | Purpose |
 |------|---------|
 | `index.html` | Frontend app (single file, no build step) |
