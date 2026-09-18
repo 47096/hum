@@ -57,7 +57,7 @@ def llm_proxy():
 
         logger.info(f"LLM POST {url} api_key_len={len(api_key)}")
         resp = requests.post(url, json=body, headers=api_headers, timeout=60)
-        logger.info(f"LLM Response: {resp.status_code} {resp.text[:200]}")
+        logger.info(f"LLM Response: {resp.status_code} len={len(resp.text)}")
         return cors_response(resp.text, resp.status_code)
 
     except Exception as e:
