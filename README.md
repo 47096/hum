@@ -44,11 +44,7 @@ Chat / upload → title + style + lyrics → Generate → play + download
 
 ## Sample track
 
-**Play in the app** (has a full player): use the demo track flow on the [live app](https://47096.github.io/hum/).
-
-**File:** [`demo/hum-of-creation.mp3`](demo/hum-of-creation.mp3) — click to open/download on GitHub.
-
-*(GitHub READMEs do not render `<audio>` players — the HTML is stripped. Attach the MP3 as a GitHub media file if you want an inline bar.)*
+- [`demo/hum-of-creation.mp3`](demo/hum-of-creation.mp3) — showcase output from the app
 
 ## Run your own
 
