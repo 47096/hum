@@ -1,154 +1,84 @@
-# Hum — AI Music Generator
+# Hum — AI music generator
 
-Generate songs and instrumentals using AI. Chat with the AI to create style prompts and lyrics, then generate music — all in one conversation.
+**Product — chat (or paste anything) into a song.**
+
+Describe a vibe, upload a deck/photo, drop a GitHub link or YouTube URL — Hum writes style + lyrics and generates the track in one conversation.
 
 https://github.com/user-attachments/assets/cce36cd9-dcc2-4a13-82eb-ca20e15ae68b
 
-**Live app:** [https://47096.github.io/hum/](https://47096.github.io/hum/)
+**[Live app →](https://47096.github.io/hum/)** · Built for [MiniMax Week](https://www.gmicloud.ai/minimax-week) — Synthesis Track
 
-**Built for:** [MiniMax Week](https://www.gmicloud.ai/minimax-week) — Synthesis Track
+---
+
+## Why this product
+
+Music generation is usually a form and a prompt box. Hum is a **conversation**: editable title/style/lyrics in chat, multiple input types (text, image, doc, repo, video), then one click to a finished song with **lyrics embedded** in the MP3.
 
 ## How it works
 
 ```
-Chat with AI → AI generates title/style/lyrics → Click Generate → Music plays
+Chat / upload → title + style + lyrics → Generate → play + download
 ```
 
 ## Features
 
-### Core
-- **Chat-based creation** — describe your song in natural language, AI handles the rest
-- **12 genre templates** — Pop, Hip-Hop, R&B, Latin, EDM, Afrobeats, Rock, K-Pop, Country, Lo-fi, Jazz, Soul
-- **Image-to-song** — upload an image and AI generates style/lyrics based on the visual mood
-- **Document-to-song** — upload a Word doc (.docx) or PowerPoint deck (.pptx) and AI creates a song inspired by the content
-- **GitHub repo-to-song** — paste a GitHub URL and AI generates a song about the project
-- **YouTube links** — paste a YouTube URL to create a song inspired by it
-- **Song & Instrumental modes** — toggle between songs with lyrics and music-only tracks
-- **Inline editing** — click to edit title, style, and lyrics directly in the chat
-- **Regenerate** — don't like the first result? Click regenerate for a new variation
-- **Embedded lyrics** — downloaded MP3s include lyrics for Apple Music
+| Area | What you get |
+|------|----------------|
+| **Create** | Chat prompts · 12 genre templates · song or instrumental |
+| **Inputs** | Text · image · .docx/.pptx · GitHub repo URL · YouTube URL |
+| **Edit** | Click-to-edit title / style / lyrics · regenerate variations |
+| **Output** | Play in-browser · WAV/MP3 · lyrics in MP3 tags · download all |
+| **UX** | Setup banner · verse/chorus layout · timers · responsive · keyboard |
 
-### How editing works
-- Edit title, style, or lyrics by clicking on them in the chat
-- Click **Generate** to create a song with your edits
-- Use **Regenerate** to get a new variation with the same prompt
-- Each generation creates a new recording — you can't edit an existing song's vocals
+**Limits (honest):** full-song generation only (no partial vocal re-record). Each Generate is a new take.
 
-### Limitations
-- MiniMax Music3.0 generates complete songs (music + vocals) — partial regeneration isn't supported
-- Changing lyrics means generating a new song, not re-recording vocals
-- The style prompt creates similar vibes but different executions each time
+## Use cases
 
-### UX Polish
-- **Setup banner** — guided API key setup for first-time users
-- **Sectioned lyrics** — lyrics display with verse/chorus labels for easy scanning
-- **Generation timer** — see elapsed time while your song generates
-- **Animated loading** — pulsing dots instead of static "Thinking..." text
-- **Responsive design** — works on desktop, tablet, and mobile with swipe gestures
-- **Keyboard accessible** — full keyboard navigation for all interactive elements
-- **Player controls** — dimmed when no track loaded, active when music plays
+| Use | How |
+|-----|-----|
+| **Team anthem / all-hands** | Paste the quarterly deck |
+| **Content & social** | Image or caption → short track |
+| **Open-source / dev community** | Paste your GitHub repo |
+| **Learning** | Notes → lo-fi study track |
+| **Personal** | Travel photos, resumes, in-jokes → a song |
 
-### Technical
-- **Single HTML file** — no build step, no dependencies, deploy anywhere
-- **Session storage** — API keys stored securely in sessionStorage
-- **Song history** — saved locally, replay or delete past generations
-- **Download all** — export all tracks at once
-- **Customizable** — sample rate, bitrate, format (MP3/WAV/PCM), BPM, key, mode
+## Sample track
 
-## Use Cases
+[`demo/hum-of-creation.mp3`](demo/hum-of-creation.mp3) — showcase output from the app (in-repo sample).
 
-| What | How | Why |
-|------|-----|-----|
-| 📄 **Job search anthem** | Upload your resume | Get a confidence boost track before interviews |
-| 📊 **Executive ballad** | Upload your quarterly deck | Turn data into a memorable song for the all-hands |
-| 📷 **Travel memories** | Upload a vacation photo | Capture the mood in a song to share with friends |
-| 🔗 **Open source pride** | Paste your GitHub repo | Get a developer anthem for your community |
-| 📖 **Study focus** | Upload your lecture notes | Generate a lo-fi track for late-night study sessions |
+## Run your own
 
-## Setup
-
-### 1. Get an API key
-
-**GMI Cloud:**
-- Sign up at [console.gmicloud.ai](https://console.gmicloud.ai)
-- Go to **API Keys** and create one
-
-**MiniMax (alternative):**
-- Sign up at [platform.minimax.io](https://platform.minimax.io)
-- Go to **API Keys** and create one
-
-### 2. Deploy the CORS proxy (Render)
-
-The proxy is in the `proxy/` folder and deploys automatically via Render Blueprint.
-
-1. Go to [render.com](https://render.com) and sign up with GitHub
-2. Click **"New"** → **"Blueprint"**
-3. Connect this repo
-4. Click **"Apply"** — Render will deploy the proxy automatically
-5. Copy the URL (e.g. `https://hum-proxy.onrender.com`)
-
-**Why Render?**
-- No timeout limits (handles long-running generation)
-- Free tier: 750 hours/month, no credit card required
-
-### 3. Host the frontend on GitHub Pages
-
-1. Push this repo to GitHub
-2. Go to **Settings → Pages → Source → Deploy from branch**
-3. Select `main` branch, `/ (root)` folder
-4. Your site will be live at `https://<username>.github.io/hum/`
-
-### 4. Configure in browser
-
-1. Open the GitHub Pages URL
-2. Select your provider (GMI Cloud or MiniMax)
-3. Paste your API key
-4. Paste your Render proxy URL
-5. Done — generate songs from any device
-
-## Local development
-
-For local use, run the Python proxy:
+1. **API key** — [GMI Cloud](https://console.gmicloud.ai) or [MiniMax](https://platform.minimax.io)  
+2. **Proxy** — `proxy/` on [Render Blueprint](https://render.com) (or `python proxy/app.py` locally)  
+3. **Frontend** — this repo’s `index.html` (GitHub Pages or any static host)  
+4. **Configure** — provider + key + proxy URL in the app  
 
 ```bash
-cd proxy
-pip install -r requirements.txt
-python app.py
-# Open http://localhost:8765
+cd proxy && pip install -r requirements.txt && python app.py
+# frontend: open index.html or serve the repo root
 ```
 
-## Files
+## Repo layout
 
-- `demo/hum-of-creation.mp3` — sample generated track (showcase only)
+| Path | Role |
+|------|------|
+| `index.html` | Single-file frontend |
+| `proxy/app.py` | CORS proxy + lyrics embedding (Flask) |
+| `render.yaml` | Render deploy config |
+| `demo/hum-of-creation.mp3` | Sample generated track |
 
+## Tech
 
-| File | Purpose |
-|------|---------|
-| `index.html` | Frontend app (single file, no build step) |
-| `proxy/app.py` | CORS proxy with lyrics embedding (Python/Flask) |
-| `proxy/requirements.txt` | Python dependencies |
-| `render.yaml` | Render deployment config |
+Vanilla HTML/CSS/JS · Flask proxy · MiniMax-M3 (chat/lyrics) · MiniMax Music3.0 (audio) · GitHub Pages + Render · Lucide · Inter
 
-## Tech Stack
+**Privacy:** API keys stay in `sessionStorage`; generation goes through your proxy to the music provider you choose.
 
-- **Frontend:** Vanilla HTML/CSS/JS (single file, ~3000 lines)
-- **Backend:** Python/Flask proxy for CORS handling
-- **LLM:** MiniMax-M3 via GMI Cloud (chat, lyrics, title generation)
-- **Music:** MiniMax Music3.0 via GMI Cloud (audio generation)
-- **Hosting:** GitHub Pages (frontend) + Render (proxy)
-- **Icons:** Lucide
-- **Fonts:** Inter
+## Family
 
-## Competition
-
-Built for [MiniMax Week](https://www.gmicloud.ai/minimax-week) — Synthesis Track.
-
-**What makes it different:**
-- Chat-based workflow (not a form)
-- Image and YouTube inputs for creative inspiration
-- Inline editing and regeneration
-- Polished UX with accessibility focus
+- [`mimo-reader`](https://github.com/47096/mimo-reader) — browser TTS product  
+- [`hanna`](https://github.com/47096/hanna) — Chrome TTS extension  
+- [`lux-tts`](https://github.com/47096/lux-tts) — Colab voice-clone demo  
 
 ## License
 
-MIT
+MIT · [datafying](https://datafying.co/)
