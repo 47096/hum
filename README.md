@@ -44,7 +44,12 @@ Chat / upload → title + style + lyrics → Generate → play + download
 
 ## Sample track
 
-[`demo/hum-of-creation.mp3`](demo/hum-of-creation.mp3) — showcase output from the app (in-repo sample).
+Showcase output from the app (also in-repo: [`demo/hum-of-creation.mp3`](demo/hum-of-creation.mp3)).
+
+<audio controls src="https://github.com/47096/hum/raw/main/demo/hum-of-creation.mp3">
+  Your browser does not support the audio element.
+  <a href="demo/hum-of-creation.mp3">Download the sample MP3</a>
+</audio>
 
 ## Run your own
 
